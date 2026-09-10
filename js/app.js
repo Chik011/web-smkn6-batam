@@ -143,20 +143,11 @@ function renderApp() {
 
       <main class="desktop-layout">
         <div class="phone-frame">
-          <div class="phone-status-bar">
-            <span class="phone-status-time">${getShortTime()}</span>
-            <div class="phone-status-icons">
-              <span>📶</span>
-              <span>5G</span>
-              <span>🔋 100%</span>
-            </div>
-          </div>
           <div class="phone-screen" id="phoneScreen">
             <div class="tab-content-anim" key="${role}-${state.activeTabs[role] || 'def'}">
               ${screenResult.contentHtml}
             </div>
           </div>
-          ${screenResult.bottomNavHtml}
         </div>
       </main>
     `;
