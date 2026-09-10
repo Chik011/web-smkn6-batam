@@ -61,7 +61,7 @@ function syncTabFromHash() {
     const validTabs = {
       siswa: ['home', 'pelajaran', 'scan', 'notifikasi', 'akun', 'visimisi', 'gurutkj', 'totalsiswa', 'kalender', 'galerisiswa', 'library', 'elibrary', 'videotkj'],
       guru: ['beranda', 'absensi', 'nilai', 'profil'],
-      admin: ['home', 'guru', 'mapel', 'siswa', 'jadwal', 'setting']
+      admin: ['home', 'guru', 'mapel', 'siswa', 'jadwal', 'setting', 'galeri', 'kalender', 'elibrary']
     };
     if (validTabs[role] && validTabs[role].includes(hash)) {
       if (store.state.activeTabs[role] !== hash) {

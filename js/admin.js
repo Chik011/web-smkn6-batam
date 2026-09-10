@@ -26,6 +26,15 @@ export function renderAdminScreen(state) {
     case 'setting':
       contentHtml = renderSetting(state);
       break;
+    case 'galeri':
+      contentHtml = renderGaleriAdmin(state);
+      break;
+    case 'kalender':
+      contentHtml = renderKalenderAdmin(state);
+      break;
+    case 'elibrary':
+      contentHtml = renderElibraryAdmin(state);
+      break;
     default:
       contentHtml = renderHome(state);
   }
@@ -126,11 +135,11 @@ function renderHome(state) {
       </div>
 
       <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;">
-        <button type="button" class="btn-primary" style="background:#f3e8ff; color:#9333ea; border:1px solid #e9d5ff; text-align:left; padding:12px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="window.openAdminContentModal('galeri')">
+        <button type="button" class="btn-primary" style="background:#f3e8ff; color:#9333ea; border:1px solid #e9d5ff; text-align:left; padding:12px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="window.switchAdminTab('galeri')">
           🖼️ Kelola Galeri Siswa
         </button>
 
-        <button type="button" class="btn-primary" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; text-align:left; padding:12px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="window.openAdminContentModal('kalender')">
+        <button type="button" class="btn-primary" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; text-align:left; padding:12px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="window.switchAdminTab('kalender')">
           📅 Kelola Kalender
         </button>
 
@@ -138,7 +147,7 @@ function renderHome(state) {
           🎯 Edit Visi & Misi
         </button>
 
-        <button type="button" class="btn-primary" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; text-align:left; padding:12px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="window.openAdminContentModal('elibrary')">
+        <button type="button" class="btn-primary" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; text-align:left; padding:12px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="window.switchAdminTab('elibrary')">
           📚 Kelola E-Library
         </button>
       </div>
@@ -818,15 +827,15 @@ function renderSetting(state) {
           🎯 Edit Visi & Misi
         </button>
 
-        <button type="button" class="btn-primary" style="background:#f3e8ff; color:#9333ea; border:1px solid #e9d5ff; text-align:left; padding:12px; font-weight:700; font-size:0.78rem;" onclick="window.openAdminContentModal('galeri')">
+        <button type="button" class="btn-primary" style="background:#f3e8ff; color:#9333ea; border:1px solid #e9d5ff; text-align:left; padding:12px; font-weight:700; font-size:0.78rem;" onclick="window.switchAdminTab('galeri')">
           🖼️ Kelola Galeri Siswa
         </button>
 
-        <button type="button" class="btn-primary" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; text-align:left; padding:12px; font-weight:700; font-size:0.78rem;" onclick="window.openAdminContentModal('kalender')">
+        <button type="button" class="btn-primary" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; text-align:left; padding:12px; font-weight:700; font-size:0.78rem;" onclick="window.switchAdminTab('kalender')">
           📅 Kelola Kalender
         </button>
 
-        <button type="button" class="btn-primary" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; text-align:left; padding:12px; font-weight:700; font-size:0.78rem;" onclick="window.openAdminContentModal('elibrary')">
+        <button type="button" class="btn-primary" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; text-align:left; padding:12px; font-weight:700; font-size:0.78rem;" onclick="window.switchAdminTab('elibrary')">
           📚 Kelola E-Library
         </button>
       </div>
@@ -850,6 +859,196 @@ function renderSetting(state) {
         🚪 Logout dari Admin
       </button>
       <p style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-top:16px;">Versi 1.3.0 - TKJ Online Academic Hub (Firebase Connected)</p>
+    </div>
+  `;
+}
+
+function renderGaleriAdmin(state) {
+  const items = state.galeriItems || [];
+  return `
+    <div class="admin-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button type="button" style="background:rgba(255,255,255,0.2); border:none; color:white; padding:6px 12px; border-radius:8px; font-weight:700; cursor:pointer; font-size:0.85rem;" onclick="window.switchAdminTab('home')">← Kembali</button>
+        <div>
+          <span class="admin-header-title">Admin Panel</span>
+          <h2 style="margin:0; font-size:1.25rem;">Kelola Galeri Siswa</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-card mt-4">
+      <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin-bottom:12px;">🖼️ Tambah Foto Galeri Baru</h4>
+      
+      <div style="font-size:0.8rem; font-weight:700; color:#0284c7; margin-bottom:8px; background:#e0f2fe; padding:8px 12px; border-radius:8px; border:1px solid #bae6fd;">
+        ☁️ Pengaturan Cloudinary:
+        <div style="margin-top:4px;">
+          <input type="text" id="gCloudName" class="form-input" placeholder="Masukkan Cloud Name (contoh: dx123abc)" value="${state.cloudinaryCloudName || ''}" onchange="store.setCloudinaryCloudName(this.value)" style="font-size:0.8rem; padding:6px 10px;" />
+        </div>
+      </div>
+
+      <form onsubmit="window.handleAddGaleriSubmit(event)">
+        <div class="form-group mt-3">
+          <label class="form-label">📁 Unggah Gambar Langsung ke Cloudinary</label>
+          <input type="file" id="gFileInput" accept="image/*" class="form-input" onchange="window.handleCloudinaryFileSelect(event)" style="padding:6px 10px;" />
+          <div id="gUploadStatus" style="display:none; font-size:0.75rem; margin-top:4px;"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Judul Foto / Kegiatan</label>
+          <input type="text" id="gTitle" class="form-input" placeholder="Judul Foto / Kegiatan" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kategori (Badge)</label>
+          <input type="text" id="gCategory" class="form-input" placeholder="Kategori (contoh: 🏆 PRESTASI, 🛠️ PRAKTIKUM)" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">URL Gambar (Terisi Otomatis setelah Upload)</label>
+          <input type="text" id="gUrl" class="form-input" placeholder="URL Link Gambar (https://...)" required />
+          <img id="gPreviewImg" src="" style="display:none; width:100%; height:140px; object-fit:cover; border-radius:10px; margin-top:8px; border:1px solid #e2e8f0;" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Keterangan Singkat</label>
+          <input type="text" id="gSub" class="form-input" placeholder="Keterangan singkat kegiatan" />
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%; font-weight:700; background:#9333ea; border:none; padding:12px; cursor:pointer;">+ Simpan Ke Galeri Siswa</button>
+      </form>
+    </div>
+
+    <div style="padding:0 16px 24px;">
+      <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:10px;">Daftar Gambar Terdaftar (${items.length})</h4>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        ${items.length === 0 ? `
+          <div class="content-card text-center" style="padding:20px; color:#94a3b8;">Belum ada foto galeri terdaftar.</div>
+        ` : items.map(g => `
+          <div class="list-item-card" style="margin:0; display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:12px; overflow:hidden;">
+              <img src="${g.imageUrl}" style="width:48px; height:48px; object-fit:cover; border-radius:8px; flex-shrink:0; border:1px solid #e2e8f0;" />
+              <div style="min-width:0;">
+                <span style="font-size:0.68rem; font-weight:800; color:#9333ea; background:#f3e8ff; padding:2px 6px; border-radius:4px; display:inline-block; margin-bottom:2px;">${g.category || 'GALERI'}</span>
+                <h5 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${g.title}</h5>
+                ${g.subtitle ? `<p style="font-size:0.72rem; color:#64748b; margin:2px 0 0 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${g.subtitle}</p>` : ''}
+              </div>
+            </div>
+            <button type="button" class="icon-btn-action delete" onclick="if(confirm('Hapus foto galeri ini?')){ store.deleteGaleriItem('${g.id}'); window.showToast('Foto galeri dihapus', 'info'); }" title="Hapus Gambar">🗑️</button>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderKalenderAdmin(state) {
+  const agendas = state.kalenderAgendas || [];
+  return `
+    <div class="admin-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button type="button" style="background:rgba(255,255,255,0.2); border:none; color:white; padding:6px 12px; border-radius:8px; font-weight:700; cursor:pointer; font-size:0.85rem;" onclick="window.switchAdminTab('home')">← Kembali</button>
+        <div>
+          <span class="admin-header-title">Admin Panel</span>
+          <h2 style="margin:0; font-size:1.25rem;">Kelola Kalender Akademik</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-card mt-4">
+      <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin-bottom:12px;">📅 Tambah Agenda Sekolah Baru</h4>
+      <form onsubmit="window.handleAddAgendaSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Rentang Tanggal</label>
+          <input type="text" id="aDate" class="form-input" placeholder="Contoh: 15 - 20 September 2026" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tag Label / Jenis Agenda</label>
+          <input type="text" id="aTag" class="form-input" placeholder="Contoh: PTS, Simulasi UKK, Libur" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Judul Agenda / Kegiatan</label>
+          <input type="text" id="aTitle" class="form-input" placeholder="Judul Agenda / Kegiatan" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Deskripsi / Catatan Agenda</label>
+          <textarea id="aDesc" class="form-input" rows="3" placeholder="Deskripsi singkat kegiatan"></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%; font-weight:700; background:#dc2626; border:none; padding:12px; cursor:pointer;">+ Tambah Agenda Kalender</button>
+      </form>
+    </div>
+
+    <div style="padding:0 16px 24px;">
+      <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:10px;">Agenda Terdaftar (${agendas.length})</h4>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        ${agendas.length === 0 ? `
+          <div class="content-card text-center" style="padding:20px; color:#94a3b8;">Belum ada agenda kalender terdaftar.</div>
+        ` : agendas.map(a => `
+          <div class="list-item-card" style="margin:0; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                <span style="font-size:0.7rem; font-weight:700; color:#dc2626; background:#fee2e2; padding:2px 8px; border-radius:4px;">${a.date}</span>
+                <span style="font-size:0.68rem; font-weight:700; color:#0284c7; background:#e0f2fe; padding:2px 6px; border-radius:4px;">${a.tag}</span>
+              </div>
+              <h5 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin:0;">${a.title}</h5>
+              ${a.desc ? `<p style="font-size:0.73rem; color:#64748b; margin:2px 0 0 0;">${a.desc}</p>` : ''}
+            </div>
+            <button type="button" class="icon-btn-action delete" onclick="if(confirm('Hapus agenda kalender ini?')){ store.deleteKalenderAgenda('${a.id}'); window.showToast('Agenda dihapus', 'info'); }" title="Hapus Agenda">🗑️</button>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderElibraryAdmin(state) {
+  const books = state.elibraryBooks || [];
+  return `
+    <div class="admin-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button type="button" style="background:rgba(255,255,255,0.2); border:none; color:white; padding:6px 12px; border-radius:8px; font-weight:700; cursor:pointer; font-size:0.85rem;" onclick="window.switchAdminTab('home')">← Kembali</button>
+        <div>
+          <span class="admin-header-title">Admin Panel</span>
+          <h2 style="margin:0; font-size:1.25rem;">Kelola E-Library</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-card mt-4">
+      <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin-bottom:12px;">📚 Tambah Buku Digital Baru</h4>
+      <form onsubmit="window.handleAddBookSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Judul Buku Digital</label>
+          <input type="text" id="bTitle" class="form-input" placeholder="Judul Buku Digital" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kategori / Topik</label>
+          <input type="text" id="bCat" class="form-input" placeholder="Contoh: Jaringan Komputer, Keamanan Siber, Server" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Deskripsi Singkat Buku</label>
+          <textarea id="bDesc" class="form-input" rows="3" placeholder="Deskripsi singkat isi buku digital" required></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%; font-weight:700; background:#0369a1; border:none; padding:12px; cursor:pointer;">+ Tambah Buku Digital</button>
+      </form>
+    </div>
+
+    <div style="padding:0 16px 24px;">
+      <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:10px;">Daftar Buku Digital (${books.length})</h4>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        ${books.length === 0 ? `
+          <div class="content-card text-center" style="padding:20px; color:#94a3b8;">Belum ada buku digital terdaftar.</div>
+        ` : books.map(b => `
+          <div class="list-item-card" style="margin:0; display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:40px; height:40px; border-radius:8px; background:#e0f2fe; color:#0369a1; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0;">
+                ${b.icon || '📘'}
+              </div>
+              <div>
+                <span style="font-size:0.68rem; font-weight:700; color:#0369a1; background:#e0f2fe; padding:2px 6px; border-radius:4px;">${b.category || 'BUKU'}</span>
+                <h5 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin:2px 0 0 0;">${b.title}</h5>
+                ${b.desc ? `<p style="font-size:0.72rem; color:#64748b; margin:2px 0 0 0;">${b.desc}</p>` : ''}
+              </div>
+            </div>
+            <button type="button" class="icon-btn-action delete" onclick="if(confirm('Hapus buku digital ini?')){ store.deleteElibraryBook('${b.id}'); window.showToast('Buku dihapus', 'info'); }" title="Hapus Buku">🗑️</button>
+          </div>
+        `).join('')}
+      </div>
     </div>
   `;
 }
