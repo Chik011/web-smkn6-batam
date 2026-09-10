@@ -2,7 +2,6 @@
 
 export function renderAkun(state) {
   const user = state.currentUser.siswa;
-  const biometric = state.biometricEnabled;
 
   return `
     <div style="padding:16px 16px 0;">
@@ -33,18 +32,10 @@ export function renderAkun(state) {
 
       <div class="account-menu-item" style="cursor:default;">
         <div class="account-menu-left">
-          <svg width="20" height="20" fill="none" stroke="#0284c7" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457-.39-2.823-1.07-4"/></svg>
-          <span>Login Biometrik</span>
+          <span style="font-size:1.15rem;">${state.themeMode === 'dark' ? '🌙' : '☀️'}</span>
+          <span>Tema Gelap (Dark Mode)</span>
         </div>
-        <input type="checkbox" ${biometric ? 'checked' : ''} onchange="window.toggleBiometric(this.checked)" style="width:20px; height:20px; cursor:pointer;" />
-      </div>
-
-      <div class="account-menu-item" onclick="window.openSiswaModal('career')">
-        <div class="account-menu-left" style="color:#0369a1;">
-          <svg width="20" height="20" fill="none" stroke="#0369a1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          <span>Career Profiling</span>
-        </div>
-        <svg width="18" height="18" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        <input type="checkbox" ${state.themeMode === 'dark' ? 'checked' : ''} onchange="window.toggleThemeMode(this.checked)" style="width:20px; height:20px; cursor:pointer;" />
       </div>
 
       <div class="account-menu-item" onclick="window.logout()">

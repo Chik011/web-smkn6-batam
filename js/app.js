@@ -875,7 +875,6 @@ window.openSiswaModal = function(type) {
             </div>
             <div style="display:flex; justify-content:space-between; align-items:flex-end;">
               <span style="font-size:0.66rem; opacity:0.75;">SMK Bisa • SMK Hebat</span>
-              <div style="background:white; padding:3px 8px; border-radius:6px; color:black; font-family:monospace; font-size:0.7rem; font-weight:700;">|||| ||||| ||||</div>
             </div>
           </div>
 
@@ -899,41 +898,6 @@ window.openSiswaModal = function(type) {
 
       <div class="flip-card-hint">
         <span>🔄 Sentuh/klik kartu untuk membalik (3D Flip)</span>
-      </div>
-      <button class="btn-primary mt-4" onclick="window.closeModal()">Tutup</button>
-    `;
-  } else if (type === 'career') {
-    card.innerHTML = `
-      <div class="modal-title">🎯 Career Profiling TKJ</div>
-      <p style="font-size:0.78rem; color:#64748b; margin-bottom:12px;">Analisis kecocokan minat bakat industri teknologi:</p>
-      <div style="display:flex; flex-direction:column; gap:12px; font-size:0.8rem;">
-        <div>
-          <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:4px;">
-            <span>🌐 Network Engineer</span>
-            <span style="color:#0284c7;">95% Cocok</span>
-          </div>
-          <div style="height:8px; background:#e2e8f0; border-radius:10px; overflow:hidden;">
-            <div style="width:95%; height:100%; background:linear-gradient(90deg,#0284c7,#38bdf8); border-radius:10px;"></div>
-          </div>
-        </div>
-        <div>
-          <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:4px;">
-            <span>🛡️ Cybersecurity Specialist</span>
-            <span style="color:#6366f1;">88% Cocok</span>
-          </div>
-          <div style="height:8px; background:#e2e8f0; border-radius:10px; overflow:hidden;">
-            <div style="width:88%; height:100%; background:linear-gradient(90deg,#6366f1,#818cf8); border-radius:10px;"></div>
-          </div>
-        </div>
-        <div>
-          <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:4px;">
-            <span>☁️ Cloud & DevOps</span>
-            <span style="color:#10b981;">82% Cocok</span>
-          </div>
-          <div style="height:8px; background:#e2e8f0; border-radius:10px; overflow:hidden;">
-            <div style="width:82%; height:100%; background:linear-gradient(90deg,#10b981,#34d399); border-radius:10px;"></div>
-          </div>
-        </div>
       </div>
       <button class="btn-primary mt-4" onclick="window.closeModal()">Tutup</button>
     `;
