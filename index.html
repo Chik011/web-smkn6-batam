@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>SMKN 6 Web Application - Siswa, Guru & Admin</title>
+  <link rel="icon" type="image/png" href="img/Logo_SMKN6.png" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+
+  <!-- Modular CSS Design Tokens & Styles -->
+  <link rel="stylesheet" href="./css/main.css" />
+  <link rel="stylesheet" href="./css/siswa.css" />
+  <link rel="stylesheet" href="./css/guru.css" />
+  <link rel="stylesheet" href="./css/admin.css" />
+</head>
+<body>
+
+  <!-- Main React/JS Mount Container -->
+  <div id="app"></div>
+
+  <!-- Global Modal Overlay -->
+  <div class="modal-overlay" id="globalModal" onclick="if(event.target === this) window.closeModal()">
+    <div class="modal-card" id="modalCardContent">
+      <!-- Dynamic Modal Content -->
+    </div>
+  </div>
+
+  <!-- App Script -->
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

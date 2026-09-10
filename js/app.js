@@ -1,0 +1,1234 @@
+/* App Main Orchestrator & Global Handlers */
+
+import { store } from './state.js';
+import { getYouTubeDetails } from './firebase.js';
+import { renderSiswaScreen } from './siswa.js';
+import { renderGuruScreen } from './guru.js';
+import { renderAdminScreen } from './admin.js';
+
+function getFormattedTime() {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  return `${hours}:${minutes}:${seconds} WIB`;
+}
+
+function getShortTime() {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
+function getFormattedDate() {
+  const now = new Date();
+  return now.toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  });
+}
+
+function updateLiveClocks() {
+  const timeStr = getFormattedTime();
+  const dateStr = getFormattedDate();
+  const shortTime = getShortTime();
+
+  document.querySelectorAll('.live-time-text').forEach(el => {
+    if (el.textContent !== timeStr) el.textContent = timeStr;
+  });
+
+  document.querySelectorAll('.today-label').forEach(el => {
+    if (el.textContent !== dateStr) el.textContent = dateStr;
+  });
+
+  document.querySelectorAll('.phone-status-time').forEach(el => {
+    if (el.textContent !== shortTime) el.textContent = shortTime;
+  });
+}
+
+if (!window._clockIntervalStarted) {
+  window._clockIntervalStarted = true;
+  setInterval(updateLiveClocks, 1000);
+}
+
+function syncTabFromHash() {
+  const role = document.body.dataset.role || store.state.activeRole;
+  const hash = window.location.hash.replace('#', '').trim();
+  if (role && hash) {
+    const validTabs = {
+      siswa: ['home', 'pelajaran', 'scan', 'notifikasi', 'akun'],
+      guru: ['beranda', 'absensi', 'nilai', 'profil'],
+      admin: ['home', 'guru', 'mapel', 'siswa', 'jadwal', 'setting']
+    };
+    if (validTabs[role] && validTabs[role].includes(hash)) {
+      if (store.state.activeTabs[role] !== hash) {
+        store.state.activeTabs[role] = hash;
+      }
+    }
+  }
+}
+
+if (!window._hashListenerAttached) {
+  window._hashListenerAttached = true;
+  window.addEventListener('hashchange', () => {
+    syncTabFromHash();
+    renderApp();
+  });
+}
+
+function renderApp() {
+  const state = store.state;
+  const pageRole = document.body.dataset.role || null;
+
+  if (pageRole && !state.isLoggedIn) {
+    window.location.replace('./index.html');
+    return;
+  }
+
+  if (!pageRole) {
+    if (state.isLoggedIn) {
+      window.location.replace(`./${state.activeRole || 'siswa'}.html`);
+      return;
+    }
+
+    document.getElementById('app').innerHTML = renderLoginPage();
+    return;
+  }
+
+  const role = pageRole;
+  syncTabFromHash();
+
+  const activeTab = state.activeTabs[role] || (role === 'guru' ? 'beranda' : 'home');
+  if (window.location.hash !== '#' + activeTab) {
+    history.replaceState(null, '', '#' + activeTab);
+  }
+
+  const viewMode = 'desktop';
+
+  let screenResult = { contentHtml: '', bottomNavHtml: '' };
+  if (role === 'siswa') screenResult = renderSiswaScreen(state);
+  else if (role === 'guru') screenResult = renderGuruScreen(state);
+  else if (role === 'admin') screenResult = renderAdminScreen(state);
+
+  // Desktop Header Block with Title Row and Nav Tabs Row Below It
+  const desktopBarHtml = `
+    <header class="desktop-header-block">
+      <div class="desktop-top-row">
+        <div class="desktop-brand">
+          <img src="img/Logo_SMKN6.png" alt="Logo SMKN 6 Batam" class="logo-icon" />
+          <div class="desktop-title">
+            <h1>SMKN 6 <span>Academic Hub</span></h1>
+            <p>Sistem informasi akademik terpadu</p>
+          </div>
+        </div>
+
+        <div class="desktop-meta">
+          <div class="live-status" title="Waktu Nyata WIB"><span class="status-dot"></span> <span class="live-time-text">${getFormattedTime()}</span></div>
+          <div class="today-label">${getFormattedDate()}</div>
+        </div>
+      </div>
+
+      <div class="desktop-nav-row">
+        ${screenResult.bottomNavHtml}
+      </div>
+    </header>
+  `;
+
+  if (viewMode === 'desktop') {
+    const appHtml = `
+      ${desktopBarHtml}
+
+      <main class="desktop-layout">
+        <div class="phone-frame">
+          <div class="phone-status-bar">
+            <span class="phone-status-time">${getShortTime()}</span>
+            <div class="phone-status-icons">
+              <span>📶</span>
+              <span>5G</span>
+              <span>🔋 100%</span>
+            </div>
+          </div>
+          <div class="phone-screen" id="phoneScreen">
+            <div class="tab-content-anim" key="${role}-${state.activeTabs[role] || 'def'}">
+              ${screenResult.contentHtml}
+            </div>
+          </div>
+        </div>
+      </main>
+    `;
+
+    document.getElementById('app').innerHTML = appHtml;
+    bindBottomNavEvents(role);
+  } else {
+    // Multi-role side-by-side view showing Siswa, Guru, Admin simultaneously!
+    const siswaRes = renderSiswaScreen(state);
+    const guruRes = renderGuruScreen(state);
+    const adminRes = renderAdminScreen(state);
+
+    const appHtml = `
+      ${desktopBarHtml}
+
+      <div class="emulator-container grid-view">
+        <!-- Siswa Phone -->
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <h2 style="font-family:var(--font-serif); font-size:2rem; margin-bottom:12px;">Siswa</h2>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span class="phone-status-time">${getShortTime()}</span>
+              <div class="phone-status-icons">📶 🔋</div>
+            </div>
+            <div class="phone-screen"><div class="tab-content-anim">${siswaRes.contentHtml}</div></div>
+            ${siswaRes.bottomNavHtml}
+          </div>
+        </div>
+
+        <!-- Guru Phone -->
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <h2 style="font-family:var(--font-serif); font-size:2rem; margin-bottom:12px;">Guru</h2>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span class="phone-status-time">${getShortTime()}</span>
+              <div class="phone-status-icons">📶 🔋</div>
+            </div>
+            <div class="phone-screen"><div class="tab-content-anim">${guruRes.contentHtml}</div></div>
+            ${guruRes.bottomNavHtml}
+          </div>
+        </div>
+
+        <!-- Admin Phone -->
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <h2 style="font-family:var(--font-serif); font-size:2rem; margin-bottom:12px;">Admin</h2>
+          <div class="phone-frame">
+            <div class="phone-status-bar">
+              <span class="phone-status-time">${getShortTime()}</span>
+              <div class="phone-status-icons">📶 🔋</div>
+            </div>
+            <div class="phone-screen"><div class="tab-content-anim">${adminRes.contentHtml}</div></div>
+            ${adminRes.bottomNavHtml}
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('app').innerHTML = appHtml;
+    bindBottomNavEvents('siswa');
+    bindBottomNavEvents('guru');
+    bindBottomNavEvents('admin');
+  }
+}
+
+function renderLoginPage() {
+  return `
+    <main class="login-page">
+      <section class="login-showcase">
+        <img src="img/Logo_SMKN6.png" alt="Logo SMKN 6 Batam" class="login-brand-mark" />
+        <p class="login-eyebrow">SMK NEGERI 6</p>
+        <h1>Semua aktivitas sekolah, satu ruang.</h1>
+        <div class="login-feature-list">
+          <span><b>01</b> Portal siswa</span>
+          <span><b>02</b> Ruang kerja guru</span>
+          <span><b>03</b> Panel administrasi</span>
+        </div>
+      </section>
+
+      <section class="login-card-wrap">
+        <div class="login-card">
+          <div class="login-card-heading">
+            <span class="login-lock-icon">↗</span>
+            <p class="login-eyebrow">SMKN 6 Batam</p>
+            <h2>Selamat datang kembali</h2>
+            <p>Masuk untuk melanjutkan aktivitasmu.</p>
+          </div>
+          <form class="login-form" id="mainLoginForm" onsubmit="window.handleLogin(event)">
+            <label class="form-label" for="loginRole">Masuk sebagai</label>
+            <select class="form-select" id="loginRole">
+              <option value="siswa">Siswa</option>
+              <option value="guru">Guru</option>
+              <option value="admin">Admin</option>
+            </select>
+            <label class="form-label" for="loginUsername">Username</label>
+            <input class="form-input" id="loginUsername" type="text" placeholder="Masukkan username" required />
+            <label class="form-label" for="loginPassword">Password</label>
+            <input class="form-input" id="loginPassword" type="password" placeholder="Masukkan password" required />
+            <p class="login-error" id="loginError"></p>
+            <button class="btn-primary login-submit" type="submit">Masuk ke Dashboard <span>→</span></button>
+          </form>
+
+          <div class="login-quick-roles">
+            <span class="quick-role-label">⚡ Akses Cepat Akun Demo (1-Klik):</span>
+            <div class="quick-role-chips">
+              <button type="button" class="quick-chip" onclick="window.quickFillLogin('siswa')">🎓 Siswa</button>
+              <button type="button" class="quick-chip" onclick="window.quickFillLogin('guru')">👨‍🏫 Guru</button>
+              <button type="button" class="quick-chip" onclick="window.quickFillLogin('admin')">🛡️ Admin</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  `;
+}
+
+function bindBottomNavEvents(role) {
+  const navBtns = document.querySelectorAll('.phone-bottom-nav .nav-item');
+  navBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.getAttribute('data-tab');
+      if (tab) {
+        window.switchRoleTab(role, tab);
+      }
+    });
+  });
+}
+
+// Global Window Helpers for Interactive Inline Click Triggers
+window.showToast = function(message, type = 'success') {
+  let container = document.getElementById('globalToastContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'globalToastContainer';
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+  }
+
+  const icons = {
+    success: '✅',
+    info: 'ℹ️',
+    warning: '⚠️',
+    danger: '❌'
+  };
+
+  const toast = document.createElement('div');
+  toast.className = `toast-item toast-${type}`;
+  toast.innerHTML = `
+    <span class="toast-icon">${icons[type] || '🔔'}</span>
+    <span class="toast-msg">${message}</span>
+  `;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('toast-leave');
+    setTimeout(() => {
+      toast.remove();
+    }, 320);
+  }, 3200);
+};
+
+window.quickFillLogin = function(role) {
+  const roleSelect = document.getElementById('loginRole');
+  const userInp = document.getElementById('loginUsername');
+  const passInp = document.getElementById('loginPassword');
+  if (!roleSelect || !userInp || !passInp) return;
+
+  const state = store.state;
+  let demoUser = 'siswa';
+  let demoPass = 'siswa123';
+
+  if (role === 'siswa') {
+    const firstSiswa = (state.students && state.students.length > 0) ? state.students[0] : null;
+    demoUser = firstSiswa ? (firstSiswa.name || firstSiswa.nis || 'tes2') : 'tes2';
+    demoPass = 'siswa123';
+  } else if (role === 'guru') {
+    const firstGuru = (state.teachers && state.teachers.length > 0) ? state.teachers[0] : null;
+    demoUser = firstGuru ? (firstGuru.username || firstGuru.name || 'guru') : 'guru';
+    demoPass = 'guru123';
+  } else if (role === 'admin') {
+    demoUser = 'admin';
+    demoPass = 'admin123';
+  }
+
+  roleSelect.value = role;
+  userInp.value = demoUser;
+  passInp.value = demoPass;
+  
+  [userInp, passInp].forEach(inp => {
+    inp.style.transition = 'all 0.3s ease';
+    inp.style.borderColor = '#0284c7';
+    inp.style.boxShadow = '0 0 0 4px rgba(2, 132, 199, 0.2)';
+    setTimeout(() => {
+      inp.style.borderColor = '';
+      inp.style.boxShadow = '';
+    }, 600);
+  });
+
+  window.showToast(`Akun Firebase ${role.toUpperCase()} (${demoUser}) dimuat!`, 'info');
+};
+
+window.switchRole = function(role) {
+  store.setRole(role);
+};
+
+window.handleLogin = function(event) {
+  event.preventDefault();
+  const form = document.getElementById('mainLoginForm') || event.target;
+  const role = document.getElementById('loginRole').value;
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const error = document.getElementById('loginError');
+
+  const state = store.state;
+  let isValid = false;
+  let loggedName = username;
+
+  if (role === 'siswa') {
+    const found = (state.students || []).find(s => 
+      (s.name && s.name.toLowerCase() === username.toLowerCase()) || 
+      (s.nis && String(s.nis) === username) ||
+      (s.id && String(s.id) === username) ||
+      username.toLowerCase() === 'siswa' ||
+      username.toLowerCase() === 'tes' ||
+      username.toLowerCase() === 'tes2'
+    );
+    if (found || username.length > 0) {
+      isValid = true;
+      if (found) {
+        loggedName = found.name || username;
+        state.currentUser.siswa.name = loggedName;
+        state.currentUser.siswa.nis = found.nis || '123456789';
+        state.currentUser.siswa.class = found.class || '10 TKJ 1';
+      }
+    }
+  } else if (role === 'guru') {
+    const found = (state.teachers || []).find(t => 
+      (t.username && t.username.toLowerCase() === username.toLowerCase()) || 
+      (t.name && t.name.toLowerCase() === username.toLowerCase()) ||
+      username.toLowerCase() === 'guru'
+    );
+    if (found || username.length > 0) {
+      isValid = true;
+      if (found) {
+        loggedName = found.name || found.username || username;
+        state.currentUser.guru.name = loggedName;
+        state.currentUser.guru.username = found.username || username;
+        state.currentUser.guru.mapel = found.mapel || 'MTK';
+      }
+    }
+  } else if (role === 'admin') {
+    isValid = true;
+  }
+
+  if (!isValid) {
+    if (error) error.textContent = 'Username belum terdaftar di Firebase.';
+    form.classList.remove('shake');
+    void form.offsetWidth; // trigger reflow
+    form.classList.add('shake');
+    window.showToast('Username tidak ditemukan di Firebase!', 'danger');
+    return;
+  }
+
+  window.showToast(`Berhasil masuk sebagai ${role.toUpperCase()} (${loggedName})!`, 'success');
+  setTimeout(() => {
+    store.login(role, loggedName);
+    const defaultTab = (role === 'guru') ? 'beranda' : 'home';
+    window.location.replace(`./${role}.html#${defaultTab}`);
+  }, 450);
+};
+
+window.confirmLogout = function() {
+  const pageRole = document.body.getAttribute('data-role') || 'siswa';
+  let username = 'Pengguna';
+
+  if (pageRole === 'siswa' && store.state.currentUser.siswa) {
+    username = store.state.currentUser.siswa.name || store.state.currentUser.siswa.nis || 'Siswa';
+  } else if (pageRole === 'guru' && store.state.currentUser.guru) {
+    username = store.state.currentUser.guru.name || store.state.currentUser.guru.username || 'Guru';
+  } else if (pageRole === 'admin' && store.state.currentUser.admin) {
+    username = store.state.currentUser.admin.username || 'Admin';
+  }
+
+  const overlay = document.getElementById('globalModal');
+  const card = document.getElementById('modalCardContent');
+  if (!overlay || !card) return;
+
+  card.innerHTML = `
+    <div style="text-align: center; padding: 6px 2px;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: inline-flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 14px; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.2);">
+        🚪
+      </div>
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Konfirmasi Logout</h3>
+      <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 22px;">
+        Apakah anda mau keluar dari akun ini <strong>"${username}"</strong>?
+      </p>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button type="button" style="flex: 1; padding: 11px 16px; border-radius: 12px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; color: #475569; cursor: pointer; transition: all 0.2s;" onclick="window.closeModal()">Tidak</button>
+        <button type="button" style="flex: 1; padding: 11px 16px; border-radius: 12px; background: #ef4444; color: white; border: none; font-weight: 600; cursor: pointer; transition: all 0.2s;" onclick="window.closeModal(); window.performLogout();">Iya</button>
+      </div>
+    </div>
+  `;
+  overlay.classList.add('open');
+};
+
+window.performLogout = function() {
+  window.showToast('Anda telah keluar dari sesi.', 'info');
+  setTimeout(() => {
+    store.logout();
+    window.location.replace('./index.html');
+  }, 400);
+};
+
+window.logout = function(skipConfirm) {
+  if (skipConfirm === true) {
+    window.performLogout();
+  } else {
+    window.confirmLogout();
+  }
+};
+
+window.toggleViewMode = function() {
+  const newMode = store.state.activeViewMode === 'phone' ? 'grid' : 'phone';
+  store.setViewMode(newMode);
+};
+
+window.switchRoleTab = function(role, tab) {
+  if (role && tab) {
+    if (window.location.hash !== '#' + tab) {
+      window.location.hash = '#' + tab;
+    }
+    store.setRoleTab(role, tab);
+  }
+};
+
+window.switchSiswaTab = function(tab) {
+  window.switchRoleTab('siswa', tab);
+};
+
+window.switchGuruTab = function(tab) {
+  window.switchRoleTab('guru', tab);
+};
+
+window.switchAdminTab = function(tab) {
+  window.switchRoleTab('admin', tab);
+};
+
+window.setGuruSubTab = function(category, tab) {
+  store.state.guruSubTab[category] = tab;
+  store.saveState();
+};
+
+window.setStudentStatus = function(studentId, status) {
+  window.tempAbsensi = window.tempAbsensi || { 1: 'H', 2: 'H', 3: 'H' };
+  window.tempAbsensi[studentId] = status;
+  renderApp();
+};
+
+window.markAllStudentsPresent = function() {
+  window.tempAbsensi = window.tempAbsensi || {};
+  store.state.students.forEach(s => {
+    window.tempAbsensi[s.id] = 'H';
+  });
+  window.showToast('Semua siswa ditandai Hadir (H)!', 'success');
+  renderApp();
+};
+
+window.submitAbsensiForm = function() {
+  const dateInput = document.getElementById('absensiDate');
+  const todayStr = new Date().toISOString().split('T')[0];
+  const date = dateInput?.value || todayStr;
+  const pertemuan = document.getElementById('absensiPertemuan')?.value || '1';
+  const mapel = document.getElementById('absensiMapel')?.value || 'MTK';
+  const className = document.getElementById('absensiKelas')?.value || '10 TKJ 1';
+
+  window.tempAbsensi = window.tempAbsensi || {};
+  const records = { ...window.tempAbsensi };
+  (store.state.students || []).forEach(s => {
+    if (!records[s.id]) {
+      records[s.id] = 'H';
+    }
+  });
+
+  store.saveAttendance(date, pertemuan, mapel, className, records);
+  window.showToast(`✅ Data Absensi (${mapel} - ${className}) Pertemuan ${pertemuan} Berhasil Disimpan ke Firebase!`, 'success');
+};
+
+window.editScore = function(pertemuan, studentId, currentScore) {
+  const newScore = prompt(`Masukkan nilai baru untuk Pertemuan ${pertemuan}:`, currentScore);
+  if (newScore !== null && !isNaN(newScore)) {
+    const gradesObj = store.state.grades.find(g => g.pertemuan === pertemuan) || { scores: {} };
+    gradesObj.scores[studentId] = parseInt(newScore);
+    store.saveGrades(pertemuan, 'MTK', '10 TKJ 1', gradesObj.scores);
+    window.showToast(`Nilai berhasil diperbarui jadi ${newScore}!`, 'success');
+  }
+};
+
+window.simulateExportData = function(className = '10 TKJ 1') {
+  window.showToast(`Menyiapkan data unduhan untuk kelas ${className}...`, 'info');
+  setTimeout(() => {
+    window.showToast(`✅ File rekap_${className}.xlsx berhasil diekspor!`, 'success');
+  }, 900);
+};
+
+window.setAdminSiswaSubView = function(view, level = null, className = null) {
+  store.state.adminSubView.siswa = view;
+  if (level) store.state.adminSubView.selectedLevel = level;
+  if (className) store.state.adminSubView.selectedClass = className;
+  store.saveState();
+};
+
+window.setAdminJadwalSubView = function(view, level = null) {
+  store.state.adminSubView.jadwal = view;
+  if (level) store.state.adminSubView.selectedJadwalLevel = level;
+  store.saveState();
+};
+
+window.handleBroadcastSubmit = function(e) {
+  e.preventDefault();
+  const title = document.getElementById('newsTitle').value;
+  const url = document.getElementById('newsUrl').value;
+  store.addBroadcastNews(title, url);
+  window.showToast('📢 Pengumuman video berhasil dipublikasikan!', 'success');
+  document.getElementById('newsTitle').value = '';
+  document.getElementById('newsUrl').value = '';
+};
+
+window.handleMapelSubmit = function(e) {
+  e.preventDefault();
+  const name = document.getElementById('mapelName').value;
+  store.addMapel(name);
+  window.showToast('📘 Mata Pelajaran Baru Berhasil Ditambahkan!', 'success');
+  document.getElementById('mapelName').value = '';
+};
+
+window.selectRoom = function(el, room) {
+  document.querySelectorAll('.room-selector-pills .pill-option').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('schedRuangan').value = room;
+};
+
+window.selectDay = function(el, day) {
+  document.querySelectorAll('.day-selector-pills .pill-option').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('schedHari').value = day;
+};
+
+window.handleCreateSchedule = function(e) {
+  e.preventDefault();
+  const mapel = document.getElementById('schedMapel').value;
+  const guru = document.getElementById('schedGuru').value;
+  const ruangan = document.getElementById('schedRuangan').value;
+  const start = document.getElementById('schedStart').value;
+  const end = document.getElementById('schedEnd').value;
+  const hari = document.getElementById('schedHari').value;
+
+  store.addSchedule({
+    mapel,
+    guru,
+    ruangan,
+    waktu: `${start} - ${end}`,
+    hari,
+    level: store.state.adminSubView.selectedJadwalLevel || 10,
+    class: '10 TKJ 1'
+  });
+
+  window.showToast('📅 Jadwal Pelajaran Baru Berhasil Disimpan!', 'success');
+  window.setAdminJadwalSubView('list');
+};
+
+window.toggleFlipCard = function() {
+  const inner = document.getElementById('ktsFlipInner');
+  if (inner) {
+    inner.classList.toggle('flipped');
+  }
+};
+
+window.simulateScanQR = function() {
+  window.showToast('📡 Memindai QR Code presensi...', 'info');
+  setTimeout(() => {
+    window.showToast('✅ Presensi berhasil! Kehadiran Anda hari ini telah dicatat.', 'success');
+  }, 1000);
+};
+
+// Modal Windows Handler
+window.openSiswaModal = function(type) {
+  const overlay = document.getElementById('globalModal');
+  const card = document.getElementById('modalCardContent');
+
+  if (type === 'visimisi') {
+    card.innerHTML = `
+      <div class="modal-title text-center" style="margin-bottom:6px; font-weight:800; font-size:1.15rem; color:#0f172a;">🎯 Visi & Misi TKJ SMKN 6</div>
+      <p style="font-size:0.75rem; text-align:center; color:#64748b; margin-bottom:14px;">Kompetensi Keahlian Teknik Komputer & Jaringan</p>
+      
+      <div style="background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color:white; padding:14px; border-radius:12px; margin-bottom:12px; box-shadow:0 4px 12px rgba(15,23,42,0.15);">
+        <h4 style="font-size:0.85rem; font-weight:800; color:#38bdf8; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;">Visi TKJ</h4>
+        <p style="font-size:0.78rem; line-height:1.5; color:#f8fafc; margin:0;">
+          "Menjadi Kompetensi Keahlian Teknik Komputer dan Jaringan yang Unggul, Berkarakter, Berkualitas Internasional, serta Berdaya Saing Tinggi di Bidang Teknologi Informasi & Komunikasi."
+        </p>
+      </div>
+
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:12px;">
+        <h4 style="font-size:0.85rem; font-weight:800; color:#0f172a; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">Misi Utama</h4>
+        <ol style="font-size:0.76rem; color:#334155; margin:0 0 0 16px; padding:0; line-height:1.6;">
+          <li style="margin-bottom:6px;">Melaksanakan pembelajaran berbasis standar industri (Networking, Cyber Security, Cloud Computing).</li>
+          <li style="margin-bottom:6px;">Membekali siswa dengan sertifikasi keahlian berstandar nasional dan internasional.</li>
+          <li style="margin-bottom:6px;">Membentuk karakter lulusan beriman, disiplin, berakhlak mulia, dan berjiwa wirausaha.</li>
+          <li>Menjalin kemitraan strategis dengan Dunia Usaha & Dunia Industri (DUDI).</li>
+        </ol>
+      </div>
+      <button class="btn-primary mt-4" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup Visi Misi</button>
+    `;
+  } else if (type === 'guruList') {
+    const teachers = store.state.teachers || [];
+    card.innerHTML = `
+      <div class="modal-title" style="font-weight:800; font-size:1.1rem; color:#0f172a;">👨‍🏫 Daftar Guru Pengajar TKJ</div>
+      <p style="font-size:0.78rem; color:#64748b; margin-bottom:12px;">Total ${teachers.length} Guru Aktif Terdaftar di Firebase:</p>
+      
+      <div style="max-height:280px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding-right:4px;">
+        ${teachers.length === 0 ? `
+          <div style="text-align:center; padding:20px; color:#64748b; font-size:0.8rem;">Belum ada data guru terdaftar.</div>
+        ` : teachers.map(t => `
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:10px 12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin:0;">${t.name || t.teacherName}</h4>
+              <p style="font-size:0.73rem; color:#64748b; margin:2px 0 0 0;">Pengajar: ${t.mapel || t.subject || 'Produktif TKJ'}</p>
+            </div>
+            <span style="background:#e0e7ff; color:#4338ca; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:600;">${t.username || 'Guru'}</span>
+          </div>
+        `).join('')}
+      </div>
+      <button class="btn-primary mt-4" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup Daftar Guru</button>
+    `;
+  } else if (type === 'totalSiswa') {
+    const students = store.state.students || [];
+    card.innerHTML = `
+      <div class="modal-title" style="font-weight:800; font-size:1.1rem; color:#0f172a;">👥 Rekap Total Siswa TKJ</div>
+      <p style="font-size:0.78rem; color:#64748b; margin-bottom:12px;">Total ${students.length} Siswa Terdaftar di Database Firebase:</p>
+      
+      <div style="background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:white; padding:14px; border-radius:12px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span style="font-size:0.72rem; opacity:0.85;">TOTAL SELURUH SISWA</span>
+          <h2 style="font-size:1.6rem; font-weight:800; margin:2px 0 0 0;">${students.length} Siswa</h2>
+        </div>
+        <div style="font-size:2rem;">🎓</div>
+      </div>
+
+      <div style="max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+        ${students.length === 0 ? `
+          <div style="text-align:center; padding:20px; color:#64748b; font-size:0.8rem;">Belum ada data siswa terdaftar.</div>
+        ` : students.map(s => `
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:10px 12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin:0;">${s.name || s.studentName}</h4>
+              <p style="font-size:0.73rem; color:#64748b; margin:2px 0 0 0;">NIS: ${s.nis || s.studentId || '-'}</p>
+            </div>
+            <span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${s.class || s.className || '10 TKJ 1'}</span>
+          </div>
+        `).join('')}
+      </div>
+      <button class="btn-primary mt-4" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup Rekap Siswa</button>
+    `;
+  } else if (type === 'survey') {
+    card.innerHTML = `
+      <div class="modal-title">📋 Survey Evaluasi Pembelajaran</div>
+      <p style="font-size:0.8rem; color:#64748b; margin-bottom:12px;">Beri penilaian untuk meningkatkan kualitas fasilitas & materi sekolah:</p>
+      <div class="form-group">
+        <label class="form-label">Kepuasan Fasilitas Lab Komputer</label>
+        <select class="form-select">
+          <option>Sangat Memuaskan ⭐⭐⭐⭐⭐</option>
+          <option>Puas & Lengkap ⭐⭐⭐⭐</option>
+          <option>Cukup ⭐⭐⭐</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Koneksi Jaringan Internet Sekolah</label>
+        <select class="form-select">
+          <option>Cepat & Stabil 🚀</option>
+          <option>Cukup Baik 📶</option>
+          <option>Perlu Ditingkatkan ⚠️</option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="window.showToast('Terima kasih! Survey berhasil terkirim.', 'success'); window.closeModal();">Kirim Feedback Survey</button>
+    `;
+  } else if (type === 'kts') {
+    const user = store.state.currentUser.siswa;
+    card.innerHTML = `
+      <div class="modal-title text-center" style="margin-bottom:8px;">🪪 Kartu Tanda Siswa Digital</div>
+      <p style="font-size:0.75rem; text-align:center; color:#64748b; margin-bottom:14px;">Klik kartu untuk melihat tampak depan / belakang:</p>
+
+      <div class="flip-card-scene" onclick="window.toggleFlipCard()">
+        <div class="flip-card-inner" id="ktsFlipInner">
+          <!-- Tampak Depan -->
+          <div class="flip-card-front">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <span style="font-size:0.65rem; letter-spacing:1px; opacity:0.85; font-weight:700;">KARTU PELAJAR DIGITAL</span>
+                <h4 style="font-size:0.95rem; font-weight:800; margin-top:2px;">SMK NEGERI 6</h4>
+              </div>
+              <div style="background:rgba(255,255,255,0.22); padding:3px 8px; border-radius:6px; font-size:0.68rem; font-weight:700;">AKTIF</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:14px; margin:8px 0;">
+              <div style="width:52px; height:52px; border-radius:50%; background:white; color:#072a4f; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.3rem; box-shadow:0 4px 10px rgba(0,0,0,0.15);">
+                ${user.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h3 style="font-size:1.05rem; font-weight:800; text-transform:uppercase;">${user.name}</h3>
+                <p style="font-size:0.75rem; opacity:0.9;">NIS: ${user.nis}</p>
+                <p style="font-size:0.75rem; opacity:0.9;">Kelas: ${user.class}</p>
+              </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+              <span style="font-size:0.66rem; opacity:0.75;">SMK Bisa • SMK Hebat</span>
+              <div style="background:white; padding:3px 8px; border-radius:6px; color:black; font-family:monospace; font-size:0.7rem; font-weight:700;">|||| ||||| ||||</div>
+            </div>
+          </div>
+
+          <!-- Tampak Belakang -->
+          <div class="flip-card-back">
+            <div>
+              <h4 style="font-size:0.82rem; font-weight:700; color:#38bdf8;">TATA TERTIB PENGGUNAAN</h4>
+              <ul style="font-size:0.68rem; margin:8px 0 0 16px; line-height:1.4; opacity:0.9;">
+                <li>Kartu ini identitas resmi siswa SMKN 6.</li>
+                <li>Gunakan untuk presensi QR & perpustakaan.</li>
+                <li>Dilarang dipindah-tangankan kepada orang lain.</li>
+              </ul>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed rgba(255,255,255,0.2); padding-top:8px;">
+              <span style="font-size:0.65rem; opacity:0.7;">Terverifikasi Otomatis</span>
+              <span style="font-size:0.65rem; color:#38bdf8; font-weight:700;">Academic Hub</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card-hint">
+        <span>🔄 Sentuh/klik kartu untuk membalik (3D Flip)</span>
+      </div>
+      <button class="btn-primary mt-4" onclick="window.closeModal()">Tutup</button>
+    `;
+  } else if (type === 'career') {
+    card.innerHTML = `
+      <div class="modal-title">🎯 Career Profiling TKJ</div>
+      <p style="font-size:0.78rem; color:#64748b; margin-bottom:12px;">Analisis kecocokan minat bakat industri teknologi:</p>
+      <div style="display:flex; flex-direction:column; gap:12px; font-size:0.8rem;">
+        <div>
+          <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:4px;">
+            <span>🌐 Network Engineer</span>
+            <span style="color:#0284c7;">95% Cocok</span>
+          </div>
+          <div style="height:8px; background:#e2e8f0; border-radius:10px; overflow:hidden;">
+            <div style="width:95%; height:100%; background:linear-gradient(90deg,#0284c7,#38bdf8); border-radius:10px;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:4px;">
+            <span>🛡️ Cybersecurity Specialist</span>
+            <span style="color:#6366f1;">88% Cocok</span>
+          </div>
+          <div style="height:8px; background:#e2e8f0; border-radius:10px; overflow:hidden;">
+            <div style="width:88%; height:100%; background:linear-gradient(90deg,#6366f1,#818cf8); border-radius:10px;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:4px;">
+            <span>☁️ Cloud & DevOps</span>
+            <span style="color:#10b981;">82% Cocok</span>
+          </div>
+          <div style="height:8px; background:#e2e8f0; border-radius:10px; overflow:hidden;">
+            <div style="width:82%; height:100%; background:linear-gradient(90deg,#10b981,#34d399); border-radius:10px;"></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-primary mt-4" onclick="window.closeModal()">Tutup</button>
+    `;
+  } else if (type === 'kalenderAkademik') {
+    card.innerHTML = `
+      <div class="modal-title" style="font-weight:800; font-size:1.1rem; color:#0f172a;">📅 Kalender Akademik SMKN 6</div>
+      <p style="font-size:0.78rem; color:#64748b; margin-bottom:12px;">Agenda & Tanggal Penting Tahun Ajaran 2026/2027:</p>
+      
+      <div style="max-height:300px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-right:4px;">
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #0284c7; padding:10px 12px; border-radius:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.7rem; font-weight:700; color:#0284c7;">15 - 20 September 2026</span>
+            <span style="background:#e0f2fe; color:#0284c7; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:700;">Ujian</span>
+          </div>
+          <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Penilaian Tengah Semester (PTS) Ganjil</h4>
+          <p style="font-size:0.72rem; color:#64748b; margin:0;">Ujian teori dan berbasis komputer seluruh mata pelajaran.</p>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #6366f1; padding:10px 12px; border-radius:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.7rem; font-weight:700; color:#6366f1;">05 - 12 Oktober 2026</span>
+            <span style="background:#e0e7ff; color:#4338ca; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:700;">TKJ Specialty</span>
+          </div>
+          <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Sertifikasi Industri MikroTik MTCNA</h4>
+          <p style="font-size:0.72rem; color:#64748b; margin:0;">Pelatihan dan sertifikasi jaringan internasional untuk kelas XI & XII TKJ.</p>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #10b981; padding:10px 12px; border-radius:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.7rem; font-weight:700; color:#10b981;">10 - 15 November 2026</span>
+            <span style="background:#dcfce7; color:#15803d; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:700;">UKK TKJ</span>
+          </div>
+          <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Simulasi Uji Kompetensi Keahlian (UKK)</h4>
+          <p style="font-size:0.72rem; color:#64748b; margin:0;">Uji praktikum Perakitan Server, Fiber Optic, dan Routing Cisco di Lab.</p>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #f59e0b; padding:10px 12px; border-radius:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.7rem; font-weight:700; color:#d97706;">01 - 10 Desember 2026</span>
+            <span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:700;">PAS Ganjil</span>
+          </div>
+          <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Penilaian Akhir Semester (PAS) Ganjil</h4>
+          <p style="font-size:0.72rem; color:#64748b; margin:0;">Evaluasi komprehensif semester ganjil tahun ajaran 2026/2027.</p>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #ef4444; padding:10px 12px; border-radius:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.7rem; font-weight:700; color:#ef4444;">21 Des 2026 - 04 Jan 2027</span>
+            <span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:700;">Libur Semester</span>
+          </div>
+          <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Libur Semester Ganjil & Tahun Baru</h4>
+          <p style="font-size:0.72rem; color:#64748b; margin:0;">Masa libur sekolah siswa SMKN 6 Bandung.</p>
+        </div>
+      </div>
+      <button class="btn-primary mt-4" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup Kalender</button>
+    `;
+  } else if (type === 'galeriSiswa') {
+    card.innerHTML = `
+      <div class="modal-title" style="font-weight:800; font-size:1.1rem; color:#0f172a;">🖼️ Galeri & Prestasi Siswa TKJ</div>
+      <p style="font-size:0.78rem; color:#64748b; margin-bottom:12px;">Showcase Karya, Praktikum Lab & Prestasi LKS:</p>
+      
+      <div style="max-height:300px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-right:4px;">
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="background:#fef3c7; color:#b45309; font-weight:800; font-size:0.68rem; padding:2px 8px; border-radius:6px;">🏆 PRESTASI</span>
+            <span style="font-size:0.7rem; color:#64748b;">LKS 2026</span>
+          </div>
+          <h4 style="font-size:0.88rem; font-weight:700; color:#0f172a; margin:0 0 4px 0;">🥇 Juara 1 LKS IT Network Systems Administration</h4>
+          <p style="font-size:0.73rem; color:#475569; margin:0 0 6px 0;">Tim TKJ SMKN 6 berhasil meraih Medali Emas pada Lomba Kompetensi Siswa bidang Jaringan Komputer.</p>
+          <span style="font-size:0.7rem; font-weight:600; color:#0284c7;">Oleh: Tim Siswa XI TKJ 1</span>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="background:#e0f2fe; color:#0369a1; font-weight:800; font-size:0.68rem; padding:2px 8px; border-radius:6px;">🛠️ PRAKTIKUM LAB</span>
+            <span style="font-size:0.7rem; color:#64748b;">Lab TKJ 2</span>
+          </div>
+          <h4 style="font-size:0.88rem; font-weight:700; color:#0f172a; margin:0 0 4px 0;">🌐 Praktikum Fiber Optic Splicing & OTDR Test</h4>
+          <p style="font-size:0.73rem; color:#475569; margin:0 0 6px 0;">Penyambungan kabel serat optik menggunakan Fusion Splicer dan pengukuran redaman sinyal.</p>
+          <span style="font-size:0.7rem; font-weight:600; color:#0284c7;">Oleh: Kelompok 3 - 10 TKJ 1</span>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="background:#e0e7ff; color:#4338ca; font-weight:800; font-size:0.68rem; padding:2px 8px; border-radius:6px;">💻 PROJECT</span>
+            <span style="font-size:0.7rem; color:#64748b;">Cloud Server</span>
+          </div>
+          <h4 style="font-size:0.88rem; font-weight:700; color:#0f172a; margin:0 0 4px 0;">🚀 Deployment Server Linux Debian & DNS Server</h4>
+          <p style="font-size:0.73rem; color:#475569; margin:0 0 6px 0;">Konfigurasi Web Server Apache, MySQL Database, dan Virtual Host lokal sekolah.</p>
+          <span style="font-size:0.7rem; font-weight:600; color:#0284c7;">Oleh: Siswa 10 TKJ 1</span>
+        </div>
+      </div>
+      <button class="btn-primary mt-4" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup Galeri Siswa</button>
+    `;
+  } else if (type === 'videoTKJ') {
+    const newsList = store.state.broadcastNews || [];
+    card.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <div class="modal-title" style="font-weight:800; font-size:1.15rem; color:#0f172a; margin:0;">📺 Beranda Video TKJ</div>
+        <span style="background:#e0f2fe; color:#0284c7; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${newsList.length} Video</span>
+      </div>
+      <p style="font-size:0.78rem; color:#64748b; margin-bottom:12px;">Kumpulan Pengumuman, Tutorial & Pembelajaran YouTube TKJ:</p>
+
+      <div style="max-height:340px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-right:4px;">
+        ${newsList.length === 0 ? `
+          <div style="text-align:center; padding:24px; color:#64748b; font-size:0.8rem;">Belum ada video pengumuman terdaftar di Firebase.</div>
+        ` : newsList.map((item, idx) => {
+          const yt = getYouTubeDetails(item.url);
+          const directUrl = (item.url && item.url.startsWith('http')) ? item.url : (yt.id ? `https://www.youtube.com/watch?v=${yt.id}` : '#');
+          return `
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px; display:flex; gap:12px; align-items:center;">
+              <div style="width:100px; height:60px; border-radius:8px; background:#0f172a; position:relative; overflow:hidden; flex-shrink:0; cursor:pointer;" onclick="window.playNewsVideoById('${item.id}', ${idx})">
+                ${yt.thumbnailUrl ? `
+                  <img src="${yt.thumbnailUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'" />
+                ` : ''}
+                <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.3);">
+                  <div style="width:26px; height:26px; border-radius:50%; background:rgba(255,255,255,0.9); color:#0b345e; display:flex; align-items:center; justify-content:center; font-size:0.7rem;">▶</div>
+                </div>
+              </div>
+
+              <div style="flex:1; min-width:0;">
+                <h4 style="font-size:0.84rem; font-weight:700; color:#1e293b; margin:0 0 4px 0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.title}">${item.title}</h4>
+                <div style="display:flex; gap:6px; align-items:center;">
+                  <button style="background:#0284c7; color:white; border:none; padding:4px 10px; border-radius:6px; font-size:0.7rem; font-weight:700; cursor:pointer;" onclick="window.playNewsVideoById('${item.id}', ${idx})">
+                    ▶ Tonton
+                  </button>
+                  ${directUrl !== '#' ? `
+                    <a href="${directUrl}" target="_blank" rel="noopener noreferrer" style="background:#dc2626; color:white; text-decoration:none; padding:4px 8px; border-radius:6px; font-size:0.68rem; font-weight:700;">
+                      YouTube
+                    </a>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <button class="btn-primary mt-4" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup Beranda Video</button>
+    `;
+  } else if (type === 'lainnya') {
+    card.innerHTML = `
+      <div class="modal-title" style="font-weight:800; font-size:1.15rem; color:#0f172a;">⚙️ Semua Fitur Aplikasi SMKN 6</div>
+      <p style="font-size:0.78rem; color:#64748b; margin-bottom:14px;">Pilih fitur atau layanan digital yang ingin diakses:</p>
+
+      <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; max-height:340px; overflow-y:auto; padding-right:4px;">
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('videoTKJ');">
+          <span style="font-size:1.3rem;">📺</span>
+          <div>
+            <div>Video TKJ</div>
+            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Beranda Video YT</span>
+          </div>
+        </button>
+
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('visimisi');">
+          <span style="font-size:1.3rem;">🎯</span>
+          <div>
+            <div>Visi & Misi</div>
+            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Profil & Tujuan TKJ</span>
+          </div>
+        </button>
+
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('guruList');">
+          <span style="font-size:1.3rem;">👨‍🏫</span>
+          <div>
+            <div>Guru TKJ</div>
+            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Daftar Pengajar</span>
+          </div>
+        </button>
+
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('totalSiswa');">
+          <span style="font-size:1.3rem;">👥</span>
+          <div>
+            <div>Total Siswa</div>
+            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Rekap Database</span>
+          </div>
+        </button>
+
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('kalenderAkademik');">
+          <span style="font-size:1.3rem;">📅</span>
+          <div>
+            <div>Kalender</div>
+            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Agenda Sekolah</span>
+          </div>
+        </button>
+
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('galeriSiswa');">
+          <span style="font-size:1.3rem;">🖼️</span>
+          <div>
+            <div>Galeri Siswa</div>
+            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Karya & Prestasi</span>
+          </div>
+        </button>
+
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('pelajaran');">
+          <span style="font-size:1.3rem;">📊</span>
+          <div>
+            <div>Nilai Siswa</div>
+            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Jadwal & Rekap</span>
+          </div>
+        </button>
+
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('scan');">
+          <span style="font-size:1.3rem;">📸</span>
+          <div>
+            <div>Presensi</div>
+            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Scan QR Presensi</span>
+          </div>
+        </button>
+
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('survey');">
+          <span style="font-size:1.3rem;">📋</span>
+          <div>
+            <div>Survey</div>
+            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Evaluasi Pembelajaran</span>
+          </div>
+        </button>
+
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.showToast('Membuka E-Library SMKN 6...', 'info'); window.closeModal();">
+          <span style="font-size:1.3rem;">📚</span>
+          <div>
+            <div>E-Library</div>
+            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Buku Digital</span>
+          </div>
+        </button>
+
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.showToast('Jadwal Ujian Tengah Semester aktif.', 'info'); window.closeModal();">
+          <span style="font-size:1.3rem;">📝</span>
+          <div>
+            <div>Jadwal Ujian</div>
+            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">PTS & PAS</span>
+          </div>
+        </button>
+      </div>
+      <button class="btn-primary mt-4" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup</button>
+    `;
+  }
+
+  overlay.classList.add('open');
+};
+
+window.openAdminModal = function(type) {
+  const overlay = document.getElementById('globalModal');
+  const card = document.getElementById('modalCardContent');
+
+  if (type === 'tambahGuru') {
+    card.innerHTML = `
+      <div class="modal-title">👨‍🏫 Tambah Guru Baru</div>
+      <form onsubmit="window.handleCreateTeacher(event)">
+        <div class="form-group">
+          <label class="form-label">Nama Lengkap</label>
+          <input type="text" id="tName" class="form-input" placeholder="Contoh: Budi Santoso, S.Kom" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Username Akun</label>
+          <input type="text" id="tUser" class="form-input" placeholder="Username untuk login" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="tPass" class="form-input" placeholder="Password" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Keahlian Mata Pelajaran</label>
+          <select class="form-select" id="tMapel">
+            <option>MTK</option>
+            <option>Bahasa Indonesia</option>
+            <option>Produktif TKJ</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary mt-4">Simpan Guru Baru</button>
+      </form>
+    `;
+  } else if (type === 'tambahKelas') {
+    card.innerHTML = `
+      <div class="modal-title text-center">Tambah Kelas Baru</div>
+      <p style="font-size:0.85rem; text-align:center; color:#64748b; margin-bottom:16px;">Konfirmasi tambahkan kelas 10 TKJ 2 ke sistem?</p>
+      <div style="display:flex; gap:10px;">
+        <button style="flex:1; padding:10px; background:#f1f5f9; border:none; border-radius:8px; font-weight:600; cursor:pointer;" onclick="window.closeModal()">Batal</button>
+        <button style="flex:1; padding:10px; background:#0b345e; color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer;" onclick="store.addClass('10 TKJ 2', 10); window.showToast('Kelas 10 TKJ 2 berhasil ditambahkan!', 'success'); window.closeModal();">Ya, Tambahkan</button>
+      </div>
+    `;
+  }
+
+  overlay.classList.add('open');
+};
+
+window.handleCreateTeacher = function(e) {
+  e.preventDefault();
+  const name = document.getElementById('tName').value;
+  const username = document.getElementById('tUser').value;
+  const mapel = document.getElementById('tMapel').value;
+
+  store.addTeacher({ name, username, mapel });
+  window.showToast(`👨‍🏫 Guru ${name} berhasil ditambahkan!`, 'success');
+  window.closeModal();
+};
+
+window.playNewsVideo = function(title, url) {
+  const overlay = document.getElementById('globalModal');
+  const card = document.getElementById('modalCardContent');
+  
+  const yt = getYouTubeDetails(url);
+  const directUrl = (url && url.startsWith('http')) ? url : (yt.id ? `https://www.youtube.com/watch?v=${yt.id}` : '#');
+
+  card.innerHTML = `
+    <div class="modal-title" style="font-weight:700; font-size:1.05rem; margin-bottom:12px; color:#1e293b;">▶ ${title}</div>
+    ${yt.embedUrl ? `
+      <div style="position:relative; width:100%; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; background:#000; box-shadow:0 8px 24px rgba(0,0,0,0.25);">
+        <iframe
+          src="${yt.embedUrl}"
+          title="${title}"
+          style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
+      </div>
+    ` : `
+      <div class="news-video-frame" style="display:flex; align-items:center; justify-content:center; color:white; padding:20px; text-align:center; box-sizing:border-box;">
+        Video YouTube tidak dapat diputar di iframe.
+      </div>
+    `}
+    
+    <div style="display:flex; gap:10px; margin-top:14px;">
+      ${directUrl !== '#' ? `
+        <a href="${directUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="flex:1; text-align:center; text-decoration:none; background:#dc2626; color:white; font-weight:700; font-size:0.8rem; padding:10px 14px; border-radius:8px;">
+          🔴 Buka di YouTube
+        </a>
+      ` : ''}
+      <button class="btn-primary" style="flex:1; font-weight:700; background:#475569; font-size:0.8rem; padding:10px 14px; border-radius:8px;" onclick="window.closeModal()">
+        Tutup Video
+      </button>
+    </div>
+  `;
+  overlay.classList.add('open');
+};
+
+window.playNewsVideoById = function(id, index) {
+  const newsList = store.state.broadcastNews || [];
+  let item = newsList.find(n => String(n.id) === String(id));
+
+  if (!item && typeof index === 'number' && newsList[index]) {
+    item = newsList[index];
+  }
+
+  if (!item && typeof id === 'number' && newsList[id]) {
+    item = newsList[id];
+  }
+
+  if (item) {
+    window.playNewsVideo(item.title || 'Pengumuman TKJ', item.url);
+  } else if (typeof index === 'number' && newsList[index]) {
+    window.playNewsVideo(newsList[index].title || 'Pengumuman TKJ', newsList[index].url);
+  } else if (newsList.length > 0) {
+    window.playNewsVideo(newsList[0].title || 'Pengumuman TKJ', newsList[0].url);
+  } else {
+    window.showToast('Video pengumuman tidak ditemukan.', 'warning');
+  }
+};
+
+// Global Event Listener for TKJ News Cards
+if (!window._newsCardClickListenerAttached) {
+  window._newsCardClickListenerAttached = true;
+  document.addEventListener('click', function(e) {
+    const card = e.target.closest('.news-card-item');
+    if (card) {
+      const idxAttr = card.getAttribute('data-index');
+      if (idxAttr !== null && idxAttr !== undefined) {
+        const idx = parseInt(idxAttr, 10);
+        const newsList = store.state.broadcastNews || [];
+        const item = newsList[idx];
+        if (item) {
+          window.playNewsVideo(item.title || 'Pengumuman TKJ', item.url);
+        }
+      }
+    }
+  });
+}
+
+window.closeModal = function() {
+  document.getElementById('globalModal').classList.remove('open');
+};
+
+window.toggleBiometric = function(checked) {
+  store.state.biometricEnabled = checked;
+  store.saveState();
+  window.showToast(`Login Biometrik ${checked ? 'Diaktifkan 🔒' : 'Dinonaktifkan 🔓'}`, 'info');
+};
+
+window.toggleThemeMode = function(checked) {
+  const newTheme = checked ? 'dark' : 'light';
+  store.setThemeMode(newTheme);
+  window.showToast(`Tema ${checked ? 'Mode Gelap 🌙' : 'Mode Terang ☀️'} Diaktifkan!`, 'info');
+};
+
+window.syncFirebase = function() {
+  store.seedDatabaseToFirebase();
+};
+
+// Initialize App
+store.subscribe(renderApp);
+document.addEventListener('DOMContentLoaded', () => {
+  renderApp();
+});
+renderApp();
