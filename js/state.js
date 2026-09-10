@@ -687,13 +687,28 @@ class Store {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
     } catch (e) {
-      console.error("Error saving state", e);
+      console.error("Error saving state to LocalStorage", e);
     }
 
     if (isFirebaseConnected && db && !this.isSyncingWithFirebase) {
       try {
+        const {
+          students,
+          teachers,
+          mapel,
+          classes,
+          schedules,
+          attendance,
+          grades,
+          broadcastNews,
+          galeriItems,
+          kalenderAgendas,
+          elibraryBooks,
+          ...lightweightState
+        } = this.state;
+
         const stateRef = doc(db, 'smkn6', 'app_state');
-        setDoc(stateRef, JSON.parse(JSON.stringify(this.state)), { merge: true })
+        setDoc(stateRef, JSON.parse(JSON.stringify(lightweightState)), { merge: true })
           .catch(err => console.warn("Firebase auto-sync info:", err.message || err));
 
         if (this.state.visiMisi) {

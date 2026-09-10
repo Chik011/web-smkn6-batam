@@ -1287,20 +1287,45 @@ window.handleGaleriFileSelect = function(e) {
 
   const reader = new FileReader();
   reader.onload = function(evt) {
-    const dataUrl = evt.target.result;
-    if (urlInput) urlInput.value = dataUrl;
-    if (previewImg) {
-      previewImg.src = dataUrl;
-      previewImg.style.display = 'block';
-    }
-    if (statusEl) {
-      statusEl.style.display = 'block';
-      statusEl.style.color = '#10b981';
-      statusEl.textContent = '✅ Gambar berhasil dimuat dari perangkat!';
-    }
-    if (typeof window.showToast === 'function') {
-      window.showToast('🖼️ Gambar berhasil dimuat!', 'success');
-    }
+    const rawDataUrl = evt.target.result;
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const maxDim = 800;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > maxDim || height > maxDim) {
+        if (width > height) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+
+      if (urlInput) urlInput.value = compressedDataUrl;
+      if (previewImg) {
+        previewImg.src = compressedDataUrl;
+        previewImg.style.display = 'block';
+      }
+      if (statusEl) {
+        statusEl.style.display = 'block';
+        statusEl.style.color = '#10b981';
+        statusEl.textContent = '✅ Gambar berhasil dimuat dan dioptimasi!';
+      }
+      if (typeof window.showToast === 'function') {
+        window.showToast('🖼️ Gambar berhasil dioptimasi!', 'success');
+      }
+    };
+    img.src = rawDataUrl;
   };
   reader.readAsDataURL(file);
 };
