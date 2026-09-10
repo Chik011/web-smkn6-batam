@@ -1122,7 +1122,7 @@ window.openAdminContentModal = function(type) {
               <img src="${g.imageUrl}" style="width:36px; height:36px; object-fit:cover; border-radius:6px; flex-shrink:0;" />
               <span style="font-size:0.8rem; font-weight:600; color:#1e293b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${g.title}</span>
             </div>
-            <button type="button" class="icon-btn-action delete" onclick="store.deleteGaleriItem('${g.id}'); window.openAdminContentModal('galeri'); window.showToast('Gambar dihapus', 'info');">🗑️</button>
+            <button type="button" class="icon-btn-action delete" onclick="store.deleteGaleriItem('${g.id}'); window.showToast('Gambar dihapus', 'info');">🗑️</button>
           </div>
         `).join('')}
       </div>
@@ -1157,7 +1157,7 @@ window.openAdminContentModal = function(type) {
               <span style="font-size:0.7rem; font-weight:700; color:#0284c7;">${a.date} (${a.tag})</span>
               <div style="font-size:0.8rem; font-weight:600; color:#1e293b;">${a.title}</div>
             </div>
-            <button type="button" class="icon-btn-action delete" onclick="store.deleteKalenderAgenda('${a.id}'); window.openAdminContentModal('kalender'); window.showToast('Agenda dihapus', 'info');">🗑️</button>
+            <button type="button" class="icon-btn-action delete" onclick="store.deleteKalenderAgenda('${a.id}'); window.showToast('Agenda dihapus', 'info');">🗑️</button>
           </div>
         `).join('')}
       </div>
@@ -1189,7 +1189,7 @@ window.openAdminContentModal = function(type) {
               <span>${b.icon || '📘'}</span>
               <span style="font-size:0.8rem; font-weight:600; color:#1e293b;">${b.title}</span>
             </div>
-            <button type="button" class="icon-btn-action delete" onclick="store.deleteElibraryBook('${b.id}'); window.openAdminContentModal('elibrary'); window.showToast('Buku dihapus', 'info');">🗑️</button>
+            <button type="button" class="icon-btn-action delete" onclick="store.deleteElibraryBook('${b.id}'); window.showToast('Buku dihapus', 'info');">🗑️</button>
           </div>
         `).join('')}
       </div>
@@ -1212,34 +1212,65 @@ window.handleSaveVisiMisi = function(e) {
 
 window.handleAddGaleriSubmit = function(e) {
   e.preventDefault();
-  const title = document.getElementById('gTitle').value.trim();
-  const category = document.getElementById('gCategory').value.trim();
-  const imageUrl = document.getElementById('gUrl').value.trim();
-  const subtitle = document.getElementById('gSub').value.trim();
+  const form = e.target;
+  const title = document.getElementById('gTitle')?.value.trim();
+  const category = document.getElementById('gCategory')?.value.trim();
+  const imageUrl = document.getElementById('gUrl')?.value.trim();
+  const subtitle = document.getElementById('gSub')?.value.trim();
+
+  if (!title || !category || !imageUrl) {
+    window.showToast('Mohon lengkapi Judul, Kategori, dan File/URL Gambar!', 'error');
+    return;
+  }
+
   store.addGaleriItem({ title, category, imageUrl, subtitle });
   window.showToast('🖼️ Foto galeri berhasil ditambahkan!', 'success');
-  window.openAdminContentModal('galeri');
+
+  if (form) form.reset();
+  const previewImg = document.getElementById('gPreviewImg');
+  if (previewImg) previewImg.style.display = 'none';
+  const statusEl = document.getElementById('gUploadStatus');
+  if (statusEl) statusEl.style.display = 'none';
+  window.closeModal();
 };
 
 window.handleAddAgendaSubmit = function(e) {
   e.preventDefault();
-  const date = document.getElementById('aDate').value.trim();
-  const tag = document.getElementById('aTag').value.trim();
-  const title = document.getElementById('aTitle').value.trim();
-  const desc = document.getElementById('aDesc').value.trim();
+  const form = e.target;
+  const date = document.getElementById('aDate')?.value.trim();
+  const tag = document.getElementById('aTag')?.value.trim();
+  const title = document.getElementById('aTitle')?.value.trim();
+  const desc = document.getElementById('aDesc')?.value.trim();
+
+  if (!date || !tag || !title) {
+    window.showToast('Mohon lengkapi Tanggal, Tag Label, dan Judul Agenda!', 'error');
+    return;
+  }
+
   store.addKalenderAgenda({ date, tag, title, desc });
   window.showToast('📅 Agenda kalender berhasil ditambahkan!', 'success');
-  window.openAdminContentModal('kalender');
+
+  if (form) form.reset();
+  window.closeModal();
 };
 
 window.handleAddBookSubmit = function(e) {
   e.preventDefault();
-  const title = document.getElementById('bTitle').value.trim();
-  const category = document.getElementById('bCat').value.trim();
-  const desc = document.getElementById('bDesc').value.trim();
+  const form = e.target;
+  const title = document.getElementById('bTitle')?.value.trim();
+  const category = document.getElementById('bCat')?.value.trim();
+  const desc = document.getElementById('bDesc')?.value.trim();
+
+  if (!title || !category) {
+    window.showToast('Mohon lengkapi Judul Buku dan Kategori!', 'error');
+    return;
+  }
+
   store.addElibraryBook({ title, category, desc });
   window.showToast('📚 Buku digital berhasil ditambahkan!', 'success');
-  window.openAdminContentModal('elibrary');
+
+  if (form) form.reset();
+  window.closeModal();
 };
 
 window.handleGaleriFileSelect = function(e) {
