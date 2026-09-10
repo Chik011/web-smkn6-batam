@@ -846,6 +846,44 @@ window.openSiswaModal = function(type) {
       </div>
       <button class="btn-primary" onclick="window.showToast('Terima kasih! Survey berhasil terkirim.', 'success'); window.closeModal();">Kirim Feedback Survey</button>
     `;
+  } else if (type === 'settingProfil') {
+    const user = store.state.currentUser.siswa || {};
+    card.innerHTML = `
+      <div class="modal-title" style="font-weight:800; font-size:1.15rem; color:#0f172a; margin-bottom:4px;">⚙️ Pengaturan Profil Siswa</div>
+      <p style="font-size:0.78rem; color:#64748b; margin-bottom:14px;">Ubah data profil & informasi akun siswa Anda:</p>
+
+      <form onsubmit="window.handleSaveProfileSettings(event)">
+        <div class="form-group" style="margin-bottom:10px;">
+          <label class="form-label" style="font-size:0.75rem; font-weight:700; color:#334155; margin-bottom:4px; display:block;">Nama Lengkap Siswa</label>
+          <input type="text" id="profName" class="form-input" value="${user.name || ''}" placeholder="Masukkan Nama Lengkap" required style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:0.85rem;" />
+        </div>
+
+        <div class="form-group" style="margin-bottom:10px;">
+          <label class="form-label" style="font-size:0.75rem; font-weight:700; color:#334155; margin-bottom:4px; display:block;">Nomor Induk Siswa (NIS)</label>
+          <input type="text" id="profNis" class="form-input" value="${user.nis || ''}" placeholder="Masukkan NIS" required style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:0.85rem;" />
+        </div>
+
+        <div class="form-group" style="margin-bottom:10px;">
+          <label class="form-label" style="font-size:0.75rem; font-weight:700; color:#334155; margin-bottom:4px; display:block;">Kelas & Jurusan</label>
+          <input type="text" id="profClass" class="form-input" value="${user.class || '10 TKJ 1'}" placeholder="Contoh: 10 TKJ 1" required style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:0.85rem;" />
+        </div>
+
+        <div class="form-group" style="margin-bottom:10px;">
+          <label class="form-label" style="font-size:0.75rem; font-weight:700; color:#334155; margin-bottom:4px; display:block;">No. WhatsApp / HP</label>
+          <input type="text" id="profPhone" class="form-input" value="${user.phone || '081234567890'}" placeholder="08xxxxxxxxxx" style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:0.85rem;" />
+        </div>
+
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label" style="font-size:0.75rem; font-weight:700; color:#334155; margin-bottom:4px; display:block;">Bio / Status Singkat</label>
+          <input type="text" id="profBio" class="form-input" value="${user.bio || 'Siswa TKJ SMKN 6 Batam'}" placeholder="Status atau cita-cita Anda" style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:0.85rem;" />
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:16px;">
+          <button type="button" class="btn-primary" style="flex:1; background:#94a3b8; font-weight:700;" onclick="window.closeModal()">Batal</button>
+          <button type="submit" class="btn-primary" style="flex:1; font-weight:700;">Simpan Profil</button>
+        </div>
+      </form>
+    `;
   } else if (type === 'kts') {
     const user = store.state.currentUser.siswa;
     card.innerHTML = `
@@ -1680,6 +1718,42 @@ window.toggleBiometric = function(checked) {
   store.state.biometricEnabled = checked;
   store.saveState();
   window.showToast(`Login Biometrik ${checked ? 'Diaktifkan 🔒' : 'Dinonaktifkan 🔓'}`, 'info');
+};
+
+window.handleSaveProfileSettings = function(e) {
+  if (e) e.preventDefault();
+  const name = document.getElementById('profName')?.value.trim();
+  const nis = document.getElementById('profNis')?.value.trim();
+  const cls = document.getElementById('profClass')?.value.trim();
+  const phone = document.getElementById('profPhone')?.value.trim();
+  const bio = document.getElementById('profBio')?.value.trim();
+
+  if (!name || !nis || !cls) {
+    window.showToast('Harap isi Nama, NIS, dan Kelas dengan benar!', 'error');
+    return;
+  }
+
+  if (store.state.currentUser && store.state.currentUser.siswa) {
+    store.state.currentUser.siswa.name = name;
+    store.state.currentUser.siswa.nis = nis;
+    store.state.currentUser.siswa.class = cls;
+    store.state.currentUser.siswa.phone = phone;
+    store.state.currentUser.siswa.bio = bio;
+
+    if (store.state.students && store.state.students.length > 0) {
+      const idx = store.state.students.findIndex(s => String(s.nis || s.id) === String(nis) || s.name === name);
+      if (idx !== -1) {
+        store.state.students[idx].name = name;
+        store.state.students[idx].nis = nis;
+        store.state.students[idx].class = cls;
+      }
+    }
+
+    store.saveState();
+  }
+
+  window.closeModal();
+  window.showToast('⚙️ Profil siswa berhasil diperbarui!', 'success');
 };
 
 window.toggleThemeMode = function(checked) {
