@@ -479,7 +479,6 @@ function renderGuruTKJView(state) {
 
 function renderTotalSiswaView(state) {
   const allStudents = state.students || [];
-  const q = (window.filterSiswaQuery || '').trim().toLowerCase();
 
   const k10 = allStudents.filter(s => {
     const c = String(s.class || s.className || '').toLowerCase();
@@ -495,13 +494,6 @@ function renderTotalSiswaView(state) {
   });
   const totalCount = allStudents.length;
 
-  const students = q ? allStudents.filter(s => {
-    const name = (s.name || s.studentName || '').toLowerCase();
-    const nis = String(s.nis || s.studentId || '').toLowerCase();
-    const cls = String(s.class || s.className || '').toLowerCase();
-    return name.includes(q) || nis.includes(q) || cls.includes(q);
-  }) : allStudents;
-
   return `
     <div style="background:white; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">
       <div style="display:flex; align-items:center; gap:12px;">
@@ -513,56 +505,33 @@ function renderTotalSiswaView(state) {
     </div>
     <div style="padding:16px;">
       <!-- Grand Total Card -->
-      <div style="background:linear-gradient(135deg, #0b2545 0%, #134074 100%); color:white; padding:18px 20px; border-radius:16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 6px 20px rgba(11,37,69,0.25);">
+      <div style="background:linear-gradient(135deg, #0b2545 0%, #134074 100%); color:white; padding:20px; border-radius:16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 6px 20px rgba(11,37,69,0.25);">
         <div>
           <span style="font-size:0.72rem; font-weight:700; letter-spacing:0.8px; color:#38bdf8; text-transform:uppercase;">TOTAL KESELURUHAN SISWA</span>
-          <h2 style="font-size:1.9rem; font-weight:800; margin:2px 0 0 0; color:#ffffff;">${totalCount} <span style="font-size:1rem; font-weight:600; color:#93c5fd;">Siswa Aktif</span></h2>
+          <h2 style="font-size:2.1rem; font-weight:800; margin:4px 0 0 0; color:#ffffff;">${totalCount} <span style="font-size:1rem; font-weight:600; color:#93c5fd;">Siswa Aktif</span></h2>
         </div>
-        <div style="width:52px; height:52px; border-radius:14px; background:rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; font-size:1.8rem;">🎓</div>
+        <div style="width:56px; height:56px; border-radius:14px; background:rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; font-size:2rem;">🎓</div>
       </div>
 
       <!-- Breakdown Grid 3 Kelas -->
-      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:16px;">
-        <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:14px; padding:12px; text-align:center;">
-          <span style="font-size:0.7rem; font-weight:800; color:#0284c7; text-transform:uppercase;">KELAS 10 (X)</span>
-          <h3 style="font-size:1.35rem; font-weight:800; color:#0369a1; margin:4px 0 0 0;">${k10.length}</h3>
-          <span style="font-size:0.68rem; color:#64748b;">Siswa</span>
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
+        <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:16px; padding:16px 12px; text-align:center;">
+          <span style="font-size:0.75rem; font-weight:800; color:#0284c7; text-transform:uppercase;">KELAS 10 (X)</span>
+          <h3 style="font-size:1.6rem; font-weight:800; color:#0369a1; margin:6px 0 2px 0;">${k10.length}</h3>
+          <span style="font-size:0.72rem; color:#64748b; font-weight:600;">Siswa</span>
         </div>
 
-        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:14px; padding:12px; text-align:center;">
-          <span style="font-size:0.7rem; font-weight:800; color:#16a34a; text-transform:uppercase;">KELAS 11 (XI)</span>
-          <h3 style="font-size:1.35rem; font-weight:800; color:#15803d; margin:4px 0 0 0;">${k11.length}</h3>
-          <span style="font-size:0.68rem; color:#64748b;">Siswa</span>
+        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:16px; padding:16px 12px; text-align:center;">
+          <span style="font-size:0.75rem; font-weight:800; color:#16a34a; text-transform:uppercase;">KELAS 11 (XI)</span>
+          <h3 style="font-size:1.6rem; font-weight:800; color:#15803d; margin:6px 0 2px 0;">${k11.length}</h3>
+          <span style="font-size:0.72rem; color:#64748b; font-weight:600;">Siswa</span>
         </div>
 
-        <div style="background:#faf5ff; border:1px solid #e9d5ff; border-radius:14px; padding:12px; text-align:center;">
-          <span style="font-size:0.7rem; font-weight:800; color:#9333ea; text-transform:uppercase;">KELAS 12 (XII)</span>
-          <h3 style="font-size:1.35rem; font-weight:800; color:#7e22ce; margin:4px 0 0 0;">${k12.length}</h3>
-          <span style="font-size:0.68rem; color:#64748b;">Siswa</span>
+        <div style="background:#faf5ff; border:1px solid #e9d5ff; border-radius:16px; padding:16px 12px; text-align:center;">
+          <span style="font-size:0.75rem; font-weight:800; color:#9333ea; text-transform:uppercase;">KELAS 12 (XII)</span>
+          <h3 style="font-size:1.6rem; font-weight:800; color:#7e22ce; margin:6px 0 2px 0;">${k12.length}</h3>
+          <span style="font-size:0.72rem; color:#64748b; font-weight:600;">Siswa</span>
         </div>
-      </div>
-
-      <!-- Search Input Bar -->
-      <div style="margin-bottom:12px;">
-        <input type="text" placeholder="🔍 Cari nama siswa, NIS, atau kelas (misal 10 TKJ 1)..." value="${window.filterSiswaQuery || ''}" oninput="window.filterSiswaList(this.value)" class="form-input" style="width:100%; border-radius:12px; font-size:0.82rem; padding:10px 14px;" />
-      </div>
-
-      <!-- Student List -->
-      <div style="font-size:0.85rem; font-weight:700; color:#1e293b; margin-bottom:10px;">
-        Daftar Siswa Terdaftar ${q ? `(Hasil Cari: ${students.length})` : `(${students.length})`}:
-      </div>
-      <div style="display:flex; flex-direction:column; gap:8px;">
-        ${students.length === 0 ? `
-          <div style="text-align:center; padding:20px; color:#64748b; font-size:0.8rem;">Tidak ditemukan siswa dengan kata kunci "${window.filterSiswaQuery}".</div>
-        ` : students.map(s => `
-          <div style="background:white; border:1px solid #e2e8f0; padding:12px 14px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin:0;">${s.name || s.studentName}</h4>
-              <p style="font-size:0.75rem; color:#64748b; margin:2px 0 0 0;">NIS: ${s.nis || s.studentId || '-'}</p>
-            </div>
-            <span style="background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:8px; font-size:0.74rem; font-weight:700;">${s.class || s.className || '10 TKJ 1'}</span>
-          </div>
-        `).join('')}
       </div>
     </div>
   `;
