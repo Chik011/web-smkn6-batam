@@ -2323,6 +2323,21 @@ body.dark-theme {
   color: #ffffff;
 }
 
+/* TikTok Theme */
+.social-tt .social-icon-box {
+  background: rgba(254, 44, 85, 0.15);
+  color: #ff0050;
+}
+.social-tt:hover {
+  background: linear-gradient(135deg, rgba(254, 44, 85, 0.15), rgba(37, 244, 238, 0.2));
+  border-color: rgba(254, 44, 85, 0.6);
+  box-shadow: 0 6px 20px rgba(254, 44, 85, 0.22);
+}
+.social-tt:hover .social-icon-box {
+  background: linear-gradient(45deg, #ff0050, #00f2fe);
+  color: #ffffff;
+}
+
 /* WhatsApp Theme */
 .social-wa .social-icon-box {
   background: rgba(16, 185, 129, 0.15);
