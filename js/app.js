@@ -156,6 +156,7 @@ function renderApp() {
               ${screenResult.contentHtml}
             </div>
           </div>
+          ${screenResult.bottomNavHtml}
         </div>
       </main>
     `;
