@@ -92,9 +92,15 @@ function getFooterHtml() {
         </div>
 
         <div class="footer-links">
-          <span class="footer-link-chip" onclick="window.showToast('SMKN 6 Batam - Kampus Kabil', 'info')">🏫 Kampus Utama</span>
-          <span class="footer-link-chip" onclick="window.showToast('Teknik Komputer & Jaringan (TKJ)', 'info')">💻 Produktif TKJ</span>
-          <span class="footer-link-chip" onclick="window.showToast('Kurikulum Merdeka 2026', 'info')">✨ Kurikulum Merdeka</span>
+          <a href="https://instagram.com/smkn6batamofficial" target="_blank" rel="noopener noreferrer" class="footer-link-chip">
+            📸 Instagram
+          </a>
+          <a href="https://youtube.com/@smkn6batam" target="_blank" rel="noopener noreferrer" class="footer-link-chip">
+            ▶️ YouTube
+          </a>
+          <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer" class="footer-link-chip">
+            💬 WhatsApp
+          </a>
         </div>
 
         <div class="footer-meta">
