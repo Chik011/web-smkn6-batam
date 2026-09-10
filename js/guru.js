@@ -1,6 +1,7 @@
 /* Guru View Renderer */
 
 import { store } from './state.js';
+import { getYouTubeDetails } from './firebase.js';
 
 export function renderGuruScreen(state) {
   const activeTab = state.activeTabs.guru || 'beranda';
@@ -60,6 +61,8 @@ export function renderGuruScreen(state) {
 
 function renderBeranda(state) {
   const teacher = state.currentUser.guru;
+  const newsList = state.broadcastNews || [];
+
   return `
     <div class="guru-header">
       <p style="font-size:0.75rem; opacity:0.85;">Selamat Datang,</p>
@@ -100,6 +103,38 @@ function renderBeranda(state) {
             Buka Absensi ➔
           </button>
         </div>
+      </div>
+
+      <!-- TKJ News Section for Guru -->
+      <div style="margin-top:20px; margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div class="section-title" style="margin:0;">TKJ News & Pengumuman</div>
+          <span style="font-size:0.75rem; color:#0284c7; font-weight:700;">${newsList.length} Video</span>
+        </div>
+        ${newsList.length === 0 ? `
+          <div class="content-card text-center" style="color:#64748b; padding:20px 14px;">
+            <p style="font-size:0.8rem; margin:0;">Belum ada berita TKJ disiarkan.</p>
+          </div>
+        ` : `
+          <div class="news-scroll-row">
+            ${newsList.map((item, idx) => {
+              const yt = getYouTubeDetails(item.url);
+              return `
+                <div class="news-card-item" data-index="${idx}" onclick="window.playNewsVideoById('${item.id}', ${idx})" style="cursor:pointer;">
+                  <div class="news-thumb" style="position:relative; overflow:hidden; border-radius:12px; background:#0f172a; pointer-events:none;">
+                    ${yt.thumbnailUrl ? `
+                      <img src="${yt.thumbnailUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:inherit;" onerror="this.style.display='none'" />
+                    ` : ''}
+                    <div class="news-play-btn" style="position:relative; z-index:2; box-shadow:0 4px 12px rgba(0,0,0,0.3); pointer-events:none;">
+                      <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  </div>
+                  <div class="news-card-title" style="pointer-events:none;">${item.title}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `}
       </div>
 
       <div class="section-title" style="margin:16px 0 10px;">Mata Pelajaran Diampu</div>
