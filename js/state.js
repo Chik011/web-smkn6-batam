@@ -108,7 +108,10 @@ const defaultState = {
   ],
 
   biometricEnabled: false,
-  themeMode: 'light'
+  themeMode: 'light',
+  cloudinaryCloudName: 'w7kqjyeq',
+  cloudinaryApiKey: '846878589789137',
+  cloudinaryApiSecret: 'wO2xbdOJDFMCRc9ZvoADPrVBvOU'
 };
 
 class Store {
@@ -118,6 +121,11 @@ class Store {
     this.loadState();
     this.applyTheme();
     this.initFirebaseSync();
+  }
+
+  setCloudinaryCloudName(name) {
+    this.state.cloudinaryCloudName = (name || '').trim();
+    this.saveState();
   }
 
   setThemeMode(theme) {
@@ -653,6 +661,9 @@ class Store {
             const nis = String(s.nis || '');
             return !name.includes('ahmad rizki') && !name.includes('budi santoso') && !name.includes('citra dewi') && nis !== '2024001' && nis !== '2024002' && nis !== '2024003';
           });
+        }
+        if (!this.state.cloudinaryCloudName) {
+          this.state.cloudinaryCloudName = 'w7kqjyeq';
         }
       } else {
         this.state = JSON.parse(JSON.stringify(defaultState));

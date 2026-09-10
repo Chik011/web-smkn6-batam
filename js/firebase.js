@@ -88,6 +88,44 @@ export function getYouTubeDetails(url) {
   return { id: '', embedUrl: cleanUrl, thumbnailUrl: '' };
 }
 
+export async function uploadFileToCloudinary(file, cloudName, apiKey = '846878589789137', apiSecret = 'wO2xbdOJDFMCRc9ZvoADPrVBvOU') {
+  if (!cloudName || !cloudName.trim()) {
+    throw new Error('Harap masukkan Cloud Name Cloudinary Anda terlebih dahulu.');
+  }
+
+  const timestamp = Math.floor(Date.now() / 1000);
+  const sigString = `timestamp=${timestamp}${apiSecret}`;
+
+  // SHA-1 via Web Crypto API
+  const msgUint8 = new TextEncoder().encode(sigString);
+  const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('api_key', apiKey);
+  formData.append('timestamp', timestamp);
+  formData.append('signature', signature);
+
+  const endpoint = `https://api.cloudinary.com/v1_1/${cloudName.trim()}/image/upload`;
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    body: formData
+  });
+
+  const result = await response.json();
+  if (!response.ok || result.error) {
+    throw new Error(result.error ? result.error.message : 'Gagal mengunggah gambar ke Cloudinary.');
+  }
+
+  return result.secure_url || result.url;
+}
+
+if (typeof window !== 'undefined') {
+  window.uploadFileToCloudinary = uploadFileToCloudinary;
+}
+
 export { app, db, auth, isFirebaseConnected, doc, setDoc, onSnapshot, collection, deleteDoc, getDocs, serverTimestamp };
 
 

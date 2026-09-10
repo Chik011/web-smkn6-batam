@@ -1,6 +1,7 @@
 /* Admin View Renderer */
 
 import { store } from './state.js';
+import { uploadFileToCloudinary } from './firebase.js';
 
 export function renderAdminScreen(state) {
   const activeTab = state.activeTabs.admin || 'home';
@@ -851,22 +852,39 @@ window.openAdminContentModal = function(type) {
   } else if (type === 'galeri') {
     const items = state.galeriItems || [];
     card.innerHTML = `
-      <div class="modal-title">🖼️ Kelola Galeri Siswa</div>
+      <div class="modal-title">🖼️ Kelola Galeri Siswa (Cloudinary Integrated)</div>
       <form onsubmit="window.handleAddGaleriSubmit(event)" style="margin-bottom:16px;">
-        <div style="font-size:0.82rem; font-weight:700; color:#1e293b; margin-bottom:8px;">+ Tambah Gambar Galeri Baru</div>
+        <div style="font-size:0.82rem; font-weight:700; color:#0284c7; margin-bottom:6px;">☁️ Akun Cloudinary Admin:</div>
         <div class="form-group">
+          <label class="form-label">Cloud Name Cloudinary</label>
+          <input type="text" id="gCloudName" class="form-input" placeholder="Masukkan Cloud Name Anda (contoh: dx123abc)" value="${state.cloudinaryCloudName || ''}" onchange="store.setCloudinaryCloudName(this.value)" />
+        </div>
+
+        <div style="font-size:0.82rem; font-weight:700; color:#1e293b; margin:12px 0 6px 0;">+ Tambah Foto Galeri Baru</div>
+        <div class="form-group">
+          <label class="form-label">📁 Unggah Gambar Langsung ke Cloudinary</label>
+          <input type="file" id="gFileInput" accept="image/*" class="form-input" onchange="window.handleCloudinaryFileSelect(event)" style="padding:6px 10px;" />
+          <div id="gUploadStatus" style="display:none; font-size:0.75rem; margin-top:4px;"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Judul Foto / Kegiatan</label>
           <input type="text" id="gTitle" class="form-input" placeholder="Judul Foto / Kegiatan" required />
         </div>
         <div class="form-group">
+          <label class="form-label">Kategori (Badge)</label>
           <input type="text" id="gCategory" class="form-input" placeholder="Kategori (contoh: 🏆 PRESTASI, 🛠️ PRAKTIKUM)" required />
         </div>
         <div class="form-group">
+          <label class="form-label">URL Gambar (Terisi Otomatis setelah Upload)</label>
           <input type="text" id="gUrl" class="form-input" placeholder="URL Link Gambar (https://...)" required />
+          <img id="gPreviewImg" src="" style="display:none; width:100%; height:120px; object-fit:cover; border-radius:10px; margin-top:8px; border:1px solid #e2e8f0;" />
         </div>
         <div class="form-group">
+          <label class="form-label">Keterangan Singkat</label>
           <input type="text" id="gSub" class="form-input" placeholder="Keterangan singkat" />
         </div>
-        <button type="submit" class="btn-primary" style="width:100%;">+ Tambah Foto Ke Galeri</button>
+        <button type="submit" class="btn-primary" style="width:100%; font-weight:700;">+ Simpan Ke Galeri Siswa</button>
       </form>
 
       <div style="font-size:0.82rem; font-weight:700; color:#1e293b; margin-bottom:8px;">Daftar Gambar (${items.length}):</div>
@@ -996,4 +1014,62 @@ window.handleAddBookSubmit = function(e) {
   window.showToast('📚 Buku digital berhasil ditambahkan!', 'success');
   window.openAdminContentModal('elibrary');
 };
+
+window.handleCloudinaryFileSelect = async function(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+
+  const cloudNameInput = document.getElementById('gCloudName');
+  const cloudName = (cloudNameInput && cloudNameInput.value.trim()) || store.getState().cloudinaryCloudName;
+
+  const statusEl = document.getElementById('gUploadStatus');
+  const urlInput = document.getElementById('gUrl');
+  const previewImg = document.getElementById('gPreviewImg');
+
+  if (!cloudName) {
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#ef4444';
+      statusEl.textContent = '❌ Mohon masukkan Cloud Name Cloudinary Anda terlebih dahulu.';
+    }
+    if (typeof window.showToast === 'function') {
+      window.showToast('Mohon isi Cloud Name Cloudinary terlebih dahulu', 'error');
+    }
+    return;
+  }
+
+  try {
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#0284c7';
+      statusEl.textContent = '⏳ Mengunggah gambar ke Cloudinary... Mohon tunggu.';
+    }
+
+    const secureUrl = await uploadFileToCloudinary(file, cloudName);
+    
+    if (urlInput) urlInput.value = secureUrl;
+    if (previewImg) {
+      previewImg.src = secureUrl;
+      previewImg.style.display = 'block';
+    }
+
+    if (statusEl) {
+      statusEl.style.color = '#10b981';
+      statusEl.textContent = '✅ Gambar berhasil diunggah ke Cloudinary!';
+    }
+    if (typeof window.showToast === 'function') {
+      window.showToast('Gambar berhasil diunggah ke Cloudinary!', 'success');
+    }
+  } catch (err) {
+    console.error('Cloudinary upload error:', err);
+    if (statusEl) {
+      statusEl.style.color = '#ef4444';
+      statusEl.textContent = '❌ Upload gagal: ' + (err.message || err);
+    }
+    if (typeof window.showToast === 'function') {
+      window.showToast('Upload gagal: ' + (err.message || err), 'error');
+    }
+  }
+};
+
 
