@@ -266,7 +266,7 @@ function renderApp() {
         `;
       } else {
         phoneScreen.innerHTML = `
-          <div>
+          <div class="tab-content-anim">
             ${screenResult.contentHtml}
             ${getFooterHtml()}
           </div>
