@@ -231,11 +231,32 @@ function renderInputAbsensi(state) {
   });
   const students = Array.from(seen.values());
 
-  window.tempAbsensi = window.tempAbsensi || {};
+  const selectedDate = (document.getElementById('absensiDate')?.value) || new Date().toISOString().split('T')[0];
+  const selectedPertemuan = parseInt(document.getElementById('absensiPertemuan')?.value || '1');
+  const sessionKey = `${selectedDate}_${selectedClass}_${selectedMapel}_p${selectedPertemuan}`;
+
+  const savedRecord = (state.attendance || []).find(a =>
+    a.date === selectedDate &&
+    a.pertemuan === selectedPertemuan &&
+    a.class === selectedClass &&
+    (!a.mapel || a.mapel === selectedMapel)
+  );
+
+  if (!window.tempAbsensi || window.lastAbsensiSession !== sessionKey) {
+    window.lastAbsensiSession = sessionKey;
+    window.tempAbsensi = {};
+    if (savedRecord && savedRecord.records) {
+      Object.entries(savedRecord.records).forEach(([k, v]) => {
+        window.tempAbsensi[String(k)] = v;
+      });
+    }
+  }
 
   let countH = 0, countS = 0, countI = 0, countA = 0;
   students.forEach(s => {
-    const st = window.tempAbsensi[s.id] || 'A';
+    const sId = String(s.id);
+    const sNis = String(s.nis || '');
+    const st = window.tempAbsensi[sId] || window.tempAbsensi[sNis] || 'A';
     if (st === 'H') countH++;
     else if (st === 'S') countS++;
     else if (st === 'I') countI++;
@@ -252,16 +273,12 @@ function renderInputAbsensi(state) {
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
         <div class="form-group" style="margin-bottom:0;">
           <label class="form-label">Tanggal</label>
-          <input type="date" class="form-input" id="absensiDate" value="${new Date().toISOString().split('T')[0]}" />
+          <input type="date" class="form-input" id="absensiDate" value="${selectedDate}" onchange="window.lastAbsensiSession = ''; window.renderApp && window.renderApp();" />
         </div>
         <div class="form-group" style="margin-bottom:0;">
           <label class="form-label">Pertemuan</label>
-          <select class="form-select" id="absensiPertemuan">
-            <option value="1">Pertemuan 1</option>
-            <option value="2">Pertemuan 2</option>
-            <option value="3">Pertemuan 3</option>
-            <option value="4">Pertemuan 4</option>
-            <option value="5">Pertemuan 5</option>
+          <select class="form-select" id="absensiPertemuan" onchange="window.lastAbsensiSession = ''; window.renderApp && window.renderApp();">
+            ${[1,2,3,4,5].map(p => `<option value="${p}" ${p === selectedPertemuan ? 'selected' : ''}>Pertemuan ${p}</option>`).join('')}
           </select>
         </div>
       </div>
@@ -269,14 +286,14 @@ function renderInputAbsensi(state) {
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
         <div class="form-group" style="margin-bottom:0;">
           <label class="form-label">Mata Pelajaran</label>
-          <select class="form-select" id="absensiMapel" onchange="window.guruSelectedMapel = this.value; window.renderApp && window.renderApp();">
+          <select class="form-select" id="absensiMapel" onchange="window.guruSelectedMapel = this.value; window.lastAbsensiSession = ''; window.renderApp && window.renderApp();">
             <option value="${teacherMapel}">${teacherMapel}</option>
             ${(state.mapel || []).filter(m => m.name !== teacherMapel).map(m => `<option value="${m.name}" ${m.name === selectedMapel ? 'selected' : ''}>${m.name}</option>`).join('')}
           </select>
         </div>
         <div class="form-group" style="margin-bottom:0;">
           <label class="form-label">Kelas Ajar (${teacherClasses.length})</label>
-          <select class="form-select" id="absensiKelas" onchange="window.guruSelectedClass = this.value; window.renderApp && window.renderApp();">
+          <select class="form-select" id="absensiKelas" onchange="window.guruSelectedClass = this.value; window.lastAbsensiSession = ''; window.renderApp && window.renderApp();">
             ${teacherClasses.map(cName => `<option value="${cName}" ${cName === selectedClass ? 'selected' : ''}>${cName}</option>`).join('')}
           </select>
         </div>
@@ -300,7 +317,9 @@ function renderInputAbsensi(state) {
         ${students.length === 0 ? `
           <p style="font-size:0.82rem; color:#94a3b8; text-align:center; padding:16px 0;">Tidak ada data siswa untuk kelas ${selectedClass}.</p>
         ` : students.map(s => {
-          const currentStatus = window.tempAbsensi[s.id] || 'A';
+          const sId = String(s.id);
+          const sNis = String(s.nis || '');
+          const currentStatus = window.tempAbsensi[sId] || window.tempAbsensi[sNis] || 'A';
           return `
             <div class="student-list-item">
               <div>
