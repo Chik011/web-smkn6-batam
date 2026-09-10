@@ -598,7 +598,7 @@ function generateMonthCalendarHtml(year, monthIndex) {
     }
 
     cellsHtml += `
-      <div style="height:36px; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:10px; background:${dayBg}; color:${dayColor}; font-weight:${isToday || event ? '800' : '500'}; font-size:0.8rem; border:${border}; position:relative; cursor:pointer;" title="${isToday ? 'Hari Ini' : (event ? event.label : '')}">
+      <div style="height:36px; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:10px; background:${dayBg}; color:${dayColor}; font-weight:${isToday || event ? '800' : '500'}; font-size:0.8rem; border:${border}; position:relative; cursor:pointer; transition:transform 0.15s ease;" onclick="window.showCalendarDateDetail('${monthNames[monthIndex]}', ${d}, ${year})" title="${isToday ? 'Hari Ini (Klik untuk detail)' : (event ? event.label + ' (Klik untuk detail)' : 'Klik untuk melihat agenda')}">
         <span>${d}</span>
         ${badgeDot}
       </div>
@@ -625,6 +625,64 @@ function generateMonthCalendarHtml(year, monthIndex) {
   `;
 }
 
+window.showCalendarDateDetail = function(monthName, day, year) {
+  const overlay = document.getElementById('globalModal');
+  const card = document.getElementById('modalCardContent');
+  if (!overlay || !card) return;
+
+  const dateStr = `${day} ${monthName} ${year}`;
+  
+  let eventTag = '🗓️ AGENDA SCHEDULER';
+  let eventTitle = `Kegiatan Akademik & Pembelajaran Lab`;
+  let eventColor = '#0284c7';
+  let eventBg = '#e0f2fe';
+  let eventDesc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.';
+
+  if (monthName === 'September' && day >= 15 && day <= 20) {
+    eventTag = '🏆 PTS GANJIL';
+    eventTitle = `Penilaian Tengah Semester (PTS) Ganjil`;
+    eventColor = '#0284c7';
+    eventBg = '#e0f2fe';
+    eventDesc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
+  } else if (monthName === 'Oktober' && day >= 5 && day <= 12) {
+    eventTag = '📜 SERTIFIKASI MTCNA';
+    eventTitle = `Sertifikasi Industri MikroTik MTCNA`;
+    eventColor = '#6366f1';
+    eventBg = '#e0e7ff';
+    eventDesc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.';
+  } else if (monthName === 'November' && day >= 10 && day <= 15) {
+    eventTag = '💻 SIMULASI UKK TKJ';
+    eventTitle = `Simulasi Uji Kompetensi Keahlian (UKK) TKJ`;
+    eventColor = '#10b981';
+    eventBg = '#dcfce7';
+    eventDesc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+  } else if (monthName === 'Desember' && day >= 1 && day <= 10) {
+    eventTag = '📝 PAS GANJIL';
+    eventTitle = `Penilaian Akhir Semester (PAS) Ganjil`;
+    eventColor = '#f59e0b';
+    eventBg = '#fef3c7';
+    eventDesc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.';
+  }
+
+  card.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <span style="background:${eventBg}; color:${eventColor}; font-weight:800; font-size:0.75rem; padding:4px 10px; border-radius:8px;">
+        ${eventTag}
+      </span>
+      <span style="font-size:0.75rem; color:#0284c7; font-weight:700;">📅 ${dateStr}</span>
+    </div>
+    <h3 style="font-size:1.1rem; font-weight:800; color:#0f172a; margin:0 0 8px 0; line-height:1.35;">${eventTitle}</h3>
+    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid ${eventColor}; padding:12px 14px; border-radius:12px; margin-bottom:16px;">
+      <div style="font-size:0.72rem; font-weight:700; color:#64748b; margin-bottom:4px; text-transform:uppercase;">Deskripsi Acara (Lorem Ipsum):</div>
+      <p style="font-size:0.8rem; color:#334155; line-height:1.55; margin:0;">
+        ${eventDesc}
+      </p>
+    </div>
+    <button class="btn-primary" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup Detail Acara</button>
+  `;
+  overlay.classList.add('open');
+};
+
 function renderKalenderView(state) {
   const now = new Date();
   const curYear = now.getFullYear();
@@ -638,10 +696,10 @@ function renderKalenderView(state) {
   const month2Html = generateMonthCalendarHtml(nextYear, nextMonth);
 
   const agendas = state.kalenderAgendas || [
-    { id: '1', date: '15 - 20 September 2026', tag: 'PTS', title: 'Penilaian Tengah Semester (PTS) Ganjil', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', color: '#0284c7', bg: '#e0f2fe' },
-    { id: '2', date: '05 - 12 Oktober 2026', tag: 'Sertifikasi', title: 'Sertifikasi Industri MikroTik MTCNA', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.', color: '#6366f1', bg: '#e0e7ff' },
-    { id: '3', date: '10 - 15 November 2026', tag: 'UKK TKJ', title: 'Simulasi Uji Kompetensi Keahlian (UKK)', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.', color: '#10b981', bg: '#dcfce7' },
-    { id: '4', date: '01 - 10 Desember 2026', tag: 'PAS Ganjil', title: 'Penilaian Akhir Semester (PAS) Ganjil', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa.', color: '#f59e0b', bg: '#fef3c7' }
+    { id: '1', date: '15 - 20 September 2026', tag: 'PTS', title: 'Penilaian Tengah Semester (PTS) Ganjil', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', color: '#0284c7', bg: '#e0f2fe', mName: 'September', dNum: 15 },
+    { id: '2', date: '05 - 12 Oktober 2026', tag: 'Sertifikasi', title: 'Sertifikasi Industri MikroTik MTCNA', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.', color: '#6366f1', bg: '#e0e7ff', mName: 'Oktober', dNum: 5 },
+    { id: '3', date: '10 - 15 November 2026', tag: 'UKK TKJ', title: 'Simulasi Uji Kompetensi Keahlian (UKK)', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.', color: '#10b981', bg: '#dcfce7', mName: 'November', dNum: 10 },
+    { id: '4', date: '01 - 10 Desember 2026', tag: 'PAS Ganjil', title: 'Penilaian Akhir Semester (PAS) Ganjil', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa.', color: '#f59e0b', bg: '#fef3c7', mName: 'Desember', dNum: 1 }
   ];
 
   return `
@@ -650,7 +708,7 @@ function renderKalenderView(state) {
         <button style="background:none; border:none; cursor:pointer;" onclick="window.switchSiswaTab('home')">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </button>
-        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b;">📅 Kalender Akademik 2 Bulan Real-Time</h3>
+        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b;">📅 Kalender Akademik Real-Time</h3>
       </div>
     </div>
     <div style="padding:16px;">
@@ -661,10 +719,10 @@ function renderKalenderView(state) {
       ${month2Html}
 
       <!-- Detailed Agenda List -->
-      <div style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:16px 0 10px 0;">Agenda & Catatan Penting:</div>
+      <div style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:16px 0 10px 0;">Agenda & Catatan Penting (Klik untuk detail):</div>
       <div style="display:flex; flex-direction:column; gap:10px;">
         ${agendas.map(a => `
-          <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid ${a.color || '#0284c7'}; padding:12px 14px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+          <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid ${a.color || '#0284c7'}; padding:12px 14px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.03); cursor:pointer;" onclick="window.showCalendarDateDetail('${a.mName || 'September'}', ${a.dNum || 15}, 2026)">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span style="font-size:0.75rem; font-weight:700; color:${a.color || '#0284c7'};">${a.date}</span>
               <span style="background:${a.bg || '#e0f2fe'}; color:${a.color || '#0284c7'}; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${a.tag}</span>
