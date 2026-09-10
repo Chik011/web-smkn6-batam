@@ -496,6 +496,62 @@ class Store {
           }, () => {});
         } catch (e) {}
       });
+
+      // 9. Sync content_visimisi collection
+      try {
+        onSnapshot(doc(db, 'content_visimisi', 'visimisi_tkj'), (docSnap) => {
+          if (docSnap && docSnap.exists()) {
+            const d = docSnap.data();
+            if (d.visi && d.misi) {
+              this.state.visiMisi = { visi: d.visi, misi: d.misi };
+              this.saveStateToLocalStorage();
+              this.notify();
+            }
+          }
+        }, () => {});
+      } catch (e) {}
+
+      // 10. Sync galeri_siswa collection
+      try {
+        onSnapshot(collection(db, 'galeri_siswa'), (snapshot) => {
+          if (snapshot && !snapshot.empty) {
+            const items = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+            if (items.length > 0) {
+              this.state.galeriItems = items;
+              this.saveStateToLocalStorage();
+              this.notify();
+            }
+          }
+        }, () => {});
+      } catch (e) {}
+
+      // 11. Sync kalender_agenda collection
+      try {
+        onSnapshot(collection(db, 'kalender_agenda'), (snapshot) => {
+          if (snapshot && !snapshot.empty) {
+            const agendas = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+            if (agendas.length > 0) {
+              this.state.kalenderAgendas = agendas;
+              this.saveStateToLocalStorage();
+              this.notify();
+            }
+          }
+        }, () => {});
+      } catch (e) {}
+
+      // 12. Sync elibrary_buku collection
+      try {
+        onSnapshot(collection(db, 'elibrary_buku'), (snapshot) => {
+          if (snapshot && !snapshot.empty) {
+            const books = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+            if (books.length > 0) {
+              this.state.elibraryBooks = books;
+              this.saveStateToLocalStorage();
+              this.notify();
+            }
+          }
+        }, () => {});
+      } catch (e) {}
     } catch (e) {
       console.error("Failed to setup Firebase real-time sync:", e);
     }
@@ -545,6 +601,32 @@ class Store {
             nama_mapel: m.name,
             name: m.name
           }, { merge: true }).catch(e => console.warn(e));
+        }
+      }
+
+      // Seed Visi Misi content
+      if (this.state.visiMisi) {
+        setDoc(doc(db, 'content_visimisi', 'visimisi_tkj'), this.state.visiMisi, { merge: true }).catch(e => console.warn(e));
+      }
+
+      // Seed Galeri Siswa items
+      if (this.state.galeriItems && this.state.galeriItems.length > 0) {
+        for (const g of this.state.galeriItems) {
+          setDoc(doc(db, 'galeri_siswa', String(g.id)), g, { merge: true }).catch(e => console.warn(e));
+        }
+      }
+
+      // Seed Kalender Agendas
+      if (this.state.kalenderAgendas && this.state.kalenderAgendas.length > 0) {
+        for (const a of this.state.kalenderAgendas) {
+          setDoc(doc(db, 'kalender_agenda', String(a.id)), a, { merge: true }).catch(e => console.warn(e));
+        }
+      }
+
+      // Seed E-Library Books
+      if (this.state.elibraryBooks && this.state.elibraryBooks.length > 0) {
+        for (const b of this.state.elibraryBooks) {
+          setDoc(doc(db, 'elibrary_buku', String(b.id)), b, { merge: true }).catch(e => console.warn(e));
         }
       }
     } catch (err) {
@@ -603,6 +685,10 @@ class Store {
         const stateRef = doc(db, 'smkn6', 'app_state');
         setDoc(stateRef, JSON.parse(JSON.stringify(this.state)), { merge: true })
           .catch(err => console.warn("Firebase auto-sync info:", err.message || err));
+
+        if (this.state.visiMisi) {
+          setDoc(doc(db, 'content_visimisi', 'visimisi_tkj'), this.state.visiMisi, { merge: true }).catch(e => console.warn(e));
+        }
       } catch (e) {
         console.warn("Firebase save state error:", e);
       }
@@ -1106,6 +1192,10 @@ class Store {
       misi: Array.isArray(misi) ? misi : (this.state.visiMisi.misi || [])
     };
     this.saveState();
+
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'content_visimisi', 'visimisi_tkj'), this.state.visiMisi, { merge: true }).catch(e => console.warn(e));
+    }
   }
 
   addGaleriItem(item) {
@@ -1121,12 +1211,21 @@ class Store {
     };
     this.state.galeriItems.unshift(newItem);
     this.saveState();
+
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'galeri_siswa', newItem.id), newItem).catch(e => console.warn(e));
+    }
   }
 
   deleteGaleriItem(id) {
+    const idStr = String(id);
     if (!this.state.galeriItems) return;
-    this.state.galeriItems = this.state.galeriItems.filter(g => String(g.id) !== String(id));
+    this.state.galeriItems = this.state.galeriItems.filter(g => String(g.id) !== idStr);
     this.saveState();
+
+    if (isFirebaseConnected && db) {
+      deleteDoc(doc(db, 'galeri_siswa', idStr)).catch(e => console.warn(e));
+    }
   }
 
   addKalenderAgenda(agenda) {
@@ -1142,12 +1241,21 @@ class Store {
     };
     this.state.kalenderAgendas.push(newAgenda);
     this.saveState();
+
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'kalender_agenda', newAgenda.id), newAgenda).catch(e => console.warn(e));
+    }
   }
 
   deleteKalenderAgenda(id) {
+    const idStr = String(id);
     if (!this.state.kalenderAgendas) return;
-    this.state.kalenderAgendas = this.state.kalenderAgendas.filter(a => String(a.id) !== String(id));
+    this.state.kalenderAgendas = this.state.kalenderAgendas.filter(a => String(a.id) !== idStr);
     this.saveState();
+
+    if (isFirebaseConnected && db) {
+      deleteDoc(doc(db, 'kalender_agenda', idStr)).catch(e => console.warn(e));
+    }
   }
 
   addElibraryBook(book) {
@@ -1162,12 +1270,21 @@ class Store {
     };
     this.state.elibraryBooks.push(newBook);
     this.saveState();
+
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'elibrary_buku', newBook.id), newBook).catch(e => console.warn(e));
+    }
   }
 
   deleteElibraryBook(id) {
+    const idStr = String(id);
     if (!this.state.elibraryBooks) return;
-    this.state.elibraryBooks = this.state.elibraryBooks.filter(b => String(b.id) !== String(id));
+    this.state.elibraryBooks = this.state.elibraryBooks.filter(b => String(b.id) !== idStr);
     this.saveState();
+
+    if (isFirebaseConnected && db) {
+      deleteDoc(doc(db, 'elibrary_buku', idStr)).catch(e => console.warn(e));
+    }
   }
 }
 
