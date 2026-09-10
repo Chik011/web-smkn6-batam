@@ -146,7 +146,7 @@ function getFooterHtml() {
 
         <div class="footer-bottom">
           <div class="footer-bottom-info">
-            <p>© 2026 SMK Negeri 6 Batam • Hak Cipta Dilindungi</p>
+            <p>© 2026 SMK Negeri 6 Batam</p>
             <p class="footer-location">📍 Jl. Kabil, Batam Kota, Kepulauan Riau</p>
           </div>
         </div>
