@@ -115,6 +115,35 @@ function renderHome(state) {
       <span style="font-size:0.75rem; opacity:0.85;">📥 Klik untuk unduh rekap data</span>
     </div>
 
+    <!-- Kelola Konten & Media Academic Hub (Admin Main Actions) -->
+    <div class="content-card">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <span style="font-size:1.4rem;">🛠️</span>
+        <div>
+          <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin:0;">Kelola Galeri Siswa & Kalender Akademik</h4>
+          <p style="font-size:0.72rem; color:#64748b; margin:2px 0 0 0;">Upload foto Galeri Siswa, kelola agenda Kalender, Edit Visi Misi & E-Library.</p>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;">
+        <button type="button" class="btn-primary" style="background:#f3e8ff; color:#9333ea; border:1px solid #e9d5ff; text-align:left; padding:12px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="window.openAdminContentModal('galeri')">
+          🖼️ Kelola Galeri Siswa
+        </button>
+
+        <button type="button" class="btn-primary" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; text-align:left; padding:12px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="window.openAdminContentModal('kalender')">
+          📅 Kelola Kalender
+        </button>
+
+        <button type="button" class="btn-primary" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; text-align:left; padding:12px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="window.openAdminContentModal('visiMisi')">
+          🎯 Edit Visi & Misi
+        </button>
+
+        <button type="button" class="btn-primary" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; text-align:left; padding:12px; font-weight:700; font-size:0.78rem; cursor:pointer;" onclick="window.openAdminContentModal('elibrary')">
+          📚 Kelola E-Library
+        </button>
+      </div>
+    </div>
+
     <!-- Broadcast News Section -->
     <div class="content-card">
       <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin-bottom:12px;">📢 Buat Broadcast News</h4>
