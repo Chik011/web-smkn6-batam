@@ -1592,13 +1592,25 @@ window.toggleThemeMode = function(checked) {
   window.showToast(`Tema ${checked ? 'Mode Gelap 🌙' : 'Mode Terang ☀️'} Diaktifkan!`, 'info');
 };
 
+let renderScheduled = false;
+function scheduleRenderApp() {
+  if (renderScheduled) return;
+  renderScheduled = true;
+  requestAnimationFrame(() => {
+    renderApp();
+    renderScheduled = false;
+  });
+}
+
 window.syncFirebase = function() {
   store.seedDatabaseToFirebase();
 };
 
-// Initialize App
-store.subscribe(renderApp);
-document.addEventListener('DOMContentLoaded', () => {
-  renderApp();
-});
-renderApp();
+// Initialize App with debounced scheduler
+store.subscribe(scheduleRenderApp);
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', scheduleRenderApp);
+} else {
+  scheduleRenderApp();
+}

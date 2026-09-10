@@ -212,6 +212,11 @@ body::before {
   color: var(--accent-blue);
 }
 
+.desktop-title p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
 .desktop-meta {
   display: flex;
   align-items: center;
@@ -219,6 +224,118 @@ body::before {
   color: var(--text-muted);
   font-size: 0.78rem;
   font-weight: 600;
+}
+
+/* ==========================================================================
+   Responsive Mobile HP & Mobile Emulator Styles
+   ========================================================================== */
+@media (max-width: 768px) {
+  body {
+    background: var(--bg-app);
+  }
+
+  .desktop-header-block {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .desktop-top-row {
+    padding: 10px 14px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .desktop-brand {
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .desktop-brand .logo-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+  }
+
+  .desktop-title h1 {
+    font-size: 0.95rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .desktop-title p,
+  .desktop-subtitle {
+    display: none !important;
+  }
+
+  .desktop-meta {
+    gap: 6px;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+  }
+
+  .desktop-meta .today-label {
+    display: none !important;
+  }
+
+  .desktop-nav-row {
+    display: none !important;
+  }
+
+  .desktop-layout {
+    padding: 0 !important;
+    min-height: auto;
+  }
+
+  .phone-frame {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    height: calc(100vh - 54px);
+  }
+
+  .phone-status-bar {
+    display: flex !important;
+  }
+
+  .phone-screen {
+    border-radius: 0 !important;
+    padding-bottom: 64px !important;
+  }
+
+  .phone-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    height: 60px;
+    padding: 4px 6px 8px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .phone-bottom-nav .nav-item {
+    font-size: 0.65rem;
+    padding: 2px;
+    gap: 2px;
+  }
+
+  .phone-bottom-nav .nav-icon {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 .logout-btn {
