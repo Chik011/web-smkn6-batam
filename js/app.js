@@ -92,10 +92,10 @@ function getFooterHtml() {
         </div>
 
         <div class="footer-links">
-          <a href="https://instagram.com/smkn6batamofficial" target="_blank" rel="noopener noreferrer" class="footer-link-chip">
+          <a href="https://www.instagram.com/tkj_smkn_6/" target="_blank" rel="noopener noreferrer" class="footer-link-chip">
             📸 Instagram
           </a>
-          <a href="https://youtube.com/@smkn6batam" target="_blank" rel="noopener noreferrer" class="footer-link-chip">
+          <a href="https://www.youtube.com/@tkjteknikkomputerdanjaring7669" target="_blank" rel="noopener noreferrer" class="footer-link-chip">
             ▶️ YouTube
           </a>
           <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer" class="footer-link-chip">
