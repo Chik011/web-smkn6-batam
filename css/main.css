@@ -1412,21 +1412,25 @@ body::before {
 
 /* Modals Overlay */
 .modal-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(4px);
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  z-index: 100;
+  z-index: 99999 !important;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease;
+  overflow-y: auto;
 }
 
 .modal-overlay.open {
@@ -1434,14 +1438,22 @@ body::before {
   pointer-events: auto;
 }
 
+body.modal-open {
+  overflow: hidden !important;
+}
+
 .modal-card {
   background: white;
   width: 100%;
-  max-width: 320px;
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  box-shadow: var(--shadow-lg);
+  max-width: 380px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: 22px;
+  padding: 24px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  margin: auto;
 }
 
 @keyframes popIn {

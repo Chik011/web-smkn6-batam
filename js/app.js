@@ -1711,8 +1711,37 @@ if (!window._newsCardClickListenerAttached) {
 }
 
 window.closeModal = function() {
-  document.getElementById('globalModal').classList.remove('open');
+  const modal = document.getElementById('globalModal');
+  if (modal) modal.classList.remove('open');
+  document.body.classList.remove('modal-open');
 };
+
+if (typeof window !== 'undefined' && !window._modalObserverAttached) {
+  window._modalObserverAttached = true;
+  const syncModalBodyState = () => {
+    const modal = document.getElementById('globalModal');
+    if (modal && modal.classList.contains('open')) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+  };
+
+  const observer = new MutationObserver(syncModalBodyState);
+  const initObserver = () => {
+    const modal = document.getElementById('globalModal');
+    if (modal) {
+      observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
+      syncModalBodyState();
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initObserver);
+  } else {
+    initObserver();
+  }
+}
 
 window.toggleBiometric = function(checked) {
   store.state.biometricEnabled = checked;
