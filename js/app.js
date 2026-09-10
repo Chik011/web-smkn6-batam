@@ -90,9 +90,16 @@ function getFooterHtml() {
             <p>Sistem Informasi Akademik Terpadu</p>
           </div>
         </div>
+
+        <div class="footer-links">
+          <span class="footer-link-chip" onclick="window.showToast('SMKN 6 Batam - Kampus Kabil', 'info')">🏫 Kampus Utama</span>
+          <span class="footer-link-chip" onclick="window.showToast('Teknik Komputer & Jaringan (TKJ)', 'info')">💻 Produktif TKJ</span>
+          <span class="footer-link-chip" onclick="window.showToast('Kurikulum Merdeka 2026', 'info')">✨ Kurikulum Merdeka</span>
+        </div>
+
         <div class="footer-meta">
           <p>© 2026 SMK Negeri 6 Batam. Hak Cipta Dilindungi.</p>
-          <p class="footer-address">📍 Jl. Kabil, Kota Batam, Kepulauan Riau</p>
+          <p class="footer-address">📍 Jl. Kabil, Batam Kota, Kepulauan Riau</p>
         </div>
       </div>
     </footer>
