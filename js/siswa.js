@@ -30,6 +30,9 @@ export function renderSiswaScreen(state) {
     case 'elibrary':
       contentHtml = renderLibraryView(state);
       break;
+    case 'videotkj':
+      contentHtml = renderVidioTKJView(state);
+      break;
     case 'pelajaran':
       contentHtml = renderPelajaran(state);
       break;
@@ -198,7 +201,7 @@ function renderHome(state) {
     <div class="news-section-wrapper">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <div class="section-title" style="margin:0;">TKJ News</div>
-        <button style="background:none; border:none; color:#0284c7; font-weight:700; font-size:0.78rem; cursor:pointer; display:flex; align-items:center; gap:4px;" onclick="window.openSiswaModal('videoTKJ')">
+        <button style="background:none; border:none; color:#0284c7; font-weight:700; font-size:0.78rem; cursor:pointer; display:flex; align-items:center; gap:4px;" onclick="window.switchSiswaTab('videotkj')">
           Lihat Semua <span style="font-size:0.9rem;">→</span>
         </button>
       </div>
@@ -393,6 +396,16 @@ function renderAkun(state) {
 }
 
 function renderVisiMisiView(state) {
+  const data = state.visiMisi || {
+    visi: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    misi: [
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.",
+      "Incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
+      "Quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore."
+    ]
+  };
+
   return `
     <div style="background:white; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">
       <div style="display:flex; align-items:center; gap:12px;">
@@ -406,17 +419,14 @@ function renderVisiMisiView(state) {
       <div style="background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color:white; padding:18px; border-radius:16px; margin-bottom:14px; box-shadow:0 6px 20px rgba(15,23,42,0.15);">
         <h4 style="font-size:0.9rem; font-weight:800; color:#38bdf8; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Visi TKJ</h4>
         <p style="font-size:0.84rem; line-height:1.6; color:#f8fafc; margin:0;">
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          "${data.visi}"
         </p>
       </div>
 
       <div style="background:white; border:1px solid #e2e8f0; padding:18px; border-radius:16px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
         <h4 style="font-size:0.9rem; font-weight:800; color:#0f172a; margin-bottom:10px; text-transform:uppercase; letter-spacing:0.5px;">Misi Utama</h4>
         <ol style="font-size:0.82rem; color:#334155; margin:0 0 0 18px; padding:0; line-height:1.7;">
-          <li style="margin-bottom:8px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</li>
-          <li style="margin-bottom:8px;">Incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</li>
-          <li style="margin-bottom:8px;">Quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</li>
-          <li>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</li>
+          ${(data.misi || []).map((m, idx) => `<li style="margin-bottom:${idx === data.misi.length - 1 ? '0' : '8px'};">${m}</li>`).join('')}
         </ol>
       </div>
     </div>
@@ -636,6 +646,13 @@ function renderKalenderView(state) {
   const month1Html = generateMonthCalendarHtml(curYear, curMonth);
   const month2Html = generateMonthCalendarHtml(nextYear, nextMonth);
 
+  const agendas = state.kalenderAgendas || [
+    { id: '1', date: '15 - 20 September 2026', tag: 'PTS', title: 'Penilaian Tengah Semester (PTS) Ganjil', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', color: '#0284c7', bg: '#e0f2fe' },
+    { id: '2', date: '05 - 12 Oktober 2026', tag: 'Sertifikasi', title: 'Sertifikasi Industri MikroTik MTCNA', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.', color: '#6366f1', bg: '#e0e7ff' },
+    { id: '3', date: '10 - 15 November 2026', tag: 'UKK TKJ', title: 'Simulasi Uji Kompetensi Keahlian (UKK)', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.', color: '#10b981', bg: '#dcfce7' },
+    { id: '4', date: '01 - 10 Desember 2026', tag: 'PAS Ganjil', title: 'Penilaian Akhir Semester (PAS) Ganjil', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa.', color: '#f59e0b', bg: '#fef3c7' }
+  ];
+
   return `
     <div style="background:white; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">
       <div style="display:flex; align-items:center; gap:12px;">
@@ -655,45 +672,30 @@ function renderKalenderView(state) {
       <!-- Detailed Agenda List -->
       <div style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:16px 0 10px 0;">Agenda & Catatan Penting:</div>
       <div style="display:flex; flex-direction:column; gap:10px;">
-        <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid #0284c7; padding:12px 14px; border-radius:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:0.75rem; font-weight:700; color:#0284c7;">15 - 20 September 2026</span>
-            <span style="background:#e0f2fe; color:#0284c7; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">PTS</span>
+        ${agendas.map(a => `
+          <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid ${a.color || '#0284c7'}; padding:12px 14px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:0.75rem; font-weight:700; color:${a.color || '#0284c7'};">${a.date}</span>
+              <span style="background:${a.bg || '#e0f2fe'}; color:${a.color || '#0284c7'}; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${a.tag}</span>
+            </div>
+            <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">${a.title}</h4>
+            <p style="font-size:0.75rem; color:#64748b; margin:0; line-height:1.4;">${a.desc || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'}</p>
           </div>
-          <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Penilaian Tengah Semester (PTS) Ganjil</h4>
-          <p style="font-size:0.75rem; color:#64748b; margin:0;">Ujian teori & praktikum seluruh mata pelajaran.</p>
-        </div>
-
-        <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid #6366f1; padding:12px 14px; border-radius:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:0.75rem; font-weight:700; color:#6366f1;">05 - 12 Oktober 2026</span>
-            <span style="background:#e0e7ff; color:#4338ca; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">Sertifikasi</span>
-          </div>
-          <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Sertifikasi Industri MikroTik MTCNA</h4>
-          <p style="font-size:0.75rem; color:#64748b; margin:0;">Pelatihan dan sertifikasi jaringan internasional untuk kelas XI & XII TKJ.</p>
-        <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid #10b981; padding:12px 14px; border-radius:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:0.75rem; font-weight:700; color:#10b981;">10 - 15 November 2026</span>
-            <span style="background:#dcfce7; color:#15803d; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">UKK TKJ</span>
-          </div>
-          <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Simulasi Uji Kompetensi Keahlian (UKK)</h4>
-          <p style="font-size:0.75rem; color:#64748b; margin:0;">Uji praktikum Perakitan Server, Fiber Optic, dan Routing Cisco di Lab.</p>
-        </div>
-
-        <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid #f59e0b; padding:12px 14px; border-radius:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:0.75rem; font-weight:700; color:#d97706;">01 - 10 Desember 2026</span>
-            <span style="background:#fef3c7; color:#b45309; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">PAS Ganjil</span>
-          </div>
-          <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Penilaian Akhir Semester (PAS) Ganjil</h4>
-          <p style="font-size:0.75rem; color:#64748b; margin:0;">Evaluasi komprehensif semester ganjil tahun ajaran 2026/2027.</p>
-        </div>
+        `).join('')}
       </div>
     </div>
   `;
 }
 
 function renderGaleriSiswaView(state) {
+  const items = (state.galeriItems && state.galeriItems.length > 0) ? state.galeriItems : [
+    { id: '1', title: 'Juara 1 LKS Network Administration', category: '🏆 PRESTASI', tagColor: '#b45309', tagBg: '#fef3c7', imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80', subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+    { id: '2', title: 'Praktikum Fiber Optic Splicing', category: '🛠️ PRAKTIKUM', tagColor: '#0369a1', tagBg: '#e0f2fe', imageUrl: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=600&q=80', subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+    { id: '3', title: 'Deployment Server Linux Debian', category: '💻 PROJECT', tagColor: '#4338ca', tagBg: '#e0e7ff', imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80', subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+    { id: '4', title: 'Konfigurasi Mikrotik RouterOS', category: '🌐 JARINGAN', tagColor: '#15803d', tagBg: '#dcfce7', imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80', subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+    { id: '5', title: 'Workshop Cyber Security & Defense', category: '⚡ WORKSHOP', tagColor: '#9333ea', tagBg: '#faf5ff', imageUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80', subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' }
+  ];
+
   return `
     <div style="background:white; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">
       <div style="display:flex; align-items:center; gap:12px;">
@@ -702,42 +704,43 @@ function renderGaleriSiswaView(state) {
         </button>
         <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b;">🖼️ Galeri & Prestasi Siswa TKJ</h3>
       </div>
+      <span style="background:#f1f5f9; color:#475569; padding:4px 8px; border-radius:6px; font-size:0.72rem; font-weight:700;">${items.length} Foto</span>
     </div>
-    <div style="padding:16px; display:flex; flex-direction:column; gap:12px;">
-      <div style="background:white; border:1px solid #e2e8f0; padding:16px; border-radius:16px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <span style="background:#fef3c7; color:#b45309; font-weight:800; font-size:0.72rem; padding:3px 10px; border-radius:8px;">🏆 PRESTASI</span>
-          <span style="font-size:0.75rem; color:#64748b;">LKS 2026</span>
-        </div>
-        <h4 style="font-size:0.95rem; font-weight:700; color:#0f172a; margin:0 0 6px 0;">🥇 Juara 1 LKS IT Network Systems Administration</h4>
-        <p style="font-size:0.78rem; color:#475569; margin:0 0 8px 0;">Tim TKJ SMKN 6 berhasil meraih Medali Emas pada Lomba Kompetensi Siswa bidang Jaringan Komputer.</p>
-        <span style="font-size:0.74rem; font-weight:600; color:#0284c7;">Oleh: Tim Siswa XI TKJ 1</span>
-      </div>
-
-      <div style="background:white; border:1px solid #e2e8f0; padding:16px; border-radius:16px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <span style="background:#e0f2fe; color:#0369a1; font-weight:800; font-size:0.72rem; padding:3px 10px; border-radius:8px;">🛠️ PRAKTIKUM LAB</span>
-          <span style="font-size:0.75rem; color:#64748b;">Lab TKJ 2</span>
-        </div>
-        <h4 style="font-size:0.95rem; font-weight:700; color:#0f172a; margin:0 0 6px 0;">🌐 Praktikum Fiber Optic Splicing & OTDR Test</h4>
-        <p style="font-size:0.78rem; color:#475569; margin:0 0 8px 0;">Penyambungan kabel serat optik menggunakan Fusion Splicer dan pengukuran redaman sinyal.</p>
-        <span style="font-size:0.74rem; font-weight:600; color:#0284c7;">Oleh: Kelompok 3 - 10 TKJ 1</span>
-      </div>
-
-      <div style="background:white; border:1px solid #e2e8f0; padding:16px; border-radius:16px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <span style="background:#e0e7ff; color:#4338ca; font-weight:800; font-size:0.72rem; padding:3px 10px; border-radius:8px;">💻 PROJECT</span>
-          <span style="font-size:0.75rem; color:#64748b;">Cloud Server</span>
-        </div>
-        <h4 style="font-size:0.95rem; font-weight:700; color:#0f172a; margin:0 0 6px 0;">🚀 Deployment Server Linux Debian & DNS Server</h4>
-        <p style="font-size:0.78rem; color:#475569; margin:0 0 8px 0;">Konfigurasi Web Server Apache, MySQL Database, dan Virtual Host lokal sekolah.</p>
-        <span style="font-size:0.74rem; font-weight:600; color:#0284c7;">Oleh: Siswa 10 TKJ 1</span>
+    <div style="padding:16px;">
+      <!-- Grid 2 Column for Android Mobile View -->
+      <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;">
+        ${items.map(item => `
+          <div style="background:white; border:1px solid #e2e8f0; border-radius:14px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.03); display:flex; flex-direction:column;">
+            <div style="height:115px; width:100%; position:relative; background:#0f172a; overflow:hidden;">
+              <img src="${item.imageUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80'" />
+              <span style="position:absolute; top:6px; left:6px; background:${item.tagBg || '#fef3c7'}; color:${item.tagColor || '#b45309'}; font-weight:800; font-size:0.62rem; padding:2px 6px; border-radius:6px; backdrop-filter:blur(4px);">
+                ${item.category}
+              </span>
+            </div>
+            <div style="padding:10px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <h4 style="font-size:0.82rem; font-weight:700; color:#0f172a; margin:0 0 4px 0; line-height:1.3; height:2.6em; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                  ${item.title}
+                </h4>
+                <p style="font-size:0.7rem; color:#64748b; margin:0; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                  ${item.subtitle || 'Lorem ipsum dolor sit amet, consectetur.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        `).join('')}
       </div>
     </div>
   `;
 }
 
 function renderLibraryView(state) {
+  const books = (state.elibraryBooks && state.elibraryBooks.length > 0) ? state.elibraryBooks : [
+    { id: '1', title: 'Jaringan Dasar & Cisco Routing', category: 'Modular TKJ', desc: 'Modul praktikum konfigurasi Mikrotik, Cisco Packet Tracer & VLAN.', color: '#0284c7', icon: '📘' },
+    { id: '2', title: 'Administrasi System & Server Linux', category: 'Server & Cloud', desc: 'Panduan lengkap instalasi Debian, DNS Server, Web Server Apache & Nginx.', color: '#10b981', icon: '📗' },
+    { id: '3', title: 'Cyber Security & Network Defense', category: 'Security', desc: 'Dasar-dasar keamanan jaringan, Firewall, Penetration Testing & Enkripsi.', color: '#6366f1', icon: '📙' }
+  ];
+
   return `
     <div style="background:white; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">
       <div style="display:flex; align-items:center; gap:12px;">
@@ -748,32 +751,63 @@ function renderLibraryView(state) {
       </div>
     </div>
     <div style="padding:16px; display:flex; flex-direction:column; gap:12px;">
-      <div style="background:white; border:1px solid #e2e8f0; padding:14px; border-radius:14px; display:flex; gap:14px; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="width:48px; height:58px; border-radius:10px; background:linear-gradient(135deg, #0284c7, #0369a1); color:white; display:flex; align-items:center; justify-content:center; font-size:1.6rem; flex-shrink:0; box-shadow:0 4px 10px rgba(2,132,199,0.2);">📘</div>
-        <div style="flex:1; min-width:0;">
-          <h4 style="font-size:0.92rem; font-weight:700; color:#0f172a; margin:0 0 3px 0;">Jaringan Dasar & Cisco Routing</h4>
-          <p style="font-size:0.76rem; color:#64748b; margin:0 0 8px 0;">Modul praktikum konfigurasi Mikrotik, Cisco Packet Tracer & VLAN.</p>
-          <button style="background:#0284c7; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:0.75rem; font-weight:700; cursor:pointer;" onclick="window.showToast('📖 Membuka E-Book Jaringan Dasar...', 'success')">Baca Buku Digital</button>
+      ${books.map(b => `
+        <div style="background:white; border:1px solid #e2e8f0; padding:14px; border-radius:14px; display:flex; gap:14px; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+          <div style="width:48px; height:58px; border-radius:10px; background:${b.color || '#0284c7'}; color:white; display:flex; align-items:center; justify-content:center; font-size:1.6rem; flex-shrink:0; box-shadow:0 4px 10px rgba(0,0,0,0.15);">${b.icon || '📘'}</div>
+          <div style="flex:1; min-width:0;">
+            <h4 style="font-size:0.92rem; font-weight:700; color:#0f172a; margin:0 0 3px 0;">${b.title}</h4>
+            <p style="font-size:0.76rem; color:#64748b; margin:0 0 8px 0;">${b.desc}</p>
+            <button style="background:${b.color || '#0284c7'}; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:0.75rem; font-weight:700; cursor:pointer;" onclick="window.showToast('📖 Membuka E-Book ${b.title}...', 'success')">Baca Buku Digital</button>
+          </div>
         </div>
-      </div>
+      `).join('')}
+    </div>
+  `;
+}
 
-      <div style="background:white; border:1px solid #e2e8f0; padding:14px; border-radius:14px; display:flex; gap:14px; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="width:48px; height:58px; border-radius:10px; background:linear-gradient(135deg, #10b981, #047857); color:white; display:flex; align-items:center; justify-content:center; font-size:1.6rem; flex-shrink:0; box-shadow:0 4px 10px rgba(16,185,129,0.2);">📗</div>
-        <div style="flex:1; min-width:0;">
-          <h4 style="font-size:0.92rem; font-weight:700; color:#0f172a; margin:0 0 3px 0;">Administrasi System & Server Linux</h4>
-          <p style="font-size:0.76rem; color:#64748b; margin:0 0 8px 0;">Panduan lengkap instalasi Debian, DNS Server, Web Server Apache & Nginx.</p>
-          <button style="background:#10b981; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:0.75rem; font-weight:700; cursor:pointer;" onclick="window.showToast('📖 Membuka E-Book Server Linux...', 'success')">Baca Buku Digital</button>
-        </div>
-      </div>
+function renderVidioTKJView(state) {
+  const newsList = state.broadcastNews || [];
 
-      <div style="background:white; border:1px solid #e2e8f0; padding:14px; border-radius:14px; display:flex; gap:14px; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="width:48px; height:58px; border-radius:10px; background:linear-gradient(135deg, #6366f1, #4338ca); color:white; display:flex; align-items:center; justify-content:center; font-size:1.6rem; flex-shrink:0; box-shadow:0 4px 10px rgba(99,102,241,0.2);">📙</div>
-        <div style="flex:1; min-width:0;">
-          <h4 style="font-size:0.92rem; font-weight:700; color:#0f172a; margin:0 0 3px 0;">Cyber Security & Network Defense</h4>
-          <p style="font-size:0.76rem; color:#64748b; margin:0 0 8px 0;">Dasar-dasar keamanan jaringan, Firewall, Penetration Testing & Enkripsi.</p>
-          <button style="background:#6366f1; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:0.75rem; font-weight:700; cursor:pointer;" onclick="window.showToast('📖 Membuka E-Book Cyber Security...', 'success')">Baca Buku Digital</button>
-        </div>
+  return `
+    <div style="background:white; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button style="background:none; border:none; cursor:pointer;" onclick="window.switchSiswaTab('home')">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        </button>
+        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b;">🎬 Vidio & Learning TKJ SMKN 6</h3>
       </div>
+      <span style="background:#fee2e2; color:#dc2626; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${newsList.length} Video</span>
+    </div>
+
+    <div style="padding:16px; display:flex; flex-direction:column; gap:14px;">
+      ${newsList.length === 0 ? `
+        <div style="text-align:center; padding:36px 20px; color:#64748b; font-size:0.85rem;">Belum ada video pembelajaran TKJ yang diunggah.</div>
+      ` : newsList.map((item, idx) => {
+        const yt = getYouTubeDetails(item.url);
+        return `
+          <div style="background:white; border:1px solid #e2e8f0; border-radius:16px; overflow:hidden; box-shadow:0 3px 10px rgba(0,0,0,0.04);">
+            <div style="position:relative; width:100%; height:170px; background:#0f172a; cursor:pointer;" onclick="window.playNewsVideoById('${item.id}', ${idx})">
+              ${yt.thumbnailUrl ? `
+                <img src="${yt.thumbnailUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'" />
+              ` : ''}
+              <div style="position:absolute; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center;">
+                <div style="width:52px; height:52px; border-radius:50%; background:#dc2626; color:white; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(220,38,38,0.4);">
+                  <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+              </div>
+            </div>
+            <div style="padding:14px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <h4 style="font-size:0.92rem; font-weight:700; color:#0f172a; margin:0 0 4px 0;">${item.title}</h4>
+                <p style="font-size:0.75rem; color:#64748b; margin:0;">Pembelajaran TKJ SMKN 6 Batam</p>
+              </div>
+              <button style="background:#dc2626; color:white; border:none; padding:8px 14px; border-radius:10px; font-size:0.75rem; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px;" onclick="window.playNewsVideoById('${item.id}', ${idx})">
+                ▶ Tonton
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('')}
     </div>
   `;
 }

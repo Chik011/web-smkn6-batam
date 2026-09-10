@@ -59,7 +59,7 @@ function syncTabFromHash() {
   const hash = window.location.hash.replace('#', '').trim();
   if (role && hash) {
     const validTabs = {
-      siswa: ['home', 'pelajaran', 'scan', 'notifikasi', 'akun', 'visimisi', 'gurutkj', 'totalsiswa', 'kalender', 'galerisiswa', 'library', 'elibrary'],
+      siswa: ['home', 'pelajaran', 'scan', 'notifikasi', 'akun', 'visimisi', 'gurutkj', 'totalsiswa', 'kalender', 'galerisiswa', 'library', 'elibrary', 'videotkj'],
       guru: ['beranda', 'absensi', 'nilai', 'profil'],
       admin: ['home', 'guru', 'mapel', 'siswa', 'jadwal', 'setting']
     };
@@ -1115,7 +1115,7 @@ window.openSiswaModal = function(type) {
       <p style="font-size:0.78rem; color:#64748b; margin-bottom:14px;">Pilih fitur atau layanan digital yang ingin diakses:</p>
 
       <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; max-height:340px; overflow-y:auto; padding-right:4px;">
-        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('videoTKJ');">
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('videotkj');">
           <span style="font-size:1.3rem;">📺</span>
           <div>
             <div>Video TKJ</div>

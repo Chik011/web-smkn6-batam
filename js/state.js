@@ -72,6 +72,41 @@ const defaultState = {
     selectedJadwalLevel: 10
   },
 
+  // Visi Misi Content
+  visiMisi: {
+    visi: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    misi: [
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.",
+      "Incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
+      "Quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore."
+    ]
+  },
+
+  // Galeri Siswa Database (5 Grid Items default)
+  galeriItems: [
+    { id: '1', title: 'Juara 1 LKS Network Administration', category: '🏆 PRESTASI', tagColor: '#b45309', tagBg: '#fef3c7', imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80', subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+    { id: '2', title: 'Praktikum Fiber Optic Splicing', category: '🛠️ PRAKTIKUM', tagColor: '#0369a1', tagBg: '#e0f2fe', imageUrl: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=600&q=80', subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+    { id: '3', title: 'Deployment Server Linux Debian', category: '💻 PROJECT', tagColor: '#4338ca', tagBg: '#e0e7ff', imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80', subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+    { id: '4', title: 'Konfigurasi Mikrotik RouterOS', category: '🌐 JARINGAN', tagColor: '#15803d', tagBg: '#dcfce7', imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80', subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+    { id: '5', title: 'Workshop Cyber Security & Defense', category: '⚡ WORKSHOP', tagColor: '#9333ea', tagBg: '#faf5ff', imageUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80', subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' }
+  ],
+
+  // Kalender Agenda Database (Lorem Ipsum descriptions)
+  kalenderAgendas: [
+    { id: '1', date: '15 - 20 September 2026', tag: 'PTS', title: 'Penilaian Tengah Semester (PTS) Ganjil', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', color: '#0284c7', bg: '#e0f2fe' },
+    { id: '2', date: '05 - 12 Oktober 2026', tag: 'Sertifikasi', title: 'Sertifikasi Industri MikroTik MTCNA', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.', color: '#6366f1', bg: '#e0e7ff' },
+    { id: '3', date: '10 - 15 November 2026', tag: 'UKK TKJ', title: 'Simulasi Uji Kompetensi Keahlian (UKK)', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.', color: '#10b981', bg: '#dcfce7' },
+    { id: '4', date: '01 - 10 Desember 2026', tag: 'PAS Ganjil', title: 'Penilaian Akhir Semester (PAS) Ganjil', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa.', color: '#f59e0b', bg: '#fef3c7' }
+  ],
+
+  // E-Library Database
+  elibraryBooks: [
+    { id: '1', title: 'Jaringan Dasar & Cisco Routing', category: 'Modular TKJ', desc: 'Modul praktikum konfigurasi Mikrotik, Cisco Packet Tracer & VLAN.', color: '#0284c7', icon: '📘' },
+    { id: '2', title: 'Administrasi System & Server Linux', category: 'Server & Cloud', desc: 'Panduan lengkap instalasi Debian, DNS Server, Web Server Apache & Nginx.', color: '#10b981', icon: '📗' },
+    { id: '3', title: 'Cyber Security & Network Defense', category: 'Security', desc: 'Dasar-dasar keamanan jaringan, Firewall, Penetration Testing & Enkripsi.', color: '#6366f1', icon: '📙' }
+  ],
+
   biometricEnabled: false,
   themeMode: 'light'
 };
@@ -1062,6 +1097,77 @@ class Store {
     if (isFirebaseConnected && db) {
       setDoc(doc(db, 'grades', newId), gradeObj).catch(e => console.warn(e));
     }
+  }
+
+  // Admin Content Management Actions
+  updateVisiMisi(visi, misi) {
+    this.state.visiMisi = {
+      visi: visi || this.state.visiMisi.visi,
+      misi: Array.isArray(misi) ? misi : (this.state.visiMisi.misi || [])
+    };
+    this.saveState();
+  }
+
+  addGaleriItem(item) {
+    if (!this.state.galeriItems) this.state.galeriItems = [];
+    const newItem = {
+      id: String(Date.now()),
+      title: item.title || 'Karya Siswa TKJ',
+      category: item.category || '🖼️ GALERI',
+      tagColor: item.tagColor || '#0284c7',
+      tagBg: item.tagBg || '#e0f2fe',
+      imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80',
+      subtitle: item.subtitle || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+    };
+    this.state.galeriItems.unshift(newItem);
+    this.saveState();
+  }
+
+  deleteGaleriItem(id) {
+    if (!this.state.galeriItems) return;
+    this.state.galeriItems = this.state.galeriItems.filter(g => String(g.id) !== String(id));
+    this.saveState();
+  }
+
+  addKalenderAgenda(agenda) {
+    if (!this.state.kalenderAgendas) this.state.kalenderAgendas = [];
+    const newAgenda = {
+      id: String(Date.now()),
+      date: agenda.date || '01 - 05 Bulan 2026',
+      tag: agenda.tag || 'Agenda',
+      title: agenda.title || 'Kegiatan Akademik',
+      desc: agenda.desc || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      color: agenda.color || '#0284c7',
+      bg: agenda.bg || '#e0f2fe'
+    };
+    this.state.kalenderAgendas.push(newAgenda);
+    this.saveState();
+  }
+
+  deleteKalenderAgenda(id) {
+    if (!this.state.kalenderAgendas) return;
+    this.state.kalenderAgendas = this.state.kalenderAgendas.filter(a => String(a.id) !== String(id));
+    this.saveState();
+  }
+
+  addElibraryBook(book) {
+    if (!this.state.elibraryBooks) this.state.elibraryBooks = [];
+    const newBook = {
+      id: String(Date.now()),
+      title: book.title || 'Buku Digital TKJ',
+      category: book.category || 'Teknologi',
+      desc: book.desc || 'Modul pembelajaran dan panduan praktikum digital.',
+      color: book.color || '#0284c7',
+      icon: book.icon || '📘'
+    };
+    this.state.elibraryBooks.push(newBook);
+    this.saveState();
+  }
+
+  deleteElibraryBook(id) {
+    if (!this.state.elibraryBooks) return;
+    this.state.elibraryBooks = this.state.elibraryBooks.filter(b => String(b.id) !== String(id));
+    this.saveState();
   }
 }
 

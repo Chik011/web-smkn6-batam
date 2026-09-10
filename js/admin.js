@@ -771,6 +771,37 @@ function renderSetting(state) {
         </div>
         <button type="submit" class="btn-primary">Update Kredensial Online</button>
       </form>
+    </div>
+
+    <!-- Kelola Konten Academic Hub (Admin) -->
+    <div class="content-card mt-4">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <span style="font-size:1.4rem;">🛠️</span>
+        <div>
+          <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin:0;">Kelola Konten Academic Hub (Admin)</h4>
+          <p style="font-size:0.72rem; color:#64748b; margin:2px 0 0 0;">Edit Visi Misi, Tambah Gambar Galeri, Edit Kalender, & E-Library.</p>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;">
+        <button type="button" class="btn-primary" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; text-align:left; padding:12px; font-weight:700; font-size:0.78rem;" onclick="window.openAdminContentModal('visiMisi')">
+          🎯 Edit Visi & Misi
+        </button>
+
+        <button type="button" class="btn-primary" style="background:#f3e8ff; color:#9333ea; border:1px solid #e9d5ff; text-align:left; padding:12px; font-weight:700; font-size:0.78rem;" onclick="window.openAdminContentModal('galeri')">
+          🖼️ Kelola Galeri Siswa
+        </button>
+
+        <button type="button" class="btn-primary" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; text-align:left; padding:12px; font-weight:700; font-size:0.78rem;" onclick="window.openAdminContentModal('kalender')">
+          📅 Kelola Kalender
+        </button>
+
+        <button type="button" class="btn-primary" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; text-align:left; padding:12px; font-weight:700; font-size:0.78rem;" onclick="window.openAdminContentModal('elibrary')">
+          📚 Kelola E-Library
+        </button>
+      </div>
+    </div>
+
     <div class="content-card mt-4">
       <div style="display:flex; align-items:center; justify-content:space-between;">
         <div style="display:flex; align-items:center; gap:10px;">
@@ -792,4 +823,177 @@ function renderSetting(state) {
     </div>
   `;
 }
+
+window.openAdminContentModal = function(type) {
+  const overlay = document.getElementById('globalModal');
+  const card = document.getElementById('modalCardContent');
+  const state = store.state;
+
+  if (type === 'visiMisi') {
+    const vm = state.visiMisi || {};
+    card.innerHTML = `
+      <div class="modal-title">🎯 Edit Visi & Misi TKJ</div>
+      <form onsubmit="window.handleSaveVisiMisi(event)">
+        <div class="form-group">
+          <label class="form-label">Visi TKJ</label>
+          <textarea id="editVisiText" class="form-input" rows="3" required>${vm.visi || ''}</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Misi (1 Per Baris)</label>
+          <textarea id="editMisiText" class="form-input" rows="4" required>${(vm.misi || []).join('\n')}</textarea>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:14px;">
+          <button type="button" class="btn-primary" style="flex:1; background:#64748b;" onclick="window.closeModal()">Batal</button>
+          <button type="submit" class="btn-primary" style="flex:1;">Simpan Visi & Misi</button>
+        </div>
+      </form>
+    `;
+  } else if (type === 'galeri') {
+    const items = state.galeriItems || [];
+    card.innerHTML = `
+      <div class="modal-title">🖼️ Kelola Galeri Siswa</div>
+      <form onsubmit="window.handleAddGaleriSubmit(event)" style="margin-bottom:16px;">
+        <div style="font-size:0.82rem; font-weight:700; color:#1e293b; margin-bottom:8px;">+ Tambah Gambar Galeri Baru</div>
+        <div class="form-group">
+          <input type="text" id="gTitle" class="form-input" placeholder="Judul Foto / Kegiatan" required />
+        </div>
+        <div class="form-group">
+          <input type="text" id="gCategory" class="form-input" placeholder="Kategori (contoh: 🏆 PRESTASI, 🛠️ PRAKTIKUM)" required />
+        </div>
+        <div class="form-group">
+          <input type="text" id="gUrl" class="form-input" placeholder="URL Link Gambar (https://...)" required />
+        </div>
+        <div class="form-group">
+          <input type="text" id="gSub" class="form-input" placeholder="Keterangan singkat" />
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;">+ Tambah Foto Ke Galeri</button>
+      </form>
+
+      <div style="font-size:0.82rem; font-weight:700; color:#1e293b; margin-bottom:8px;">Daftar Gambar (${items.length}):</div>
+      <div style="max-height:200px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+        ${items.map(g => `
+          <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; padding:8px 12px; border-radius:8px;">
+            <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+              <img src="${g.imageUrl}" style="width:36px; height:36px; object-fit:cover; border-radius:6px; flex-shrink:0;" />
+              <span style="font-size:0.8rem; font-weight:600; color:#1e293b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${g.title}</span>
+            </div>
+            <button type="button" class="icon-btn-action delete" onclick="store.deleteGaleriItem('${g.id}'); window.openAdminContentModal('galeri'); window.showToast('Gambar dihapus', 'info');">🗑️</button>
+          </div>
+        `).join('')}
+      </div>
+      <button type="button" class="btn-primary" style="width:100%; margin-top:14px; background:#64748b;" onclick="window.closeModal()">Selesai</button>
+    `;
+  } else if (type === 'kalender') {
+    const agendas = state.kalenderAgendas || [];
+    card.innerHTML = `
+      <div class="modal-title">📅 Kelola Kalender & Agenda</div>
+      <form onsubmit="window.handleAddAgendaSubmit(event)" style="margin-bottom:16px;">
+        <div style="font-size:0.82rem; font-weight:700; color:#1e293b; margin-bottom:8px;">+ Tambah Agenda Sekolah Baru</div>
+        <div class="form-group">
+          <input type="text" id="aDate" class="form-input" placeholder="Rentang Tanggal (misal: 15 - 20 September 2026)" required />
+        </div>
+        <div class="form-group">
+          <input type="text" id="aTag" class="form-input" placeholder="Tag Label (misal: PTS, UKK, PAS)" required />
+        </div>
+        <div class="form-group">
+          <input type="text" id="aTitle" class="form-input" placeholder="Judul Agenda / Kegiatan" required />
+        </div>
+        <div class="form-group">
+          <textarea id="aDesc" class="form-input" rows="2" placeholder="Deskripsi / Catatan Lorem Ipsum"></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;">+ Tambah Agenda Kalender</button>
+      </form>
+
+      <div style="font-size:0.82rem; font-weight:700; color:#1e293b; margin-bottom:8px;">Agenda Terdaftar (${agendas.length}):</div>
+      <div style="max-height:200px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+        ${agendas.map(a => `
+          <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; padding:8px 12px; border-radius:8px;">
+            <div>
+              <span style="font-size:0.7rem; font-weight:700; color:#0284c7;">${a.date} (${a.tag})</span>
+              <div style="font-size:0.8rem; font-weight:600; color:#1e293b;">${a.title}</div>
+            </div>
+            <button type="button" class="icon-btn-action delete" onclick="store.deleteKalenderAgenda('${a.id}'); window.openAdminContentModal('kalender'); window.showToast('Agenda dihapus', 'info');">🗑️</button>
+          </div>
+        `).join('')}
+      </div>
+      <button type="button" class="btn-primary" style="width:100%; margin-top:14px; background:#64748b;" onclick="window.closeModal()">Selesai</button>
+    `;
+  } else if (type === 'elibrary') {
+    const books = state.elibraryBooks || [];
+    card.innerHTML = `
+      <div class="modal-title">📚 Kelola E-Library & Buku Digital</div>
+      <form onsubmit="window.handleAddBookSubmit(event)" style="margin-bottom:16px;">
+        <div style="font-size:0.82rem; font-weight:700; color:#1e293b; margin-bottom:8px;">+ Tambah Buku Digital Baru</div>
+        <div class="form-group">
+          <input type="text" id="bTitle" class="form-input" placeholder="Judul Buku Digital" required />
+        </div>
+        <div class="form-group">
+          <input type="text" id="bCat" class="form-input" placeholder="Kategori / Topik" required />
+        </div>
+        <div class="form-group">
+          <input type="text" id="bDesc" class="form-input" placeholder="Deskripsi Singkat Buku" required />
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;">+ Tambah Buku Digital</button>
+      </form>
+
+      <div style="font-size:0.82rem; font-weight:700; color:#1e293b; margin-bottom:8px;">Buku Digital (${books.length}):</div>
+      <div style="max-height:200px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+        ${books.map(b => `
+          <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; padding:8px 12px; border-radius:8px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span>${b.icon || '📘'}</span>
+              <span style="font-size:0.8rem; font-weight:600; color:#1e293b;">${b.title}</span>
+            </div>
+            <button type="button" class="icon-btn-action delete" onclick="store.deleteElibraryBook('${b.id}'); window.openAdminContentModal('elibrary'); window.showToast('Buku dihapus', 'info');">🗑️</button>
+          </div>
+        `).join('')}
+      </div>
+      <button type="button" class="btn-primary" style="width:100%; margin-top:14px; background:#64748b;" onclick="window.closeModal()">Selesai</button>
+    `;
+  }
+
+  overlay.classList.add('open');
+};
+
+window.handleSaveVisiMisi = function(e) {
+  e.preventDefault();
+  const visi = document.getElementById('editVisiText').value.trim();
+  const misiRaw = document.getElementById('editMisiText').value.trim();
+  const misi = misiRaw.split('\n').map(m => m.trim()).filter(Boolean);
+  store.updateVisiMisi(visi, misi);
+  window.showToast('🎯 Visi & Misi berhasil diperbarui!', 'success');
+  window.closeModal();
+};
+
+window.handleAddGaleriSubmit = function(e) {
+  e.preventDefault();
+  const title = document.getElementById('gTitle').value.trim();
+  const category = document.getElementById('gCategory').value.trim();
+  const imageUrl = document.getElementById('gUrl').value.trim();
+  const subtitle = document.getElementById('gSub').value.trim();
+  store.addGaleriItem({ title, category, imageUrl, subtitle });
+  window.showToast('🖼️ Foto galeri berhasil ditambahkan!', 'success');
+  window.openAdminContentModal('galeri');
+};
+
+window.handleAddAgendaSubmit = function(e) {
+  e.preventDefault();
+  const date = document.getElementById('aDate').value.trim();
+  const tag = document.getElementById('aTag').value.trim();
+  const title = document.getElementById('aTitle').value.trim();
+  const desc = document.getElementById('aDesc').value.trim();
+  store.addKalenderAgenda({ date, tag, title, desc });
+  window.showToast('📅 Agenda kalender berhasil ditambahkan!', 'success');
+  window.openAdminContentModal('kalender');
+};
+
+window.handleAddBookSubmit = function(e) {
+  e.preventDefault();
+  const title = document.getElementById('bTitle').value.trim();
+  const category = document.getElementById('bCat').value.trim();
+  const desc = document.getElementById('bDesc').value.trim();
+  store.addElibraryBook({ title, category, desc });
+  window.showToast('📚 Buku digital berhasil ditambahkan!', 'success');
+  window.openAdminContentModal('elibrary');
+};
 
