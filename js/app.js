@@ -86,9 +86,8 @@ function renderApp() {
 
   if (!state.isLoggedIn) {
     delete document.body.dataset.role;
-    const loginHtml = renderLoginPage();
-    if (appEl.innerHTML !== loginHtml) {
-      appEl.innerHTML = loginHtml;
+    if (!document.querySelector('.login-page')) {
+      appEl.innerHTML = renderLoginPage();
     }
     return;
   }
@@ -111,46 +110,61 @@ function renderApp() {
   else if (role === 'guru') screenResult = renderGuruScreen(state);
   else if (role === 'admin') screenResult = renderAdminScreen(state);
 
-  const desktopBarHtml = `
-    <header class="desktop-header-block">
-      <div class="desktop-top-row">
-        <div class="desktop-brand">
-          <img src="img/Logo_SMKN6.png" alt="Logo SMKN 6 Batam" class="logo-icon" />
-          <div class="desktop-title">
-            <h1>SMKN 6 <span>Academic Hub</span></h1>
-            <p>Sistem informasi akademik terpadu</p>
+  const headerExists = document.querySelector('.desktop-header-block');
+  const phoneScreen = document.getElementById('phoneScreen');
+
+  if (!headerExists || !phoneScreen) {
+    const desktopBarHtml = `
+      <header class="desktop-header-block">
+        <div class="desktop-top-row">
+          <div class="desktop-brand">
+            <img src="img/Logo_SMKN6.png" alt="Logo SMKN 6 Batam" class="logo-icon" />
+            <div class="desktop-title">
+              <h1>SMKN 6 <span>Academic Hub</span></h1>
+              <p>Sistem informasi akademik terpadu</p>
+            </div>
+          </div>
+
+          <div class="desktop-meta">
+            <div class="live-status" title="Waktu Nyata WIB"><span class="status-dot"></span> <span class="live-time-text">${getFormattedTime()}</span></div>
+            <div class="today-label">${getFormattedDate()}</div>
           </div>
         </div>
 
-        <div class="desktop-meta">
-          <div class="live-status" title="Waktu Nyata WIB"><span class="status-dot"></span> <span class="live-time-text">${getFormattedTime()}</span></div>
-          <div class="today-label">${getFormattedDate()}</div>
+        <div class="desktop-nav-row" id="desktopNavRow">
+          ${screenResult.bottomNavHtml}
         </div>
-      </div>
+      </header>
+    `;
 
-      <div class="desktop-nav-row">
-        ${screenResult.bottomNavHtml}
-      </div>
-    </header>
-  `;
+    const appHtml = `
+      ${desktopBarHtml}
 
-  const appHtml = `
-    ${desktopBarHtml}
-
-    <main class="desktop-layout">
-      <div class="phone-frame">
-        <div class="phone-screen" id="phoneScreen">
-          <div class="tab-content-anim" key="${role}-${state.activeTabs[role] || 'def'}">
-            ${screenResult.contentHtml}
+      <main class="desktop-layout">
+        <div class="phone-frame">
+          <div class="phone-screen" id="phoneScreen">
+            <div class="tab-content-anim">
+              ${screenResult.contentHtml}
+            </div>
           </div>
         </div>
-      </div>
-    </main>
-  `;
+      </main>
+    `;
 
-  if (appEl.innerHTML !== appHtml) {
     appEl.innerHTML = appHtml;
     bindBottomNavEvents(role);
+  } else {
+    const navRow = document.getElementById('desktopNavRow');
+    if (navRow) {
+      navRow.innerHTML = screenResult.bottomNavHtml;
+      bindBottomNavEvents(role);
+    }
+
+    phoneScreen.innerHTML = `
+      <div class="tab-content-anim">
+        ${screenResult.contentHtml}
+      </div>
+    `;
   }
 }
 
