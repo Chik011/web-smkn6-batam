@@ -82,31 +82,67 @@ if (!window._hashListenerAttached) {
 function getFooterHtml() {
   return `
     <footer class="app-global-footer">
+      <div class="footer-glow-bg"></div>
       <div class="footer-content">
-        <div class="footer-brand">
-          <img src="img/Logo_SMKN6.png" alt="Logo SMKN 6 Batam" class="footer-logo" />
-          <div>
-            <strong>SMKN 6 Academic Hub</strong>
-            <p>Sistem Informasi Akademik Terpadu</p>
+        
+        <div class="footer-top-brand">
+          <div class="footer-logo-wrapper">
+            <img src="img/Logo_SMKN6.png" alt="Logo SMKN 6 Batam" class="footer-logo" />
+            <span class="footer-logo-glow"></span>
+          </div>
+          <div class="footer-brand-info">
+            <h4 class="footer-title">SMK NEGERI 6 BATAM</h4>
+            <p class="footer-subtitle">Teknik Komputer & Jaringan (TKJ) • Hub Akademik</p>
           </div>
         </div>
 
-        <div class="footer-links">
-          <a href="https://www.instagram.com/tkj_smkn_6/" target="_blank" rel="noopener noreferrer" class="footer-link-chip">
-            📸 Instagram
-          </a>
-          <a href="https://www.youtube.com/@tkjteknikkomputerdanjaring7669" target="_blank" rel="noopener noreferrer" class="footer-link-chip">
-            ▶️ YouTube
-          </a>
-          <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer" class="footer-link-chip">
-            💬 WhatsApp
-          </a>
+        <div class="footer-social-section">
+          <div class="footer-social-cards">
+            <a href="https://www.instagram.com/tkj_smkn_6/" target="_blank" rel="noopener noreferrer" class="social-card social-ig">
+              <div class="social-icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+              </div>
+              <div class="social-details">
+                <span class="social-name">Instagram</span>
+                <span class="social-handle">@tkj_smkn_6</span>
+              </div>
+              <svg class="social-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+
+            <a href="https://www.youtube.com/@tkjteknikkomputerdanjaring7669" target="_blank" rel="noopener noreferrer" class="social-card social-yt">
+              <div class="social-icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+              </div>
+              <div class="social-details">
+                <span class="social-name">YouTube</span>
+                <span class="social-handle">TKJ SMKN 6 Batam</span>
+              </div>
+              <svg class="social-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+
+            <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer" class="social-card social-wa">
+              <div class="social-icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              </div>
+              <div class="social-details">
+                <span class="social-name">WhatsApp</span>
+                <span class="social-handle">Layanan Informasi</span>
+              </div>
+              <svg class="social-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
         </div>
 
-        <div class="footer-meta">
-          <p>© 2026 SMK Negeri 6 Batam. Hak Cipta Dilindungi.</p>
-          <p class="footer-address">📍 Jl. Kabil, Batam Kota, Kepulauan Riau</p>
+        <div class="footer-bottom">
+          <div class="footer-bottom-info">
+            <p>© 2026 SMK Negeri 6 Batam • Hak Cipta Dilindungi</p>
+            <p class="footer-location">📍 Jl. Kabil, Batam Kota, Kepulauan Riau</p>
+          </div>
+          <div class="footer-status-badge">
+            <span class="status-pulse-dot"></span> System Operational
+          </div>
         </div>
+
       </div>
     </footer>
   `;
