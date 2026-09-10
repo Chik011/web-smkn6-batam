@@ -950,8 +950,8 @@ window.openSiswaModal = function(type) {
             <span style="font-size:0.7rem; font-weight:700; color:#0284c7;">15 - 20 September 2026</span>
             <span style="background:#e0f2fe; color:#0284c7; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:700;">Ujian</span>
           </div>
-          <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Penilaian Tengah Semester (PTS) Ganjil</h4>
-          <p style="font-size:0.72rem; color:#64748b; margin:0;">Ujian teori dan berbasis komputer seluruh mata pelajaran.</p>
+          <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Lorem Ipsum Dolor Sit Amet</h4>
+          <p style="font-size:0.72rem; color:#64748b; margin:0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
         </div>
 
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #6366f1; padding:10px 12px; border-radius:10px;">
@@ -959,8 +959,8 @@ window.openSiswaModal = function(type) {
             <span style="font-size:0.7rem; font-weight:700; color:#6366f1;">05 - 12 Oktober 2026</span>
             <span style="background:#e0e7ff; color:#4338ca; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:700;">TKJ Specialty</span>
           </div>
-          <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Sertifikasi Industri MikroTik MTCNA</h4>
-          <p style="font-size:0.72rem; color:#64748b; margin:0;">Pelatihan dan sertifikasi jaringan internasional untuk kelas XI & XII TKJ.</p>
+          <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Lorem Ipsum Consectetur Adipiscing</h4>
+          <p style="font-size:0.72rem; color:#64748b; margin:0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
         </div>
 
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #10b981; padding:10px 12px; border-radius:10px;">
@@ -968,8 +968,8 @@ window.openSiswaModal = function(type) {
             <span style="font-size:0.7rem; font-weight:700; color:#10b981;">10 - 15 November 2026</span>
             <span style="background:#dcfce7; color:#15803d; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:700;">UKK TKJ</span>
           </div>
-          <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Simulasi Uji Kompetensi Keahlian (UKK)</h4>
-          <p style="font-size:0.72rem; color:#64748b; margin:0;">Uji praktikum Perakitan Server, Fiber Optic, dan Routing Cisco di Lab.</p>
+          <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Lorem Ipsum Eiusmod Tempor</h4>
+          <p style="font-size:0.72rem; color:#64748b; margin:0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
         </div>
 
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #f59e0b; padding:10px 12px; border-radius:10px;">
@@ -977,8 +977,8 @@ window.openSiswaModal = function(type) {
             <span style="font-size:0.7rem; font-weight:700; color:#d97706;">01 - 10 Desember 2026</span>
             <span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:700;">PAS Ganjil</span>
           </div>
-          <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Penilaian Akhir Semester (PAS) Ganjil</h4>
-          <p style="font-size:0.72rem; color:#64748b; margin:0;">Evaluasi komprehensif semester ganjil tahun ajaran 2026/2027.</p>
+          <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Lorem Ipsum Labore Et Dolore</h4>
+          <p style="font-size:0.72rem; color:#64748b; margin:0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
         </div>
 
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #ef4444; padding:10px 12px; border-radius:10px;">
@@ -986,8 +986,8 @@ window.openSiswaModal = function(type) {
             <span style="font-size:0.7rem; font-weight:700; color:#ef4444;">21 Des 2026 - 04 Jan 2027</span>
             <span style="background:#fee2e2; color:#991b1b; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:700;">Libur Semester</span>
           </div>
-          <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Libur Semester Ganjil & Tahun Baru</h4>
-          <p style="font-size:0.72rem; color:#64748b; margin:0;">Masa libur sekolah siswa SMKN 6 Bandung.</p>
+          <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Lorem Ipsum Magna Aliqua</h4>
+          <p style="font-size:0.72rem; color:#64748b; margin:0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
         </div>
       </div>
       <button class="btn-primary mt-4" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup Kalender</button>

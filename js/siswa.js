@@ -633,32 +633,32 @@ window.showCalendarDateDetail = function(monthName, day, year) {
   const dateStr = `${day} ${monthName} ${year}`;
   
   let eventTag = '🗓️ AGENDA SCHEDULER';
-  let eventTitle = `Kegiatan Akademik & Pembelajaran Lab`;
+  let eventTitle = `Lorem Ipsum Dolor Sit Amet`;
   let eventColor = '#0284c7';
   let eventBg = '#e0f2fe';
   let eventDesc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.';
 
   if (monthName === 'September' && day >= 15 && day <= 20) {
     eventTag = '🏆 PTS GANJIL';
-    eventTitle = `Penilaian Tengah Semester (PTS) Ganjil`;
+    eventTitle = `Lorem Ipsum Dolor Sit Amet`;
     eventColor = '#0284c7';
     eventBg = '#e0f2fe';
     eventDesc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
   } else if (monthName === 'Oktober' && day >= 5 && day <= 12) {
     eventTag = '📜 SERTIFIKASI MTCNA';
-    eventTitle = `Sertifikasi Industri MikroTik MTCNA`;
+    eventTitle = `Lorem Ipsum Consectetur Adipiscing`;
     eventColor = '#6366f1';
     eventBg = '#e0e7ff';
     eventDesc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.';
   } else if (monthName === 'November' && day >= 10 && day <= 15) {
     eventTag = '💻 SIMULASI UKK TKJ';
-    eventTitle = `Simulasi Uji Kompetensi Keahlian (UKK) TKJ`;
+    eventTitle = `Lorem Ipsum Eiusmod Tempor`;
     eventColor = '#10b981';
     eventBg = '#dcfce7';
     eventDesc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
   } else if (monthName === 'Desember' && day >= 1 && day <= 10) {
     eventTag = '📝 PAS GANJIL';
-    eventTitle = `Penilaian Akhir Semester (PAS) Ganjil`;
+    eventTitle = `Lorem Ipsum Labore Et Dolore`;
     eventColor = '#f59e0b';
     eventBg = '#fef3c7';
     eventDesc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.';
@@ -696,10 +696,10 @@ function renderKalenderView(state) {
   const month2Html = generateMonthCalendarHtml(nextYear, nextMonth);
 
   const agendas = state.kalenderAgendas || [
-    { id: '1', date: '15 - 20 September 2026', tag: 'PTS', title: 'Penilaian Tengah Semester (PTS) Ganjil', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', color: '#0284c7', bg: '#e0f2fe', mName: 'September', dNum: 15 },
-    { id: '2', date: '05 - 12 Oktober 2026', tag: 'Sertifikasi', title: 'Sertifikasi Industri MikroTik MTCNA', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.', color: '#6366f1', bg: '#e0e7ff', mName: 'Oktober', dNum: 5 },
-    { id: '3', date: '10 - 15 November 2026', tag: 'UKK TKJ', title: 'Simulasi Uji Kompetensi Keahlian (UKK)', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.', color: '#10b981', bg: '#dcfce7', mName: 'November', dNum: 10 },
-    { id: '4', date: '01 - 10 Desember 2026', tag: 'PAS Ganjil', title: 'Penilaian Akhir Semester (PAS) Ganjil', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa.', color: '#f59e0b', bg: '#fef3c7', mName: 'Desember', dNum: 1 }
+    { id: '1', date: '15 - 20 September 2026', tag: 'PTS', title: 'Lorem Ipsum Dolor Sit Amet', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', color: '#0284c7', bg: '#e0f2fe', mName: 'September', dNum: 15 },
+    { id: '2', date: '05 - 12 Oktober 2026', tag: 'Sertifikasi', title: 'Lorem Ipsum Consectetur Adipiscing', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.', color: '#6366f1', bg: '#e0e7ff', mName: 'Oktober', dNum: 5 },
+    { id: '3', date: '10 - 15 November 2026', tag: 'UKK TKJ', title: 'Lorem Ipsum Eiusmod Tempor', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.', color: '#10b981', bg: '#dcfce7', mName: 'November', dNum: 10 },
+    { id: '4', date: '01 - 10 Desember 2026', tag: 'PAS Ganjil', title: 'Lorem Ipsum Labore Et Dolore', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa.', color: '#f59e0b', bg: '#fef3c7', mName: 'Desember', dNum: 1 }
   ];
 
   return `
