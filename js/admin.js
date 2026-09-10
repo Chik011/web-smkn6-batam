@@ -467,13 +467,17 @@ function renderSiswaDaftarView(state) {
       <button class="btn-add-primary" onclick="window.addStudentModal('${className}')">+ Tambah Siswa</button>
     </div>
 
-    <div style="display:flex; flex-direction:column; gap:8px;">
+    <div style="margin-bottom:12px;">
+      <input type="text" class="form-input" placeholder="🔍 Cari nama atau NIS siswa..." oninput="window.handleSearchAdminSiswa(this.value, 'adminDaftarSiswaContainer')" />
+    </div>
+
+    <div id="adminDaftarSiswaContainer" style="display:flex; flex-direction:column; gap:8px;">
       ${students.length === 0 ? `
         <div class="content-card text-center" style="padding:20px; color:#94a3b8;">
           Belum ada siswa di kelas ${className}. Klik + Tambah Siswa untuk menambahkan.
         </div>
       ` : students.map((s, idx) => `
-        <div class="list-item-card" style="margin:0;">
+        <div class="list-item-card searchable-siswa-item" data-search="${(s.name + ' ' + (s.nis || '')).replace(/"/g, '&quot;')}" style="margin:0;">
           <div class="list-item-left">
             <div class="list-item-avatar" style="background:#e0f2fe; color:#0369a1; font-weight:700; font-size:0.8rem;">
               ${idx + 1}
@@ -522,13 +526,17 @@ function renderSiswaRekapView(state) {
       <div style="font-size:0.75rem; color:#64748b;">Total Sesi Presensi Tercatat: <b>${attendanceSessions.length} sesi</b></div>
     </div>
 
-    <div style="display:flex; flex-direction:column; gap:8px;">
+    <div style="margin-bottom:12px;">
+      <input type="text" class="form-input" placeholder="🔍 Cari nama siswa di rekap absensi..." oninput="window.handleSearchAdminSiswa(this.value, 'adminRekapSiswaContainer')" />
+    </div>
+
+    <div id="adminRekapSiswaContainer" style="display:flex; flex-direction:column; gap:8px;">
       ${studentStats.length === 0 ? `
         <div class="content-card text-center" style="padding:20px; color:#94a3b8;">
           Belum ada data siswa di kelas ${className}.
         </div>
       ` : studentStats.map((s, idx) => `
-        <div class="content-card" style="margin:0; padding:12px;">
+        <div class="content-card searchable-siswa-item" data-search="${(s.name + ' ' + (s.nis || '')).replace(/"/g, '&quot;')}" style="margin:0; padding:12px;">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
               <h5 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin:0;">${idx + 1}. ${s.name}</h5>
@@ -570,13 +578,17 @@ function renderSiswaNilaiView(state) {
       <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin:0;">Nilai Akademik - ${className}</h4>
     </div>
 
-    <div style="display:flex; flex-direction:column; gap:8px;">
+    <div style="margin-bottom:12px;">
+      <input type="text" class="form-input" placeholder="🔍 Cari nama siswa di nilai akademik..." oninput="window.handleSearchAdminSiswa(this.value, 'adminNilaiSiswaContainer')" />
+    </div>
+
+    <div id="adminNilaiSiswaContainer" style="display:flex; flex-direction:column; gap:8px;">
       ${studentScores.length === 0 ? `
         <div class="content-card text-center" style="padding:20px; color:#94a3b8;">
           Belum ada data siswa di kelas ${className}.
         </div>
       ` : studentScores.map((s, idx) => `
-        <div class="content-card" style="margin:0; padding:12px;">
+        <div class="content-card searchable-siswa-item" data-search="${(s.name + ' ' + (s.nis || '')).replace(/"/g, '&quot;')}" style="margin:0; padding:12px;">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
               <h5 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin:0;">${idx + 1}. ${s.name}</h5>
@@ -1259,5 +1271,17 @@ window.handleGaleriFileSelect = function(e) {
 };
 
 window.handleCloudinaryFileSelect = window.handleGaleriFileSelect;
+
+window.handleSearchAdminSiswa = function(val, containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const query = (val || '').toLowerCase().trim();
+  const items = container.querySelectorAll('.searchable-siswa-item');
+  items.forEach(card => {
+    const searchData = (card.getAttribute('data-search') || card.textContent).toLowerCase();
+    const matches = searchData.includes(query);
+    card.style.display = matches ? (card.classList.contains('list-item-card') ? 'flex' : 'block') : 'none';
+  });
+};
 
 
