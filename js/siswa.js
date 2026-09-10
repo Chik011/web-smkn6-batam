@@ -416,15 +416,36 @@ function renderVisiMisiView(state) {
           <li style="margin-bottom:8px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</li>
           <li style="margin-bottom:8px;">Incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</li>
           <li style="margin-bottom:8px;">Quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</li>
-          <li>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.</li>
+          <li>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</li>
         </ol>
       </div>
     </div>
   `;
 }
 
+window.filterGuruQuery = '';
+window.filterGuruList = function(q) {
+  window.filterGuruQuery = q || '';
+  store.notify();
+};
+
+window.filterSiswaQuery = '';
+window.filterSiswaList = function(q) {
+  window.filterSiswaQuery = q || '';
+  store.notify();
+};
+
 function renderGuruTKJView(state) {
-  const teachers = state.teachers || [];
+  const allTeachers = state.teachers || [];
+  const q = (window.filterGuruQuery || '').trim().toLowerCase();
+  
+  const teachers = q ? allTeachers.filter(t => {
+    const name = (t.name || t.teacherName || '').toLowerCase();
+    const mapel = (t.mapel || t.subject || '').toLowerCase();
+    const user = (t.username || '').toLowerCase();
+    return name.includes(q) || mapel.includes(q) || user.includes(q);
+  }) : allTeachers;
+
   return `
     <div style="background:white; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">
       <div style="display:flex; align-items:center; gap:12px;">
@@ -436,8 +457,13 @@ function renderGuruTKJView(state) {
       <span style="background:#e0e7ff; color:#4338ca; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${teachers.length} Guru</span>
     </div>
     <div style="padding:16px; display:flex; flex-direction:column; gap:10px;">
+      <!-- Search Input Bar -->
+      <div style="position:relative; margin-bottom:4px;">
+        <input type="text" placeholder="🔍 Cari nama guru, mapel, atau username..." value="${window.filterGuruQuery || ''}" oninput="window.filterGuruList(this.value)" class="form-input" style="width:100%; border-radius:12px; font-size:0.82rem; padding:10px 14px;" />
+      </div>
+
       ${teachers.length === 0 ? `
-        <div style="text-align:center; padding:30px; color:#64748b; font-size:0.85rem;">Belum ada data guru terdaftar.</div>
+        <div style="text-align:center; padding:30px; color:#64748b; font-size:0.85rem;">Tidak ada guru yang cocok dengan pencarian "${window.filterGuruQuery}".</div>
       ` : teachers.map(t => `
         <div style="background:white; border:1px solid #e2e8f0; padding:14px 16px; border-radius:14px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
           <div>
@@ -452,20 +478,29 @@ function renderGuruTKJView(state) {
 }
 
 function renderTotalSiswaView(state) {
-  const students = state.students || [];
-  const k10 = students.filter(s => {
+  const allStudents = state.students || [];
+  const q = (window.filterSiswaQuery || '').trim().toLowerCase();
+
+  const k10 = allStudents.filter(s => {
     const c = String(s.class || s.className || '').toLowerCase();
     return c.includes('10') || c.includes('x');
   });
-  const k11 = students.filter(s => {
+  const k11 = allStudents.filter(s => {
     const c = String(s.class || s.className || '').toLowerCase();
     return c.includes('11') || c.includes('xi');
   });
-  const k12 = students.filter(s => {
+  const k12 = allStudents.filter(s => {
     const c = String(s.class || s.className || '').toLowerCase();
     return c.includes('12') || c.includes('xii');
   });
-  const totalCount = students.length;
+  const totalCount = allStudents.length;
+
+  const students = q ? allStudents.filter(s => {
+    const name = (s.name || s.studentName || '').toLowerCase();
+    const nis = String(s.nis || s.studentId || '').toLowerCase();
+    const cls = String(s.class || s.className || '').toLowerCase();
+    return name.includes(q) || nis.includes(q) || cls.includes(q);
+  }) : allStudents;
 
   return `
     <div style="background:white; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">
@@ -507,11 +542,18 @@ function renderTotalSiswaView(state) {
         </div>
       </div>
 
+      <!-- Search Input Bar -->
+      <div style="margin-bottom:12px;">
+        <input type="text" placeholder="🔍 Cari nama siswa, NIS, atau kelas (misal 10 TKJ 1)..." value="${window.filterSiswaQuery || ''}" oninput="window.filterSiswaList(this.value)" class="form-input" style="width:100%; border-radius:12px; font-size:0.82rem; padding:10px 14px;" />
+      </div>
+
       <!-- Student List -->
-      <div style="font-size:0.85rem; font-weight:700; color:#1e293b; margin-bottom:10px;">Daftar Siswa Terdaftar:</div>
+      <div style="font-size:0.85rem; font-weight:700; color:#1e293b; margin-bottom:10px;">
+        Daftar Siswa Terdaftar ${q ? `(Hasil Cari: ${students.length})` : `(${students.length})`}:
+      </div>
       <div style="display:flex; flex-direction:column; gap:8px;">
         ${students.length === 0 ? `
-          <div style="text-align:center; padding:20px; color:#64748b; font-size:0.8rem;">Belum ada data siswa terdaftar.</div>
+          <div style="text-align:center; padding:20px; color:#64748b; font-size:0.8rem;">Tidak ditemukan siswa dengan kata kunci "${window.filterSiswaQuery}".</div>
         ` : students.map(s => `
           <div style="background:white; border:1px solid #e2e8f0; padding:12px 14px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
             <div>
@@ -526,51 +568,157 @@ function renderTotalSiswaView(state) {
   `;
 }
 
+function generateMonthCalendarHtml(year, monthIndex) {
+  const monthNames = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ];
+  const dayNames = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+  
+  const today = new Date();
+  const isCurrentMonth = (today.getFullYear() === year && today.getMonth() === monthIndex);
+  const todayDate = today.getDate();
+
+  const firstDayObj = new Date(year, monthIndex, 1);
+  let startDay = firstDayObj.getDay() - 1; 
+  if (startDay === -1) startDay = 6; 
+
+  const totalDays = new Date(year, monthIndex + 1, 0).getDate();
+
+  const events = {};
+  if (monthNames[monthIndex] === 'September') {
+    for (let d = 15; d <= 20; d++) {
+      events[d] = { label: 'PTS Ganjil', color: '#0284c7', bg: '#e0f2fe' };
+    }
+  } else if (monthNames[monthIndex] === 'Oktober') {
+    for (let d = 5; d <= 12; d++) {
+      events[d] = { label: 'MTCNA TKJ', color: '#4338ca', bg: '#e0e7ff' };
+    }
+  } else if (monthNames[monthIndex] === 'November') {
+    for (let d = 10; d <= 15; d++) {
+      events[d] = { label: 'UKK TKJ', color: '#15803d', bg: '#dcfce7' };
+    }
+  } else if (monthNames[monthIndex] === 'Desember') {
+    for (let d = 1; d <= 10; d++) {
+      events[d] = { label: 'PAS Ganjil', color: '#b45309', bg: '#fef3c7' };
+    }
+  }
+
+  let cellsHtml = '';
+  for (let i = 0; i < startDay; i++) {
+    cellsHtml += `<div style="height:36px;"></div>`;
+  }
+  for (let d = 1; d <= totalDays; d++) {
+    const isToday = isCurrentMonth && (d === todayDate);
+    const event = events[d];
+
+    let dayBg = 'transparent';
+    let dayColor = '#1e293b';
+    let border = 'none';
+    let badgeDot = '';
+
+    if (isToday) {
+      dayBg = 'linear-gradient(135deg, #0284c7, #0369a1)';
+      dayColor = '#ffffff';
+      border = '2px solid #38bdf8';
+    } else if (event) {
+      dayBg = event.bg;
+      dayColor = event.color;
+      badgeDot = `<span style="width:4px; height:4px; border-radius:50%; background:${event.color}; position:absolute; bottom:3px;"></span>`;
+    }
+
+    cellsHtml += `
+      <div style="height:36px; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:10px; background:${dayBg}; color:${dayColor}; font-weight:${isToday || event ? '800' : '500'}; font-size:0.8rem; border:${border}; position:relative; cursor:pointer;" title="${isToday ? 'Hari Ini' : (event ? event.label : '')}">
+        <span>${d}</span>
+        ${badgeDot}
+      </div>
+    `;
+  }
+
+  return `
+    <div style="background:white; border:1px solid #e2e8f0; border-radius:16px; padding:14px; box-shadow:0 2px 8px rgba(0,0,0,0.04); margin-bottom:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #f1f5f9;">
+        <h4 style="font-size:0.95rem; font-weight:800; color:#0f172a; margin:0;">🗓️ ${monthNames[monthIndex]} ${year}</h4>
+        <span style="font-size:0.7rem; font-weight:700; color:${isCurrentMonth ? '#0284c7' : '#64748b'}; background:${isCurrentMonth ? '#e0f2fe' : '#f1f5f9'}; padding:3px 8px; border-radius:6px;">
+          ${isCurrentMonth ? 'Bulan Ini (Real-Time)' : 'Bulan Depan'}
+        </span>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(7, 1fr); text-align:center; margin-bottom:6px;">
+        ${dayNames.map(day => `<span style="font-size:0.7rem; font-weight:700; color:#94a3b8; padding-bottom:4px;">${day}</span>`).join('')}
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(7, 1fr); gap:4px;">
+        ${cellsHtml}
+      </div>
+    </div>
+  `;
+}
+
 function renderKalenderView(state) {
+  const now = new Date();
+  const curYear = now.getFullYear();
+  const curMonth = now.getMonth();
+
+  const nextMonthDate = new Date(curYear, curMonth + 1, 1);
+  const nextYear = nextMonthDate.getFullYear();
+  const nextMonth = nextMonthDate.getMonth();
+
+  const month1Html = generateMonthCalendarHtml(curYear, curMonth);
+  const month2Html = generateMonthCalendarHtml(nextYear, nextMonth);
+
   return `
     <div style="background:white; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">
       <div style="display:flex; align-items:center; gap:12px;">
         <button style="background:none; border:none; cursor:pointer;" onclick="window.switchSiswaTab('home')">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </button>
-        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b;">📅 Kalender Akademik SMKN 6</h3>
+        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b;">📅 Kalender Akademik 2 Bulan Real-Time</h3>
       </div>
     </div>
-    <div style="padding:16px; display:flex; flex-direction:column; gap:12px;">
-      <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid #0284c7; padding:14px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.75rem; font-weight:700; color:#0284c7;">15 - 20 September 2026</span>
-          <span style="background:#e0f2fe; color:#0284c7; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">Ujian</span>
-        </div>
-        <h4 style="font-size:0.92rem; font-weight:700; color:#1e293b; margin:6px 0 3px 0;">Penilaian Tengah Semester (PTS) Ganjil</h4>
-        <p style="font-size:0.78rem; color:#64748b; margin:0;">Ujian teori dan berbasis komputer seluruh mata pelajaran.</p>
-      </div>
+    <div style="padding:16px;">
+      <!-- Month 1: Current Month -->
+      ${month1Html}
 
-      <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid #6366f1; padding:14px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.75rem; font-weight:700; color:#6366f1;">05 - 12 Oktober 2026</span>
-          <span style="background:#e0e7ff; color:#4338ca; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">TKJ Specialty</span>
-        </div>
-        <h4 style="font-size:0.92rem; font-weight:700; color:#1e293b; margin:6px 0 3px 0;">Sertifikasi Industri MikroTik MTCNA</h4>
-        <p style="font-size:0.78rem; color:#64748b; margin:0;">Pelatihan dan sertifikasi jaringan internasional untuk kelas XI & XII TKJ.</p>
-      </div>
+      <!-- Month 2: Next Month -->
+      ${month2Html}
 
-      <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid #10b981; padding:14px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.75rem; font-weight:700; color:#10b981;">10 - 15 November 2026</span>
-          <span style="background:#dcfce7; color:#15803d; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">UKK TKJ</span>
+      <!-- Detailed Agenda List -->
+      <div style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:16px 0 10px 0;">Agenda & Catatan Penting:</div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid #0284c7; padding:12px 14px; border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.75rem; font-weight:700; color:#0284c7;">15 - 20 September 2026</span>
+            <span style="background:#e0f2fe; color:#0284c7; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">PTS</span>
+          </div>
+          <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Penilaian Tengah Semester (PTS) Ganjil</h4>
+          <p style="font-size:0.75rem; color:#64748b; margin:0;">Ujian teori & praktikum seluruh mata pelajaran.</p>
         </div>
-        <h4 style="font-size:0.92rem; font-weight:700; color:#1e293b; margin:6px 0 3px 0;">Simulasi Uji Kompetensi Keahlian (UKK)</h4>
-        <p style="font-size:0.78rem; color:#64748b; margin:0;">Uji praktikum Perakitan Server, Fiber Optic, dan Routing Cisco di Lab.</p>
-      </div>
 
-      <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid #f59e0b; padding:14px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:0.75rem; font-weight:700; color:#d97706;">01 - 10 Desember 2026</span>
-          <span style="background:#fef3c7; color:#b45309; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">PAS Ganjil</span>
+        <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid #6366f1; padding:12px 14px; border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.75rem; font-weight:700; color:#6366f1;">05 - 12 Oktober 2026</span>
+            <span style="background:#e0e7ff; color:#4338ca; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">Sertifikasi</span>
+          </div>
+          <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Sertifikasi Industri MikroTik MTCNA</h4>
+          <p style="font-size:0.75rem; color:#64748b; margin:0;">Pelatihan dan sertifikasi jaringan internasional untuk kelas XI & XII TKJ.</p>
+        <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid #10b981; padding:12px 14px; border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.75rem; font-weight:700; color:#10b981;">10 - 15 November 2026</span>
+            <span style="background:#dcfce7; color:#15803d; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">UKK TKJ</span>
+          </div>
+          <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Simulasi Uji Kompetensi Keahlian (UKK)</h4>
+          <p style="font-size:0.75rem; color:#64748b; margin:0;">Uji praktikum Perakitan Server, Fiber Optic, dan Routing Cisco di Lab.</p>
         </div>
-        <h4 style="font-size:0.92rem; font-weight:700; color:#1e293b; margin:6px 0 3px 0;">Penilaian Akhir Semester (PAS) Ganjil</h4>
-        <p style="font-size:0.78rem; color:#64748b; margin:0;">Evaluasi komprehensif semester ganjil tahun ajaran 2026/2027.</p>
+
+        <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid #f59e0b; padding:12px 14px; border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.75rem; font-weight:700; color:#d97706;">01 - 10 Desember 2026</span>
+            <span style="background:#fef3c7; color:#b45309; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">PAS Ganjil</span>
+          </div>
+          <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">Penilaian Akhir Semester (PAS) Ganjil</h4>
+          <p style="font-size:0.75rem; color:#64748b; margin:0;">Evaluasi komprehensif semester ganjil tahun ajaran 2026/2027.</p>
+        </div>
       </div>
     </div>
   `;
