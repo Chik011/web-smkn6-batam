@@ -304,19 +304,19 @@ body::before {
   }
 
   .desktop-nav-row {
-    display: flex !important;
+    display: none !important; /* HIDE NAVBAR FROM TOP HEADER ON MOBILE HP */
+  }
+
+  .mobile-bottom-nav-wrap {
+    display: block !important;
     position: fixed !important;
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    top: auto !important;
     z-index: 9999 !important;
-    padding: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
   }
 
-  .desktop-nav-row .phone-bottom-nav {
+  .mobile-bottom-nav-wrap .phone-bottom-nav {
     display: flex !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -328,8 +328,8 @@ body::before {
     left: 0 !important;
     right: 0 !important;
     z-index: 9999 !important;
-    height: 64px !important;
-    padding: 6px 4px 10px !important;
+    height: 62px !important;
+    padding: 6px 4px 8px !important;
     background: rgba(255, 255, 255, 0.98) !important;
     backdrop-filter: blur(14px) !important;
     -webkit-backdrop-filter: blur(14px) !important;
@@ -339,7 +339,7 @@ body::before {
     align-items: center !important;
   }
 
-  .desktop-nav-row .phone-bottom-nav .nav-item {
+  .mobile-bottom-nav-wrap .phone-bottom-nav .nav-item {
     flex: 1 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -349,12 +349,12 @@ body::before {
     font-weight: 600 !important;
     color: #64748b !important;
     padding: 4px 2px !important;
-    gap: 3px !important;
+    gap: 2px !important;
     border: none !important;
     background: transparent !important;
   }
 
-  .desktop-nav-row .phone-bottom-nav .nav-item.active {
+  .mobile-bottom-nav-wrap .phone-bottom-nav .nav-item.active {
     color: #0284c7 !important;
     font-weight: 700 !important;
     background: transparent !important;
@@ -382,8 +382,12 @@ body::before {
 
   .phone-screen {
     border-radius: 0 !important;
-    padding-bottom: 78px !important;
+    padding-bottom: 76px !important;
   }
+}
+
+.mobile-bottom-nav-wrap {
+  display: none;
 }
 
 .phone-status-bar {

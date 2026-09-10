@@ -148,6 +148,9 @@ function renderApp() {
               ${screenResult.contentHtml}
             </div>
           </div>
+          <div class="mobile-bottom-nav-wrap">
+            ${screenResult.bottomNavHtml}
+          </div>
         </div>
       </main>
     `;
