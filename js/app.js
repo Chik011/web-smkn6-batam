@@ -59,7 +59,7 @@ function syncTabFromHash() {
   const hash = window.location.hash.replace('#', '').trim();
   if (role && hash) {
     const validTabs = {
-      siswa: ['home', 'pelajaran', 'scan', 'notifikasi', 'akun'],
+      siswa: ['home', 'pelajaran', 'scan', 'notifikasi', 'akun', 'visimisi', 'gurutkj', 'totalsiswa', 'kalender', 'galerisiswa', 'library', 'elibrary'],
       guru: ['beranda', 'absensi', 'nilai', 'profil'],
       admin: ['home', 'guru', 'mapel', 'siswa', 'jadwal', 'setting']
     };
@@ -1123,7 +1123,7 @@ window.openSiswaModal = function(type) {
           </div>
         </button>
 
-        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('visimisi');">
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('visimisi');">
           <span style="font-size:1.3rem;">🎯</span>
           <div>
             <div>Visi & Misi</div>
@@ -1131,7 +1131,7 @@ window.openSiswaModal = function(type) {
           </div>
         </button>
 
-        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('guruList');">
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('gurutkj');">
           <span style="font-size:1.3rem;">👨‍🏫</span>
           <div>
             <div>Guru TKJ</div>
@@ -1139,7 +1139,7 @@ window.openSiswaModal = function(type) {
           </div>
         </button>
 
-        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('totalSiswa');">
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('totalsiswa');">
           <span style="font-size:1.3rem;">👥</span>
           <div>
             <div>Total Siswa</div>
@@ -1147,7 +1147,7 @@ window.openSiswaModal = function(type) {
           </div>
         </button>
 
-        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('kalenderAkademik');">
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('kalender');">
           <span style="font-size:1.3rem;">📅</span>
           <div>
             <div>Kalender</div>
@@ -1155,7 +1155,7 @@ window.openSiswaModal = function(type) {
           </div>
         </button>
 
-        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('galeriSiswa');">
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('galerisiswa');">
           <span style="font-size:1.3rem;">🖼️</span>
           <div>
             <div>Galeri Siswa</div>
@@ -1163,7 +1163,7 @@ window.openSiswaModal = function(type) {
           </div>
         </button>
 
-        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('elibrary');">
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('library');">
           <span style="font-size:1.3rem;">📚</span>
           <div>
             <div>E-Library</div>
