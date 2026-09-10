@@ -590,16 +590,29 @@ class Store {
 
   notify() {
     this.applyTheme();
+    if (this._notifyTimer) clearTimeout(this._notifyTimer);
+    this._notifyTimer = setTimeout(() => {
+      this._notifyTimer = null;
+      this.listeners.forEach(fn => fn(this.state));
+    }, 40);
+  }
+
+  notifySync() {
+    this.applyTheme();
+    if (this._notifyTimer) clearTimeout(this._notifyTimer);
+    this._notifyTimer = null;
     this.listeners.forEach(fn => fn(this.state));
   }
 
   // Action methods
   setRole(role) {
+    if (this.state.activeRole === role) return;
     this.state.activeRole = role;
     this.saveState();
   }
 
   setViewMode(mode) {
+    if (this.state.activeViewMode === mode) return;
     this.state.activeViewMode = mode;
     this.saveState();
   }
@@ -714,6 +727,7 @@ class Store {
   }
 
   setRoleTab(role, tab) {
+    if (this.state.activeTabs[role] === tab) return;
     this.state.activeTabs[role] = tab;
     this.saveState();
   }

@@ -477,7 +477,7 @@ window.toggleViewMode = function() {
 window.switchRoleTab = function(role, tab) {
   if (role && tab) {
     if (window.location.hash !== '#' + tab) {
-      window.location.hash = '#' + tab;
+      history.replaceState(null, '', '#' + tab);
     }
     store.setRoleTab(role, tab);
   }
@@ -1584,14 +1584,15 @@ window.toggleThemeMode = function(checked) {
   window.showToast(`Tema ${checked ? 'Mode Gelap 🌙' : 'Mode Terang ☀️'} Diaktifkan!`, 'info');
 };
 
-let renderScheduled = false;
+let renderScheduledTimer = null;
 function scheduleRenderApp() {
-  if (renderScheduled) return;
-  renderScheduled = true;
-  requestAnimationFrame(() => {
-    renderApp();
-    renderScheduled = false;
-  });
+  if (renderScheduledTimer) clearTimeout(renderScheduledTimer);
+  renderScheduledTimer = setTimeout(() => {
+    requestAnimationFrame(() => {
+      renderApp();
+      renderScheduledTimer = null;
+    });
+  }, 20);
 }
 
 window.syncFirebase = function() {
