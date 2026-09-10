@@ -721,17 +721,17 @@ window.openSiswaModal = function(type) {
       <div style="background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color:white; padding:14px; border-radius:12px; margin-bottom:12px; box-shadow:0 4px 12px rgba(15,23,42,0.15);">
         <h4 style="font-size:0.85rem; font-weight:800; color:#38bdf8; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;">Visi TKJ</h4>
         <p style="font-size:0.78rem; line-height:1.5; color:#f8fafc; margin:0;">
-          "Menjadi Kompetensi Keahlian Teknik Komputer dan Jaringan yang Unggul, Berkarakter, Berkualitas Internasional, serta Berdaya Saing Tinggi di Bidang Teknologi Informasi & Komunikasi."
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
         </p>
       </div>
 
       <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:14px; border-radius:12px;">
         <h4 style="font-size:0.85rem; font-weight:800; color:#0f172a; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">Misi Utama</h4>
         <ol style="font-size:0.76rem; color:#334155; margin:0 0 0 16px; padding:0; line-height:1.6;">
-          <li style="margin-bottom:6px;">Melaksanakan pembelajaran berbasis standar industri (Networking, Cyber Security, Cloud Computing).</li>
-          <li style="margin-bottom:6px;">Membekali siswa dengan sertifikasi keahlian berstandar nasional dan internasional.</li>
-          <li style="margin-bottom:6px;">Membentuk karakter lulusan beriman, disiplin, berakhlak mulia, dan berjiwa wirausaha.</li>
-          <li>Menjalin kemitraan strategis dengan Dunia Usaha & Dunia Industri (DUDI).</li>
+          <li style="margin-bottom:6px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+          <li style="margin-bottom:6px;">Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+          <li style="margin-bottom:6px;">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.</li>
+          <li>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.</li>
         </ol>
       </div>
       <button class="btn-primary mt-4" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup Visi Misi</button>
@@ -759,28 +759,66 @@ window.openSiswaModal = function(type) {
     `;
   } else if (type === 'totalSiswa') {
     const students = store.state.students || [];
+    const k10 = students.filter(s => {
+      const c = String(s.class || s.className || '').toLowerCase();
+      return c.includes('10') || c.includes('x');
+    });
+    const k11 = students.filter(s => {
+      const c = String(s.class || s.className || '').toLowerCase();
+      return c.includes('11') || c.includes('xi');
+    });
+    const k12 = students.filter(s => {
+      const c = String(s.class || s.className || '').toLowerCase();
+      return c.includes('12') || c.includes('xii');
+    });
+    const totalCount = students.length;
+
     card.innerHTML = `
-      <div class="modal-title" style="font-weight:800; font-size:1.1rem; color:#0f172a;">👥 Rekap Total Siswa TKJ</div>
-      <p style="font-size:0.78rem; color:#64748b; margin-bottom:12px;">Total ${students.length} Siswa Terdaftar di Database Firebase:</p>
-      
-      <div style="background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:white; padding:14px; border-radius:12px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+      <div class="modal-title" style="font-weight:800; font-size:1.15rem; color:#0f172a; margin-bottom:4px;">👥 Rekap Total Siswa Berdasarkan Kelas</div>
+      <p style="font-size:0.78rem; color:#64748b; margin-bottom:14px;">Rincian jumlah siswa per-tingkat kelas X, XI, dan XII:</p>
+
+      <!-- Grand Total Card -->
+      <div style="background:linear-gradient(135deg, #0b2545 0%, #134074 100%); color:white; padding:16px 18px; border-radius:16px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 6px 20px rgba(11,37,69,0.25);">
         <div>
-          <span style="font-size:0.72rem; opacity:0.85;">TOTAL SELURUH SISWA</span>
-          <h2 style="font-size:1.6rem; font-weight:800; margin:2px 0 0 0;">${students.length} Siswa</h2>
+          <span style="font-size:0.7rem; font-weight:700; letter-spacing:0.8px; color:#38bdf8; text-transform:uppercase;">TOTAL KESELURUHAN SISWA</span>
+          <h2 style="font-size:1.8rem; font-weight:800; margin:2px 0 0 0; color:#ffffff;">${totalCount} <span style="font-size:0.95rem; font-weight:600; color:#93c5fd;">Siswa Aktif</span></h2>
         </div>
-        <div style="font-size:2rem;">🎓</div>
+        <div style="width:48px; height:48px; border-radius:14px; background:rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; font-size:1.6rem;">🎓</div>
       </div>
 
-      <div style="max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+      <!-- Breakdown Grid 3 Kelas -->
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:14px;">
+        <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:10px; text-align:center;">
+          <span style="font-size:0.68rem; font-weight:800; color:#0284c7; text-transform:uppercase;">KELAS 10 (X)</span>
+          <h3 style="font-size:1.25rem; font-weight:800; color:#0369a1; margin:4px 0 0 0;">${k10.length}</h3>
+          <span style="font-size:0.65rem; color:#64748b;">Siswa</span>
+        </div>
+
+        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:10px; text-align:center;">
+          <span style="font-size:0.68rem; font-weight:800; color:#16a34a; text-transform:uppercase;">KELAS 11 (XI)</span>
+          <h3 style="font-size:1.25rem; font-weight:800; color:#15803d; margin:4px 0 0 0;">${k11.length}</h3>
+          <span style="font-size:0.65rem; color:#64748b;">Siswa</span>
+        </div>
+
+        <div style="background:#faf5ff; border:1px solid #e9d5ff; border-radius:12px; padding:10px; text-align:center;">
+          <span style="font-size:0.68rem; font-weight:800; color:#9333ea; text-transform:uppercase;">KELAS 12 (XII)</span>
+          <h3 style="font-size:1.25rem; font-weight:800; color:#7e22ce; margin:4px 0 0 0;">${k12.length}</h3>
+          <span style="font-size:0.65rem; color:#64748b;">Siswa</span>
+        </div>
+      </div>
+
+      <!-- Student List by Class -->
+      <div style="font-size:0.8rem; font-weight:700; color:#1e293b; margin-bottom:8px;">Daftar Siswa Terdaftar:</div>
+      <div style="max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding-right:4px;">
         ${students.length === 0 ? `
           <div style="text-align:center; padding:20px; color:#64748b; font-size:0.8rem;">Belum ada data siswa terdaftar.</div>
         ` : students.map(s => `
           <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:10px 12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin:0;">${s.name || s.studentName}</h4>
+              <h4 style="font-size:0.86rem; font-weight:700; color:#1e293b; margin:0;">${s.name || s.studentName}</h4>
               <p style="font-size:0.73rem; color:#64748b; margin:2px 0 0 0;">NIS: ${s.nis || s.studentId || '-'}</p>
             </div>
-            <span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${s.class || s.className || '10 TKJ 1'}</span>
+            <span style="background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:8px; font-size:0.72rem; font-weight:700;">${s.class || s.className || '10 TKJ 1'}</span>
           </div>
         `).join('')}
       </div>
@@ -1036,6 +1074,41 @@ window.openSiswaModal = function(type) {
 
       <button class="btn-primary mt-4" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup Beranda Video</button>
     `;
+  } else if (type === 'elibrary') {
+    card.innerHTML = `
+      <div class="modal-title" style="font-weight:800; font-size:1.15rem; color:#0f172a; margin-bottom:4px;">📚 E-Library & Buku Digital TKJ</div>
+      <p style="font-size:0.78rem; color:#64748b; margin-bottom:14px;">Koleksi Modul Pembelajaran & E-Book Referensi Akademik:</p>
+
+      <div style="max-height:320px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-right:4px;">
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px; display:flex; gap:12px; align-items:center;">
+          <div style="width:44px; height:54px; border-radius:8px; background:linear-gradient(135deg, #0284c7, #0369a1); color:white; display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0; box-shadow:0 4px 10px rgba(2,132,199,0.2);">📘</div>
+          <div style="flex:1; min-width:0;">
+            <h4 style="font-size:0.88rem; font-weight:700; color:#0f172a; margin:0 0 2px 0;">Jaringan Dasar & Cisco Routing</h4>
+            <p style="font-size:0.72rem; color:#64748b; margin:0 0 6px 0;">Modul praktikum konfigurasi Mikrotik, Cisco Packet Tracer & VLAN.</p>
+            <button style="background:#0284c7; color:white; border:none; padding:4px 10px; border-radius:6px; font-size:0.7rem; font-weight:700; cursor:pointer;" onclick="window.showToast('📖 Membuka E-Book Jaringan Dasar...', 'success')">Baca Buku Digital</button>
+          </div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px; display:flex; gap:12px; align-items:center;">
+          <div style="width:44px; height:54px; border-radius:8px; background:linear-gradient(135deg, #10b981, #047857); color:white; display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0; box-shadow:0 4px 10px rgba(16,185,129,0.2);">📗</div>
+          <div style="flex:1; min-width:0;">
+            <h4 style="font-size:0.88rem; font-weight:700; color:#0f172a; margin:0 0 2px 0;">Administrasi System & Server Linux</h4>
+            <p style="font-size:0.72rem; color:#64748b; margin:0 0 6px 0;">Panduan lengkap instalasi Debian, DNS Server, Web Server Apache & Nginx.</p>
+            <button style="background:#10b981; color:white; border:none; padding:4px 10px; border-radius:6px; font-size:0.7rem; font-weight:700; cursor:pointer;" onclick="window.showToast('📖 Membuka E-Book Server Linux...', 'success')">Baca Buku Digital</button>
+          </div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px; display:flex; gap:12px; align-items:center;">
+          <div style="width:44px; height:54px; border-radius:8px; background:linear-gradient(135deg, #6366f1, #4338ca); color:white; display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0; box-shadow:0 4px 10px rgba(99,102,241,0.2);">📙</div>
+          <div style="flex:1; min-width:0;">
+            <h4 style="font-size:0.88rem; font-weight:700; color:#0f172a; margin:0 0 2px 0;">Cyber Security & Network Defense</h4>
+            <p style="font-size:0.72rem; color:#64748b; margin:0 0 6px 0;">Dasar-dasar keamanan jaringan, Firewall, Penetration Testing & Enkripsi.</p>
+            <button style="background:#6366f1; color:white; border:none; padding:4px 10px; border-radius:6px; font-size:0.7rem; font-weight:700; cursor:pointer;" onclick="window.showToast('📖 Membuka E-Book Cyber Security...', 'success')">Baca Buku Digital</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn-primary mt-4" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup E-Library</button>
+    `;
   } else if (type === 'lainnya') {
     card.innerHTML = `
       <div class="modal-title" style="font-weight:800; font-size:1.15rem; color:#0f172a;">⚙️ Semua Fitur Aplikasi SMKN 6</div>
@@ -1090,6 +1163,14 @@ window.openSiswaModal = function(type) {
           </div>
         </button>
 
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('elibrary');">
+          <span style="font-size:1.3rem;">📚</span>
+          <div>
+            <div>E-Library</div>
+            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Buku Digital</span>
+          </div>
+        </button>
+
         <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('pelajaran');">
           <span style="font-size:1.3rem;">📊</span>
           <div>
@@ -1111,22 +1192,6 @@ window.openSiswaModal = function(type) {
           <div>
             <div>Survey</div>
             <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Evaluasi Pembelajaran</span>
-          </div>
-        </button>
-
-        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.showToast('Membuka E-Library SMKN 6...', 'info'); window.closeModal();">
-          <span style="font-size:1.3rem;">📚</span>
-          <div>
-            <div>E-Library</div>
-            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Buku Digital</span>
-          </div>
-        </button>
-
-        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.showToast('Jadwal Ujian Tengah Semester aktif.', 'info'); window.closeModal();">
-          <span style="font-size:1.3rem;">📝</span>
-          <div>
-            <div>Jadwal Ujian</div>
-            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">PTS & PAS</span>
           </div>
         </button>
       </div>

@@ -167,6 +167,13 @@ function renderHome(state) {
         <span>Galeri Siswa</span>
       </button>
 
+      <button class="app-icon-item" onclick="window.openSiswaModal('elibrary')">
+        <div class="icon-box" style="background:#e0f2fe; color:#0284c7;">
+          📚
+        </div>
+        <span>E-Library</span>
+      </button>
+
       <button class="app-icon-item" onclick="window.openSiswaModal('lainnya')">
         <div class="icon-box" style="background:#f8fafc; color:#64748b;">
           ⚙️
