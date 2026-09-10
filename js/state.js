@@ -1283,6 +1283,20 @@ class Store {
     }
   }
 
+  updateGaleriItem(id, updatedData) {
+    const idStr = String(id);
+    if (!this.state.galeriItems) return;
+    const item = this.state.galeriItems.find(g => String(g.id) === idStr);
+    if (item) {
+      Object.assign(item, updatedData);
+      this.saveState();
+
+      if (isFirebaseConnected && db) {
+        setDoc(doc(db, 'galeri_siswa', idStr), item, { merge: true }).catch(e => console.warn(e));
+      }
+    }
+  }
+
   deleteGaleriItem(id) {
     const idStr = String(id);
     if (!this.state.galeriItems) return;

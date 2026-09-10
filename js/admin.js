@@ -938,7 +938,10 @@ function renderGaleriAdmin(state) {
                 ${g.subtitle ? `<p style="font-size:0.72rem; color:#64748b; margin:2px 0 0 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${g.subtitle}</p>` : ''}
               </div>
             </div>
-            <button type="button" class="icon-btn-action delete" onclick="if(confirm('Hapus foto galeri ini?')){ store.deleteGaleriItem('${g.id}'); window.showToast('Foto galeri dihapus', 'info'); }" title="Hapus Gambar">🗑️</button>
+            <div class="item-actions" style="display:flex; gap:6px;">
+              <button type="button" class="icon-btn-action edit" onclick="window.editGaleriModal('${g.id}')" title="Edit Foto Galeri">✏️</button>
+              <button type="button" class="icon-btn-action delete" onclick="if(confirm('Hapus foto galeri ini?')){ store.deleteGaleriItem('${g.id}'); window.showToast('Foto galeri dihapus', 'info'); }" title="Hapus Gambar">🗑️</button>
+            </div>
           </div>
         `).join('')}
       </div>
@@ -1342,6 +1345,117 @@ window.handleSearchAdminSiswa = function(val, containerId) {
     const matches = searchData.includes(query);
     card.style.display = matches ? (card.classList.contains('list-item-card') ? 'flex' : 'block') : 'none';
   });
+};
+
+window.editGaleriModal = function(id) {
+  const item = (store.state.galeriItems || []).find(g => String(g.id) === String(id));
+  if (!item) return;
+
+  const overlay = document.getElementById('globalModal');
+  const card = document.getElementById('modalCardContent');
+  if (!overlay || !card) return;
+
+  card.innerHTML = `
+    <div class="modal-title">✏️ Edit Foto Galeri Siswa</div>
+    <form onsubmit="window.handleEditGaleriSubmit(event, '${id}')">
+      <div class="form-group">
+        <label class="form-label">📁 Pilih File Gambar Baru (Opsional)</label>
+        <input type="file" id="editGFileInput" accept="image/*" class="form-input" onchange="window.handleEditGaleriFileSelect(event)" style="padding:6px 10px;" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Judul Foto / Kegiatan</label>
+        <input type="text" id="editGTitle" class="form-input" value="${(item.title || '').replace(/"/g, '&quot;')}" required />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Kategori (Badge)</label>
+        <input type="text" id="editGCategory" class="form-input" value="${(item.category || '🖼️ GALERI').replace(/"/g, '&quot;')}" required />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">URL Gambar / Link Foto</label>
+        <input type="text" id="editGUrl" class="form-input" value="${(item.imageUrl || '').replace(/"/g, '&quot;')}" required />
+        <img id="editGPreviewImg" src="${item.imageUrl || ''}" style="display:${item.imageUrl ? 'block' : 'none'}; width:100%; height:140px; object-fit:cover; border-radius:10px; margin-top:8px; border:1px solid #e2e8f0;" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Keterangan Singkat</label>
+        <input type="text" id="editGSub" class="form-input" value="${(item.subtitle || '').replace(/"/g, '&quot;')}" />
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:16px;">
+        <button type="button" class="btn-primary" style="flex:1; background:#64748b;" onclick="window.closeModal()">Batal</button>
+        <button type="submit" class="btn-primary" style="flex:1; background:#9333ea; border:none;">Simpan Perubahan</button>
+      </div>
+    </form>
+  `;
+
+  overlay.classList.add('open');
+};
+
+window.handleEditGaleriSubmit = function(e, id) {
+  e.preventDefault();
+  const title = document.getElementById('editGTitle')?.value.trim();
+  const category = document.getElementById('editGCategory')?.value.trim();
+  const imageUrl = document.getElementById('editGUrl')?.value.trim();
+  const subtitle = document.getElementById('editGSub')?.value.trim();
+
+  if (!title || !category || !imageUrl) {
+    window.showToast('Mohon lengkapi Judul, Kategori, dan File/URL Gambar!', 'error');
+    return;
+  }
+
+  store.updateGaleriItem(id, { title, category, imageUrl, subtitle });
+  window.showToast('✏️ Foto galeri berhasil diperbarui!', 'success');
+  window.closeModal();
+};
+
+window.handleEditGaleriFileSelect = function(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+
+  const urlInput = document.getElementById('editGUrl');
+  const previewImg = document.getElementById('editGPreviewImg');
+
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const rawDataUrl = evt.target.result;
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const maxDim = 800;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > maxDim || height > maxDim) {
+        if (width > height) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+
+      if (urlInput) urlInput.value = compressedDataUrl;
+      if (previewImg) {
+        previewImg.src = compressedDataUrl;
+        previewImg.style.display = 'block';
+      }
+      if (typeof window.showToast === 'function') {
+        window.showToast('🖼️ Gambar berhasil dioptimasi!', 'success');
+      }
+    };
+    img.src = rawDataUrl;
+  };
+  reader.readAsDataURL(file);
 };
 
 
