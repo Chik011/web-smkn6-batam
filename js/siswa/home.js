@@ -14,7 +14,7 @@ export function renderHome(state) {
 
   // Fallback to state.mapel if schedules is empty so Pelajaran is always populated from Firebase
   if (scheduleToday.length === 0 && state.mapel && state.mapel.length > 0) {
-    scheduleToday = state.mapel.slice(0, 3).map((m, idx) => ({
+    scheduleToday = state.mapel.map((m, idx) => ({
       id: m.id || idx,
       mapel: m.name,
       ruangan: 'Lab TKJ',

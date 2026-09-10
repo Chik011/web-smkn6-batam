@@ -89,7 +89,11 @@ export function renderAdminScreen(state) {
 }
 
 function renderHome(state) {
-  const studentsCount = state.students.length;
+  const students = state.students || [];
+  const studentsCount = students.length;
+  const count10 = students.filter(s => (s.class || '10').includes('10')).length;
+  const count11 = students.filter(s => (s.class || '').includes('11')).length;
+  const count12 = students.filter(s => (s.class || '').includes('12')).length;
   const videos = state.broadcastNews || [];
 
   return `
@@ -98,21 +102,21 @@ function renderHome(state) {
       <h2>Home</h2>
     </div>
 
-    <!-- Class Count Grid Cards matching Image 3 -->
+    <!-- Class Count Grid Cards -->
     <div class="stat-cards-grid">
       <div class="stat-card" onclick="window.simulateExportData('Kelas 10')" title="Klik untuk ekspor data">
         <div class="class-label">Kls 10</div>
-        <div class="class-num">3</div>
+        <div class="class-num">${count10}</div>
         <div class="class-sub">Export 📊</div>
       </div>
       <div class="stat-card" onclick="window.simulateExportData('Kelas 11')" title="Klik untuk ekspor data">
         <div class="class-label">Kls 11</div>
-        <div class="class-num">0</div>
+        <div class="class-num">${count11}</div>
         <div class="class-sub">Export 📊</div>
       </div>
       <div class="stat-card" onclick="window.simulateExportData('Kelas 12')" title="Klik untuk ekspor data">
         <div class="class-label">Kls 12</div>
-        <div class="class-num">0</div>
+        <div class="class-num">${count12}</div>
         <div class="class-sub">Export 📊</div>
       </div>
     </div>

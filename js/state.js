@@ -248,15 +248,9 @@ class Store {
       // 4. Primary Sync: Firestore `users` collection (Siswa Database)
       const isDummy = (s) => {
         if (!s) return true;
-        const name = String(s.name || s.nama || s.studentName || '').toLowerCase();
         const nis = String(s.nis || s.nisn || s.studentId || s.id || '').trim();
-        const dummyNames = ['ahmad', 'budi', 'citra', 'rizki', 'dewi', 'santoso'];
         const dummyNis = ['2024001', '2024002', '2024003'];
-        if (dummyNis.includes(nis)) return true;
-        for (const dn of dummyNames) {
-          if (name.includes(dn)) return true;
-        }
-        return false;
+        return dummyNis.includes(nis);
       };
 
       ['users', 'students', 'siswa'].forEach(colName => {
@@ -284,7 +278,7 @@ class Store {
                 if (fetched.length > 0 || colName === 'users') {
                   const seenMap = new Map();
                   fetched.forEach(s => {
-                    const k = (s.nis || s.name || s.id).toString().toLowerCase();
+                    const k = String(s.id || s.nis || s.name).trim().toLowerCase();
                     if (!seenMap.has(k)) seenMap.set(k, s);
                   });
                   this.state.students = Array.from(seenMap.values());
