@@ -326,7 +326,22 @@ function renderInputAbsensi(state) {
 }
 
 function renderRiwayatAbsensi(state) {
-  const attendance = state.attendance || [];
+  const rawAttendance = state.attendance || [];
+  const attMap = new Map();
+  rawAttendance.forEach(a => {
+    if (!a) return;
+    const cKey = String(a.class || a.className || '10 TKJ 1').trim().toLowerCase();
+    const mKey = String(a.mapel || a.subject || 'MTK').trim().toLowerCase();
+    const pKey = parseInt(a.pertemuan || a.period || 1, 10);
+    const k = `${cKey}_${mKey}_p${pKey}`;
+    if (!attMap.has(k)) {
+      attMap.set(k, { ...a, pertemuan: pKey });
+    } else {
+      const prev = attMap.get(k);
+      attMap.set(k, { ...prev, ...a, records: { ...(prev.records || {}), ...(a.records || {}) }, pertemuan: pKey });
+    }
+  });
+  const attendance = Array.from(attMap.values());
   const studentsMap = {};
   state.students.forEach(s => studentsMap[s.id] = s.name);
 

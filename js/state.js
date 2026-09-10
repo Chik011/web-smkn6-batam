@@ -376,6 +376,7 @@ class Store {
 
             const sessions = await Promise.all(sessionPromises);
             this.state.attendance = sessions;
+            this.deduplicateAttendance();
             this.saveStateToLocalStorage();
             this.notify();
           }
@@ -426,6 +427,7 @@ class Store {
             });
 
             this.state.attendance = Object.values(groups);
+            this.deduplicateAttendance();
             this.saveStateToLocalStorage();
             this.notify();
           }
@@ -666,8 +668,10 @@ class Store {
         if (!this.state.cloudinaryCloudName) {
           this.state.cloudinaryCloudName = 'w7kqjyeq';
         }
+        this.deduplicateAttendance();
       } else {
         this.state = JSON.parse(JSON.stringify(defaultState));
+        this.deduplicateAttendance();
         this.saveStateToLocalStorage();
       }
     } catch (e) {
@@ -1099,16 +1103,56 @@ class Store {
     }
   }
 
+  deduplicateAttendance() {
+    if (!Array.isArray(this.state.attendance)) {
+      this.state.attendance = [];
+      return;
+    }
+    const map = new Map();
+    this.state.attendance.forEach(item => {
+      if (!item) return;
+      const classId = String(item.class || item.className || '10 TKJ 1').trim().toLowerCase();
+      const mapelId = String(item.mapel || item.subject || 'MTK').trim().toLowerCase();
+      const pNum = parseInt(item.pertemuan || item.period || 1, 10);
+      const key = `${classId}_${mapelId}_p${pNum}`;
+
+      if (!map.has(key)) {
+        map.set(key, { ...item, pertemuan: pNum });
+      } else {
+        const existing = map.get(key);
+        const mergedRecords = { ...(existing.records || {}), ...(item.records || {}) };
+        map.set(key, {
+          ...existing,
+          ...item,
+          id: existing.id || item.id,
+          date: item.date || existing.date,
+          pertemuan: pNum,
+          records: mergedRecords
+        });
+      }
+    });
+    this.state.attendance = Array.from(map.values());
+  }
+
   // Guru Actions
   saveAttendance(date, pertemuan, mapel, className, records) {
-    const existingIndex = this.state.attendance.findIndex(
-      a => a.date === date && a.pertemuan === parseInt(pertemuan) && a.mapel === mapel && a.class === className
-    );
-    const newId = existingIndex >= 0 ? String(this.state.attendance[existingIndex].id) : String(Date.now());
+    const targetPertemuan = parseInt(pertemuan, 10);
+    const cleanMapel = String(mapel || '').trim().toLowerCase();
+    const cleanClass = String(className || '').trim().toLowerCase();
+
+    const existingIndex = (this.state.attendance || []).findIndex(a => {
+      if (!a) return false;
+      const aPertemuan = parseInt(a.pertemuan || a.period || 1, 10);
+      const aMapel = String(a.mapel || a.subject || '').trim().toLowerCase();
+      const aClass = String(a.class || a.className || '').trim().toLowerCase();
+      return aPertemuan === targetPertemuan && aMapel === cleanMapel && aClass === cleanClass;
+    });
+
+    const newId = existingIndex >= 0 ? String(this.state.attendance[existingIndex].id) : `${date}_${cleanClass.replace(/\s+/g, '_')}_${cleanMapel.replace(/\s+/g, '_')}_p${targetPertemuan}`;
     const attObj = {
       id: newId,
       date,
-      pertemuan: parseInt(pertemuan),
+      pertemuan: targetPertemuan,
       mapel,
       class: className,
       records
@@ -1119,6 +1163,7 @@ class Store {
     } else {
       this.state.attendance.push(attObj);
     }
+    this.deduplicateAttendance();
     this.saveState();
 
     if (isFirebaseConnected && db) {
