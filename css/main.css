@@ -2356,47 +2356,32 @@ body.dark-theme {
 /* Bottom Bar */
 .footer-bottom {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding-top: 10px;
+  justify-content: center;
+  text-align: center;
+  gap: 4px;
+  padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-bottom-info {
+  text-align: center;
 }
 
 .footer-bottom-info p {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: #94a3b8;
-  line-height: 1.4;
+  line-height: 1.5;
+  text-align: center;
 }
 
 .footer-location {
   color: #38bdf8 !important;
   font-weight: 500;
-  margin-top: 1px !important;
-}
-
-.footer-status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  border-radius: 16px;
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: #34d399;
-}
-
-.status-pulse-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-  animation: pulseGreen 2s infinite;
+  margin-top: 2px !important;
+  text-align: center;
 }
 
 @keyframes pulseGreen {
