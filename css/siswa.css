@@ -249,3 +249,122 @@
   align-items: center;
   justify-content: center;
 }
+
+/* Galeri Siswa Responsive Grid & Cards */
+.galeri-siswa-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* HP View: 2 items per row (2 2 gitu) */
+  gap: 10px;
+}
+
+@media (min-width: 640px) {
+  .galeri-siswa-grid {
+    grid-template-columns: repeat(3, 1fr); /* Tablet: 3 per row */
+    gap: 14px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .galeri-siswa-grid {
+    grid-template-columns: repeat(4, 1fr); /* Desktop: 4 per row */
+    gap: 16px;
+  }
+}
+
+.galeri-card-item {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  cursor: pointer;
+  height: 100%;
+}
+
+.galeri-card-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+  border-color: #cbd5e1;
+}
+
+.galeri-card-img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 115px; /* Compact image size so it's clean and not too big */
+  background: #0f172a;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .galeri-card-img-wrapper {
+    height: 135px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .galeri-card-img-wrapper {
+    height: 145px;
+  }
+}
+
+.galeri-card-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.35s ease;
+}
+
+.galeri-card-item:hover .galeri-card-img-wrapper img {
+  transform: scale(1.06);
+}
+
+.galeri-card-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  font-weight: 800;
+  font-size: 0.6rem;
+  padding: 2px 6px;
+  border-radius: 6px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18);
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.galeri-card-body {
+  padding: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #ffffff;
+}
+
+.galeri-card-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 3px 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.galeri-card-desc {
+  font-size: 0.68rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+

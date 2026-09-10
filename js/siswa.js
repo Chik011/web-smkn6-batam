@@ -689,42 +689,39 @@ function renderKalenderView(state) {
 
 function renderGaleriSiswaView(state) {
   const items = (state.galeriItems && state.galeriItems.length > 0) ? state.galeriItems : [
-    { id: '1', title: 'Juara 1 LKS Network Administration', category: '🏆 PRESTASI', tagColor: '#b45309', tagBg: '#fef3c7', imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80', subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-    { id: '2', title: 'Praktikum Fiber Optic Splicing', category: '🛠️ PRAKTIKUM', tagColor: '#0369a1', tagBg: '#e0f2fe', imageUrl: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=600&q=80', subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-    { id: '3', title: 'Deployment Server Linux Debian', category: '💻 PROJECT', tagColor: '#4338ca', tagBg: '#e0e7ff', imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80', subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-    { id: '4', title: 'Konfigurasi Mikrotik RouterOS', category: '🌐 JARINGAN', tagColor: '#15803d', tagBg: '#dcfce7', imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80', subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-    { id: '5', title: 'Workshop Cyber Security & Defense', category: '⚡ WORKSHOP', tagColor: '#9333ea', tagBg: '#faf5ff', imageUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80', subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' }
+    { id: '1', title: 'Juara 1 LKS Network Administration', category: '🏆 PRESTASI', tagColor: '#b45309', tagBg: '#fef3c7', imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80', subtitle: 'Tim Siswa TKJ SMKN 6 Batam berhasil meraih Medali Emas LKS.' },
+    { id: '2', title: 'Praktikum Fiber Optic Splicing', category: '🛠️ PRAKTIKUM', tagColor: '#0369a1', tagBg: '#e0f2fe', imageUrl: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=600&q=80', subtitle: 'Penyambungan kabel serat optik menggunakan Fusion Splicer.' },
+    { id: '3', title: 'Deployment Server Linux Debian', category: '💻 PROJECT', tagColor: '#4338ca', tagBg: '#e0e7ff', imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80', subtitle: 'Konfigurasi Web Server, DNS, dan Virtual Host Debian Server.' },
+    { id: '4', title: 'Konfigurasi Mikrotik RouterOS', category: '🌐 JARINGAN', tagColor: '#15803d', tagBg: '#dcfce7', imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80', subtitle: 'Simulasi routing, VLAN, dan Bandwidth Management Mikrotik.' },
+    { id: '5', title: 'Workshop Cyber Security & Defense', category: '⚡ WORKSHOP', tagColor: '#9333ea', tagBg: '#faf5ff', imageUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80', subtitle: 'Pelatihan dasar keamanan jaringan, firewall & pencegahan serangan.' },
+    { id: '6', title: 'Perakitan & Trouble-shooting PC Lab', category: '🖥️ HARDWARE', tagColor: '#0d9488', tagBg: '#ccfbf1', imageUrl: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=600&q=80', subtitle: 'Praktikum perakitan komputer hardware dan instalasi sistem.' }
   ];
 
   return `
-    <div style="background:white; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">
+    <div style="background:white; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; position:sticky; top:0; z-index:10;">
       <div style="display:flex; align-items:center; gap:12px;">
         <button style="background:none; border:none; cursor:pointer;" onclick="window.switchSiswaTab('home')">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </button>
-        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b;">🖼️ Galeri & Prestasi Siswa TKJ</h3>
+        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b; margin:0;">🖼️ Galeri & Prestasi Siswa TKJ</h3>
       </div>
-      <span style="background:#f1f5f9; color:#475569; padding:4px 8px; border-radius:6px; font-size:0.72rem; font-weight:700;">${items.length} Foto</span>
+      <span style="background:#f1f5f9; color:#0284c7; padding:4px 10px; border-radius:20px; font-size:0.72rem; font-weight:700;">${items.length} Foto</span>
     </div>
-    <div style="padding:16px;">
-      <!-- Grid 2 Column for Android Mobile View -->
-      <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;">
-        ${items.map(item => `
-          <div style="background:white; border:1px solid #e2e8f0; border-radius:14px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.03); display:flex; flex-direction:column;">
-            <div style="height:115px; width:100%; position:relative; background:#0f172a; overflow:hidden;">
-              <img src="${item.imageUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80'" />
-              <span style="position:absolute; top:6px; left:6px; background:${item.tagBg || '#fef3c7'}; color:${item.tagColor || '#b45309'}; font-weight:800; font-size:0.62rem; padding:2px 6px; border-radius:6px; backdrop-filter:blur(4px);">
-                ${item.category}
+
+    <div style="padding:14px 16px 24px;">
+      <div class="galeri-siswa-grid">
+        ${items.map((item, idx) => `
+          <div class="galeri-card-item" onclick="window.openGaleriDetailModal('${item.id || idx}')">
+            <div class="galeri-card-img-wrapper">
+              <img src="${item.imageUrl}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80'" />
+              <span class="galeri-card-badge" style="background:${item.tagBg || '#fef3c7'}; color:${item.tagColor || '#b45309'};">
+                ${item.category || '🖼️ GALERI'}
               </span>
             </div>
-            <div style="padding:10px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+            <div class="galeri-card-body">
               <div>
-                <h4 style="font-size:0.82rem; font-weight:700; color:#0f172a; margin:0 0 4px 0; line-height:1.3; height:2.6em; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
-                  ${item.title}
-                </h4>
-                <p style="font-size:0.7rem; color:#64748b; margin:0; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
-                  ${item.subtitle || 'Lorem ipsum dolor sit amet, consectetur.'}
-                </p>
+                <h4 class="galeri-card-title">${item.title}</h4>
+                <p class="galeri-card-desc">${item.subtitle || 'Dokumentasi kegiatan siswa TKJ SMKN 6.'}</p>
               </div>
             </div>
           </div>
@@ -733,6 +730,42 @@ function renderGaleriSiswaView(state) {
     </div>
   `;
 }
+
+window.openGaleriDetailModal = function(idOrIdx) {
+  const overlay = document.getElementById('globalModal');
+  const card = document.getElementById('modalCardContent');
+  if (!overlay || !card) return;
+
+  const items = (window.store && window.store.state && window.store.state.galeriItems && window.store.state.galeriItems.length > 0)
+    ? window.store.state.galeriItems
+    : [
+      { id: '1', title: 'Juara 1 LKS Network Administration', category: '🏆 PRESTASI', tagColor: '#b45309', tagBg: '#fef3c7', imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80', subtitle: 'Tim Siswa TKJ SMKN 6 Batam berhasil meraih Medali Emas LKS.' },
+      { id: '2', title: 'Praktikum Fiber Optic Splicing', category: '🛠️ PRAKTIKUM', tagColor: '#0369a1', tagBg: '#e0f2fe', imageUrl: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=600&q=80', subtitle: 'Penyambungan kabel serat optik menggunakan Fusion Splicer.' },
+      { id: '3', title: 'Deployment Server Linux Debian', category: '💻 PROJECT', tagColor: '#4338ca', tagBg: '#e0e7ff', imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80', subtitle: 'Konfigurasi Web Server, DNS, dan Virtual Host Debian Server.' },
+      { id: '4', title: 'Konfigurasi Mikrotik RouterOS', category: '🌐 JARINGAN', tagColor: '#15803d', tagBg: '#dcfce7', imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80', subtitle: 'Simulasi routing, VLAN, dan Bandwidth Management Mikrotik.' },
+      { id: '5', title: 'Workshop Cyber Security & Defense', category: '⚡ WORKSHOP', tagColor: '#9333ea', tagBg: '#faf5ff', imageUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80', subtitle: 'Pelatihan dasar keamanan jaringan, firewall & pencegahan serangan.' },
+      { id: '6', title: 'Perakitan & Trouble-shooting PC Lab', category: '🖥️ HARDWARE', tagColor: '#0d9488', tagBg: '#ccfbf1', imageUrl: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=600&q=80', subtitle: 'Praktikum perakitan komputer hardware dan instalasi sistem.' }
+    ];
+
+  let item = items.find(g => String(g.id) === String(idOrIdx));
+  if (!item && !isNaN(parseInt(idOrIdx, 10))) {
+    item = items[parseInt(idOrIdx, 10)];
+  }
+  if (!item) item = items[0];
+
+  card.innerHTML = `
+    <div style="border-radius:12px; overflow:hidden; margin:-16px -16px 12px -16px; background:#0f172a; max-height:260px; position:relative;">
+      <img src="${item.imageUrl}" style="width:100%; height:220px; object-fit:cover; display:block;" onerror="this.src='https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80'" />
+      <span style="position:absolute; top:12px; left:12px; background:${item.tagBg || '#fef3c7'}; color:${item.tagColor || '#b45309'}; font-weight:800; font-size:0.7rem; padding:4px 10px; border-radius:8px; backdrop-filter:blur(8px);">
+        ${item.category || '🖼️ GALERI'}
+      </span>
+    </div>
+    <h3 style="font-size:1.05rem; font-weight:800; color:#0f172a; margin:0 0 6px 0;">${item.title}</h3>
+    <p style="font-size:0.8rem; color:#475569; line-height:1.5; margin:0 0 16px 0;">${item.subtitle || 'Dokumentasi kegiatan dan prestasi siswa TKJ SMKN 6 Batam.'}</p>
+    <button class="btn-primary" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup Detail</button>
+  `;
+  overlay.classList.add('open');
+};
 
 function renderLibraryView(state) {
   const books = (state.elibraryBooks && state.elibraryBooks.length > 0) ? state.elibraryBooks : [
