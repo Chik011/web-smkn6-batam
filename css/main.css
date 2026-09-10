@@ -90,7 +90,6 @@ body::before {
   top: 0;
   z-index: 1000;
   border-bottom: 1px solid var(--line-soft);
-  animation: slideDown 0.55s ease both;
 }
 
 .desktop-header-block::after {
@@ -102,7 +101,6 @@ body::before {
   height: 2px;
   background: linear-gradient(90deg, var(--accent-blue), #38bdf8 55%, var(--accent-coral));
   transform-origin: left;
-  animation: growLine 0.8s 0.25s ease both;
 }
 
 .desktop-top-row {

@@ -81,39 +81,36 @@ if (!window._hashListenerAttached) {
 
 function renderApp() {
   const state = store.state;
-  const pageRole = document.body.dataset.role || null;
+  const appEl = document.getElementById('app');
+  if (!appEl) return;
 
-  if (pageRole && !state.isLoggedIn) {
-    window.location.replace('./index.html');
-    return;
-  }
-
-  if (!pageRole) {
-    if (state.isLoggedIn) {
-      window.location.replace(`./${state.activeRole || 'siswa'}.html`);
-      return;
+  if (!state.isLoggedIn) {
+    delete document.body.dataset.role;
+    const loginHtml = renderLoginPage();
+    if (appEl.innerHTML !== loginHtml) {
+      appEl.innerHTML = loginHtml;
     }
-
-    document.getElementById('app').innerHTML = renderLoginPage();
     return;
   }
 
-  const role = pageRole;
+  let role = document.body.dataset.role || state.activeRole || 'siswa';
+  document.body.dataset.role = role;
   syncTabFromHash();
 
   const activeTab = state.activeTabs[role] || (role === 'guru' ? 'beranda' : 'home');
-  if (window.location.hash !== '#' + activeTab) {
-    history.replaceState(null, '', '#' + activeTab);
+  const targetUrl = `./${role}.html#${activeTab}`;
+  const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+  if (currentPath !== `${role}.html` || window.location.hash !== '#' + activeTab) {
+    try {
+      history.replaceState(null, '', targetUrl);
+    } catch (e) {}
   }
-
-  const viewMode = 'desktop';
 
   let screenResult = { contentHtml: '', bottomNavHtml: '' };
   if (role === 'siswa') screenResult = renderSiswaScreen(state);
   else if (role === 'guru') screenResult = renderGuruScreen(state);
   else if (role === 'admin') screenResult = renderAdminScreen(state);
 
-  // Desktop Header Block with Title Row and Nav Tabs Row Below It
   const desktopBarHtml = `
     <header class="desktop-header-block">
       <div class="desktop-top-row">
@@ -137,78 +134,23 @@ function renderApp() {
     </header>
   `;
 
-  if (viewMode === 'desktop') {
-    const appHtml = `
-      ${desktopBarHtml}
+  const appHtml = `
+    ${desktopBarHtml}
 
-      <main class="desktop-layout">
-        <div class="phone-frame">
-          <div class="phone-screen" id="phoneScreen">
-            <div class="tab-content-anim" key="${role}-${state.activeTabs[role] || 'def'}">
-              ${screenResult.contentHtml}
-            </div>
-          </div>
-        </div>
-      </main>
-    `;
-
-    document.getElementById('app').innerHTML = appHtml;
-    bindBottomNavEvents(role);
-  } else {
-    // Multi-role side-by-side view showing Siswa, Guru, Admin simultaneously!
-    const siswaRes = renderSiswaScreen(state);
-    const guruRes = renderGuruScreen(state);
-    const adminRes = renderAdminScreen(state);
-
-    const appHtml = `
-      ${desktopBarHtml}
-
-      <div class="emulator-container grid-view">
-        <!-- Siswa Phone -->
-        <div style="display:flex; flex-direction:column; align-items:center;">
-          <h2 style="font-family:var(--font-serif); font-size:2rem; margin-bottom:12px;">Siswa</h2>
-          <div class="phone-frame">
-            <div class="phone-status-bar">
-              <span class="phone-status-time">${getShortTime()}</span>
-              <div class="phone-status-icons">📶 🔋</div>
-            </div>
-            <div class="phone-screen"><div class="tab-content-anim">${siswaRes.contentHtml}</div></div>
-            ${siswaRes.bottomNavHtml}
-          </div>
-        </div>
-
-        <!-- Guru Phone -->
-        <div style="display:flex; flex-direction:column; align-items:center;">
-          <h2 style="font-family:var(--font-serif); font-size:2rem; margin-bottom:12px;">Guru</h2>
-          <div class="phone-frame">
-            <div class="phone-status-bar">
-              <span class="phone-status-time">${getShortTime()}</span>
-              <div class="phone-status-icons">📶 🔋</div>
-            </div>
-            <div class="phone-screen"><div class="tab-content-anim">${guruRes.contentHtml}</div></div>
-            ${guruRes.bottomNavHtml}
-          </div>
-        </div>
-
-        <!-- Admin Phone -->
-        <div style="display:flex; flex-direction:column; align-items:center;">
-          <h2 style="font-family:var(--font-serif); font-size:2rem; margin-bottom:12px;">Admin</h2>
-          <div class="phone-frame">
-            <div class="phone-status-bar">
-              <span class="phone-status-time">${getShortTime()}</span>
-              <div class="phone-status-icons">📶 🔋</div>
-            </div>
-            <div class="phone-screen"><div class="tab-content-anim">${adminRes.contentHtml}</div></div>
-            ${adminRes.bottomNavHtml}
+    <main class="desktop-layout">
+      <div class="phone-frame">
+        <div class="phone-screen" id="phoneScreen">
+          <div class="tab-content-anim" key="${role}-${state.activeTabs[role] || 'def'}">
+            ${screenResult.contentHtml}
           </div>
         </div>
       </div>
-    `;
+    </main>
+  `;
 
-    document.getElementById('app').innerHTML = appHtml;
-    bindBottomNavEvents('siswa');
-    bindBottomNavEvents('guru');
-    bindBottomNavEvents('admin');
+  if (appEl.innerHTML !== appHtml) {
+    appEl.innerHTML = appHtml;
+    bindBottomNavEvents(role);
   }
 }
 
@@ -414,8 +356,12 @@ window.handleLogin = function(event) {
   window.showToast(`Berhasil masuk sebagai ${role.toUpperCase()} (${loggedName})!`, 'success');
   setTimeout(() => {
     store.login(role, loggedName);
+    document.body.dataset.role = role;
     const defaultTab = (role === 'guru') ? 'beranda' : 'home';
-    window.location.replace(`./${role}.html#${defaultTab}`);
+    try {
+      history.replaceState(null, '', `./${role}.html#${defaultTab}`);
+    } catch (e) {}
+    renderApp();
   }, 450);
 };
 
@@ -457,7 +403,11 @@ window.performLogout = function() {
   window.showToast('Anda telah keluar dari sesi.', 'info');
   setTimeout(() => {
     store.logout();
-    window.location.replace('./index.html');
+    delete document.body.dataset.role;
+    try {
+      history.replaceState(null, '', './index.html');
+    } catch (e) {}
+    renderApp();
   }, 400);
 };
 
