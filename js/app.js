@@ -487,7 +487,7 @@ window.setGuruSubTab = function(category, tab) {
 };
 
 window.setStudentStatus = function(studentId, status) {
-  window.tempAbsensi = window.tempAbsensi || { 1: 'H', 2: 'H', 3: 'H' };
+  window.tempAbsensi = window.tempAbsensi || {};
   window.tempAbsensi[studentId] = status;
   renderApp();
 };
@@ -513,7 +513,7 @@ window.submitAbsensiForm = function() {
   const records = { ...window.tempAbsensi };
   (store.state.students || []).forEach(s => {
     if (!records[s.id]) {
-      records[s.id] = 'H';
+      records[s.id] = 'A';
     }
   });
 

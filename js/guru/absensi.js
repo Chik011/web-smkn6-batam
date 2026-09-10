@@ -24,38 +24,58 @@ export function renderAbsensi(state) {
 }
 
 function renderInputAbsensi(state) {
-  const selectedClass = window.guruSelectedClass || ((state.classes && state.classes.length > 0) ? state.classes[0].name : '10 TKJ 1');
-  window.guruSelectedClass = selectedClass;
+  const teacher = state.currentUser.guru || {};
+  const teacherMapel = teacher.mapel || 'MTK';
+
+  const selectedMapel = window.guruSelectedMapel || teacherMapel;
+  window.guruSelectedMapel = selectedMapel;
+
+  const allSchedules = state.schedules || [];
+  const matchingClasses = new Set();
+
+  allSchedules.forEach(s => {
+    const sMapel = String(s.mapel || '').toLowerCase().trim();
+    const tMapel = String(selectedMapel).toLowerCase().trim();
+    const sGuru = String(s.guru || '').toLowerCase().trim();
+    const tName = String(teacher.name || '').toLowerCase().trim();
+
+    if (sMapel.includes(tMapel) || tMapel.includes(sMapel) || sGuru.includes(tName) || tName.includes(sGuru)) {
+      if (s.class) matchingClasses.add(s.class);
+      if (s.className) matchingClasses.add(s.className);
+    }
+  });
+
+  let teacherClasses = Array.from(matchingClasses);
+  if (teacherClasses.length === 0) {
+    teacherClasses = (state.classes && state.classes.length > 0)
+      ? state.classes.map(c => c.name)
+      : ['10 TKJ 1', '10 TKJ 2', '11 TKJ 1'];
+  }
+
+  if (!window.guruSelectedClass || !teacherClasses.includes(window.guruSelectedClass)) {
+    window.guruSelectedClass = teacherClasses[0];
+  }
+  const selectedClass = window.guruSelectedClass;
 
   const isDummy = (s) => {
     if (!s) return true;
-    const name = String(s.name || s.nama || s.studentName || '').toLowerCase();
     const nis = String(s.nis || s.nisn || s.studentId || s.id || '').trim();
-    const dummyNames = ['ahmad', 'budi', 'citra', 'rizki', 'dewi', 'santoso'];
     const dummyNis = ['2024001', '2024002', '2024003'];
-    if (dummyNis.includes(nis)) return true;
-    for (const dn of dummyNames) {
-      if (name.includes(dn)) return true;
-    }
-    return false;
+    return dummyNis.includes(nis);
   };
 
   const allStudents = state.students || [];
-  const rawFiltered = allStudents.filter(s => {
+  const classStudents = allStudents.filter(s => {
     if (isDummy(s)) return false;
-    if (!s.class && !s.className) return true;
     const cName = String(s.class || s.className || '').trim().toLowerCase();
     const targetClass = String(selectedClass).trim().toLowerCase();
-    return cName === targetClass;
+    return cName === targetClass || !s.class;
   });
 
-  // Strict deduplication by NIS or Name
   const seen = new Map();
-  rawFiltered.forEach(s => {
-    const key = (s.nis || s.name || s.id).toString().trim().toLowerCase();
-    if (!seen.has(key)) {
-      seen.set(key, s);
-    }
+  classStudents.forEach(s => {
+    const key = String(s.nis || s.name || s.id).trim().toLowerCase();
+    if (!seen.has(key)) seen.set(key, s);
   });
   const students = Array.from(seen.values());
 
@@ -63,16 +83,19 @@ function renderInputAbsensi(state) {
 
   let countH = 0, countS = 0, countI = 0, countA = 0;
   students.forEach(s => {
-    const st = window.tempAbsensi[s.id] || 'H';
+    const st = window.tempAbsensi[s.id] || 'A';
     if (st === 'H') countH++;
     else if (st === 'S') countS++;
     else if (st === 'I') countI++;
-    else if (st === 'A') countA++;
+    else countA++;
   });
 
   return `
     <div style="background:white; border-radius:14px; padding:18px; margin-bottom:14px; border:1px solid #e2e8f0; box-shadow:0 4px 12px rgba(15,23,42,0.04);">
-      <h4 style="font-size:0.95rem; font-weight:800; color:#1e293b; margin-bottom:12px;">Input Kehadiran Siswa</h4>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h4 style="font-size:0.95rem; font-weight:800; color:#1e293b; margin:0;">Input Kehadiran Siswa</h4>
+        <span class="badge-tag badge-blue" style="font-size:0.7rem;">Mapel: ${selectedMapel}</span>
+      </div>
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
         <div class="form-group" style="margin-bottom:0;">
@@ -94,14 +117,15 @@ function renderInputAbsensi(state) {
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
         <div class="form-group" style="margin-bottom:0;">
           <label class="form-label">Mata Pelajaran</label>
-          <select class="form-select" id="absensiMapel">
-            ${(state.mapel && state.mapel.length > 0) ? state.mapel.map(m => `<option value="${m.name}">${m.name}</option>`).join('') : '<option value="MTK">MTK</option>'}
+          <select class="form-select" id="absensiMapel" onchange="window.guruSelectedMapel = this.value; window.renderApp && window.renderApp();">
+            <option value="${teacherMapel}">${teacherMapel}</option>
+            ${(state.mapel || []).filter(m => m.name !== teacherMapel).map(m => `<option value="${m.name}" ${m.name === selectedMapel ? 'selected' : ''}>${m.name}</option>`).join('')}
           </select>
         </div>
         <div class="form-group" style="margin-bottom:0;">
-          <label class="form-label">Kelas</label>
+          <label class="form-label">Kelas Ajar (${teacherClasses.length})</label>
           <select class="form-select" id="absensiKelas" onchange="window.guruSelectedClass = this.value; window.renderApp && window.renderApp();">
-            ${(state.classes && state.classes.length > 0) ? state.classes.map(c => `<option value="${c.name}" ${c.name === selectedClass ? 'selected' : ''}>${c.name}</option>`).join('') : `<option value="${selectedClass}">${selectedClass}</option>`}
+            ${teacherClasses.map(cName => `<option value="${cName}" ${cName === selectedClass ? 'selected' : ''}>${cName}</option>`).join('')}
           </select>
         </div>
       </div>
@@ -127,7 +151,7 @@ function renderInputAbsensi(state) {
         ${students.length === 0 ? `
           <p style="font-size:0.82rem; color:#94a3b8; text-align:center; padding:16px 0;">Tidak ada data siswa untuk kelas ${selectedClass}.</p>
         ` : students.map(s => {
-          const currentStatus = window.tempAbsensi[s.id] || 'H';
+          const currentStatus = window.tempAbsensi[s.id] || 'A';
           return `
             <div class="student-list-item">
               <div>

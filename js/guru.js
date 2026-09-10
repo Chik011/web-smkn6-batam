@@ -176,22 +176,78 @@ function renderAbsensi(state) {
 }
 
 function renderInputAbsensi(state) {
-  const students = state.students;
-  // Local temporary attendance states
-  window.tempAbsensi = window.tempAbsensi || { 1: 'H', 2: 'H', 3: 'H' };
+  const teacher = state.currentUser.guru || {};
+  const teacherMapel = teacher.mapel || 'MTK';
+
+  const selectedMapel = window.guruSelectedMapel || teacherMapel;
+  window.guruSelectedMapel = selectedMapel;
+
+  const allSchedules = state.schedules || [];
+  const matchingClasses = new Set();
+
+  allSchedules.forEach(s => {
+    const sMapel = String(s.mapel || '').toLowerCase().trim();
+    const tMapel = String(selectedMapel).toLowerCase().trim();
+    const sGuru = String(s.guru || '').toLowerCase().trim();
+    const tName = String(teacher.name || '').toLowerCase().trim();
+
+    if (sMapel.includes(tMapel) || tMapel.includes(sMapel) || sGuru.includes(tName) || tName.includes(sGuru)) {
+      if (s.class) matchingClasses.add(s.class);
+      if (s.className) matchingClasses.add(s.className);
+    }
+  });
+
+  let teacherClasses = Array.from(matchingClasses);
+  if (teacherClasses.length === 0) {
+    teacherClasses = (state.classes && state.classes.length > 0)
+      ? state.classes.map(c => c.name)
+      : ['10 TKJ 1', '10 TKJ 2', '11 TKJ 1'];
+  }
+
+  if (!window.guruSelectedClass || !teacherClasses.includes(window.guruSelectedClass)) {
+    window.guruSelectedClass = teacherClasses[0];
+  }
+  const selectedClass = window.guruSelectedClass;
+
+  const isDummy = (s) => {
+    if (!s) return true;
+    const nis = String(s.nis || s.nisn || s.studentId || s.id || '').trim();
+    const dummyNis = ['2024001', '2024002', '2024003'];
+    return dummyNis.includes(nis);
+  };
+
+  const allStudents = state.students || [];
+  const classStudents = allStudents.filter(s => {
+    if (isDummy(s)) return false;
+    const cName = String(s.class || s.className || '').trim().toLowerCase();
+    const targetClass = String(selectedClass).trim().toLowerCase();
+    return cName === targetClass || !s.class;
+  });
+
+  const seen = new Map();
+  classStudents.forEach(s => {
+    const key = String(s.nis || s.name || s.id).trim().toLowerCase();
+    if (!seen.has(key)) seen.set(key, s);
+  });
+  const students = Array.from(seen.values());
+
+  window.tempAbsensi = window.tempAbsensi || {};
 
   let countH = 0, countS = 0, countI = 0, countA = 0;
   students.forEach(s => {
-    const st = window.tempAbsensi[s.id] || 'H';
+    const st = window.tempAbsensi[s.id] || 'A';
     if (st === 'H') countH++;
     else if (st === 'S') countS++;
     else if (st === 'I') countI++;
-    else if (st === 'A') countA++;
+    else countA++;
   });
 
   return `
     <div style="background:white; border-radius:14px; padding:18px; margin-bottom:14px; border:1px solid #e2e8f0; box-shadow:0 4px 12px rgba(15,23,42,0.04);">
-      <h4 style="font-size:0.95rem; font-weight:800; color:#1e293b; margin-bottom:12px;">Input Kehadiran Siswa</h4>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h4 style="font-size:0.95rem; font-weight:800; color:#1e293b; margin:0;">Input Kehadiran Siswa</h4>
+        <span class="badge-tag badge-blue" style="font-size:0.7rem;">Mapel: ${selectedMapel}</span>
+      </div>
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
         <div class="form-group" style="margin-bottom:0;">
@@ -213,27 +269,26 @@ function renderInputAbsensi(state) {
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
         <div class="form-group" style="margin-bottom:0;">
           <label class="form-label">Mata Pelajaran</label>
-          <select class="form-select" id="absensiMapel">
-            ${(state.mapel && state.mapel.length > 0) ? state.mapel.map(m => `<option value="${m.name}">${m.name}</option>`).join('') : '<option value="MTK">MTK</option>'}
+          <select class="form-select" id="absensiMapel" onchange="window.guruSelectedMapel = this.value; window.renderApp && window.renderApp();">
+            <option value="${teacherMapel}">${teacherMapel}</option>
+            ${(state.mapel || []).filter(m => m.name !== teacherMapel).map(m => `<option value="${m.name}" ${m.name === selectedMapel ? 'selected' : ''}>${m.name}</option>`).join('')}
           </select>
         </div>
         <div class="form-group" style="margin-bottom:0;">
-          <label class="form-label">Kelas</label>
-          <select class="form-select" id="absensiKelas">
-            ${(state.classes && state.classes.length > 0) ? state.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('') : '<option value="10 TKJ 1">10 TKJ 1</option>'}
+          <label class="form-label">Kelas Ajar (${teacherClasses.length})</label>
+          <select class="form-select" id="absensiKelas" onchange="window.guruSelectedClass = this.value; window.renderApp && window.renderApp();">
+            ${teacherClasses.map(cName => `<option value="${cName}" ${cName === selectedClass ? 'selected' : ''}>${cName}</option>`).join('')}
           </select>
         </div>
       </div>
 
-      <!-- Action header with Batch Mark Present -->
       <div class="attendance-action-header">
-        <span style="font-size:0.85rem; font-weight:700; color:#1e293b;">Daftar Siswa (${students.length})</span>
+        <span style="font-size:0.85rem; font-weight:700; color:#1e293b;">Daftar Siswa Kelas ${selectedClass} (${students.length})</span>
         <button type="button" class="btn-batch-attend" onclick="window.markAllStudentsPresent()">
           <span>✨ Tandai Semua Hadir</span>
         </button>
       </div>
 
-      <!-- Realtime Attendance Summary Counter -->
       <div class="attendance-counter-pills">
         <div class="counter-item h">Hadir: <span class="counter-num">${countH}</span></div>
         <div class="counter-item s">Sakit: <span class="counter-num">${countS}</span></div>
@@ -241,10 +296,11 @@ function renderInputAbsensi(state) {
         <div class="counter-item a">Alpa: <span class="counter-num">${countA}</span></div>
       </div>
 
-      <!-- Student List for Attendance -->
       <div style="display:flex; flex-direction:column; gap:8px;">
-        ${students.map(s => {
-          const currentStatus = window.tempAbsensi[s.id] || 'H';
+        ${students.length === 0 ? `
+          <p style="font-size:0.82rem; color:#94a3b8; text-align:center; padding:16px 0;">Tidak ada data siswa untuk kelas ${selectedClass}.</p>
+        ` : students.map(s => {
+          const currentStatus = window.tempAbsensi[s.id] || 'A';
           return `
             <div class="student-list-item">
               <div>
@@ -252,10 +308,10 @@ function renderInputAbsensi(state) {
                 <div class="student-info-nis">NIS: ${s.nis}</div>
               </div>
               <div class="attendance-badges">
-                <button class="badge-btn status-H ${currentStatus === 'H' ? 'active' : ''}" onclick="window.setStudentStatus(${s.id}, 'H')">H</button>
-                <button class="badge-btn status-S ${currentStatus === 'S' ? 'active' : ''}" onclick="window.setStudentStatus(${s.id}, 'S')">S</button>
-                <button class="badge-btn status-I ${currentStatus === 'I' ? 'active' : ''}" onclick="window.setStudentStatus(${s.id}, 'I')">I</button>
-                <button class="badge-btn status-A ${currentStatus === 'A' ? 'active' : ''}" onclick="window.setStudentStatus(${s.id}, 'A')">A</button>
+                <button class="badge-btn status-H ${currentStatus === 'H' ? 'active' : ''}" onclick="window.setStudentStatus('${s.id}', 'H')">H</button>
+                <button class="badge-btn status-S ${currentStatus === 'S' ? 'active' : ''}" onclick="window.setStudentStatus('${s.id}', 'S')">S</button>
+                <button class="badge-btn status-I ${currentStatus === 'I' ? 'active' : ''}" onclick="window.setStudentStatus('${s.id}', 'I')">I</button>
+                <button class="badge-btn status-A ${currentStatus === 'A' ? 'active' : ''}" onclick="window.setStudentStatus('${s.id}', 'A')">A</button>
               </div>
             </div>
           `;
