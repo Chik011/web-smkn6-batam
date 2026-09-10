@@ -528,7 +528,7 @@ class Store {
       if (saved) {
         this.state = JSON.parse(saved);
         this.state.activeViewMode = 'desktop';
-        if (typeof this.state.isLoggedIn !== 'boolean') this.state.isLoggedIn = false;
+        this.state.isLoggedIn = false; // Always demand login on app load/visit
 
         if (Array.isArray(this.state.students)) {
           this.state.students = this.state.students.filter(s => {

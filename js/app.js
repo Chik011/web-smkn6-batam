@@ -166,6 +166,12 @@ function renderApp() {
     if (!document.querySelector('.login-page')) {
       appEl.innerHTML = renderLoginPage();
     }
+    const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+    if (currentPath !== 'index.html' && currentPath !== '') {
+      try {
+        history.replaceState(null, '', './index.html');
+      } catch (e) {}
+    }
     return;
   }
 
