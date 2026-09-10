@@ -130,13 +130,33 @@ function renderHome(state) {
 
     <!-- Video List -->
     <div style="padding:0 16px 16px;">
-      <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin-bottom:8px;">Daftar Video</h4>
-      ${videos.map(v => `
-        <div class="list-item-card" style="margin:0 0 8px;">
-          <span style="font-size:0.85rem; font-weight:600; color:#1e293b;">${v.title}</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:0;">Daftar Video (${videos.length})</h4>
+        <span style="font-size:0.7rem; color:#64748b;">✋ Drag handle ☰ untuk geser urutan</span>
+      </div>
+      ${videos.map((v, idx) => `
+        <div
+          class="list-item-card video-drag-item"
+          draggable="true"
+          ondragstart="window.handleNewsDragStart(event, ${idx})"
+          ondragover="window.handleNewsDragOver(event, ${idx})"
+          ondragleave="window.handleNewsDragLeave(event)"
+          ondrop="window.handleNewsDrop(event, ${idx})"
+          ondragend="window.handleNewsDragEnd(event)"
+          style="margin:0 0 8px;"
+        >
+          <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
+            <span class="drag-handle" title="Tarik untuk memindahkan urutan">☰</span>
+            <span style="font-size:0.85rem; font-weight:600; color:#1e293b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">
+              ${v.title}
+            </span>
+          </div>
           <div class="item-actions">
-            <button class="icon-btn-action edit" onclick="window.playNewsVideoById('${v.id}')">▶</button>
-            <button class="icon-btn-action delete" onclick="store.deleteNews('${v.id}'); window.showToast('Video berhasil dihapus.', 'info');">🗑️</button>
+            <button class="icon-btn-action move-up" onclick="window.moveNewsUp(${idx})" ${idx === 0 ? 'disabled' : ''} title="Pindah ke Atas">▲</button>
+            <button class="icon-btn-action move-down" onclick="window.moveNewsDown(${idx})" ${idx === videos.length - 1 ? 'disabled' : ''} title="Pindah ke Bawah">▼</button>
+            <button class="icon-btn-action play" onclick="window.playNewsVideoById('${v.id}')" title="Putar Video">▶</button>
+            <button class="icon-btn-action edit" onclick="window.editNewsVideoModal('${v.id}')" title="Edit Video">✏️</button>
+            <button class="icon-btn-action delete" onclick="window.deleteNews('${v.id}')" title="Hapus Video">🗑️</button>
           </div>
         </div>
       `).join('')}
@@ -193,7 +213,8 @@ function renderGuru(state) {
             </div>
           </div>
           <div class="item-actions">
-            <button class="icon-btn-action delete" onclick="if(confirm('Hapus pengajar ${t.name}?')) { store.deleteTeacher('${t.id}'); window.showToast('Pengajar berhasil dihapus.', 'info'); }">🗑️</button>
+            <button class="icon-btn-action edit" onclick="window.editTeacherModal('${t.id}')" title="Edit Guru">✏️</button>
+            <button class="icon-btn-action delete" onclick="window.deleteTeacher('${t.id}', '${(t.name || '').replace(/'/g, "\\'")}')" title="Hapus Guru">🗑️</button>
           </div>
         </div>
       `).join('')}
@@ -227,10 +248,14 @@ function renderMapel(state) {
     </div>
 
     <div style="padding:0 16px;">
-      <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:8px;">Daftar Mata Pelajaran</h4>
+      <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin-bottom:8px;">Daftar Mata Pelajaran (${mapelList.length})</h4>
       ${mapelList.map(m => `
-        <div class="list-item-card" style="margin:0 0 8px;">
+        <div class="list-item-card" style="margin:0 0 8px; display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:0.88rem; font-weight:600; color:#1e293b;">📘 ${m.name}</span>
+          <div class="item-actions">
+            <button class="icon-btn-action edit" onclick="window.editMapelModal('${m.id}')" title="Edit Mapel">✏️</button>
+            <button class="icon-btn-action delete" onclick="window.deleteMapel('${m.id}', '${(m.name || '').replace(/'/g, "\\'")}')" title="Hapus Mapel">🗑️</button>
+          </div>
         </div>
       `).join('')}
     </div>
@@ -239,6 +264,22 @@ function renderMapel(state) {
 
 function renderSiswa(state) {
   const subView = state.adminSubView.siswa || 'level';
+  const mode = state.adminSubView.siswaViewMode || 'menu';
+
+  let viewContent = '';
+  if (subView === 'level') {
+    viewContent = renderSiswaLevelView(state);
+  } else if (subView === 'rooms') {
+    viewContent = renderSiswaRoomsView(state);
+  } else if (subView === 'daftar' || mode === 'daftar') {
+    viewContent = renderSiswaDaftarView(state);
+  } else if (subView === 'rekap' || mode === 'rekap') {
+    viewContent = renderSiswaRekapView(state);
+  } else if (subView === 'nilai' || mode === 'nilai') {
+    viewContent = renderSiswaNilaiView(state);
+  } else {
+    viewContent = renderSiswaMenuView(state);
+  }
 
   return `
     <div class="admin-header">
@@ -247,9 +288,7 @@ function renderSiswa(state) {
     </div>
 
     <div style="padding:16px;">
-      ${subView === 'level' ? renderSiswaLevelView(state) :
-        subView === 'rooms' ? renderSiswaRoomsView(state) :
-        renderSiswaMenuView(state)}
+      ${viewContent}
     </div>
   `;
 }
@@ -300,8 +339,8 @@ function renderSiswaRoomsView(state) {
   return `
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
       <div style="display:flex; align-items:center; gap:8px;">
-        <button style="background:none; border:none; cursor:pointer;" onclick="window.setAdminSiswaSubView('level')">←</button>
-        <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b;">Ruangan Kelas ${targetLevel}</h4>
+        <button style="background:none; border:none; cursor:pointer; font-size:1.1rem; font-weight:700;" onclick="window.setAdminSiswaSubView('level')">←</button>
+        <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin:0;">Ruangan Kelas ${targetLevel}</h4>
       </div>
       <button style="background:none; border:none; color:#0284c7; font-size:1.4rem; cursor:pointer; font-weight:700;" onclick="window.openAdminModal('tambahKelas')">+</button>
     </div>
@@ -311,55 +350,205 @@ function renderSiswaRoomsView(state) {
         <div class="content-card text-center" style="padding:20px; color:#94a3b8;">
           Belum ada ruangan kelas untuk Kelas ${targetLevel}.
         </div>
-      ` : classes.map(c => `
-        <div class="content-card" style="margin:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="window.setAdminSiswaSubView('menu', ${targetLevel}, '${c.name}')">
-          <div style="display:flex; align-items:center; gap:12px;">
-            <div style="width:36px; height:36px; border-radius:8px; background:#e2e8f0; display:flex; align-items:center; justify-content:center;">🏫</div>
+      ` : classes.map(c => {
+        const studentCount = (state.students || []).filter(s => (s.class || '').trim().toLowerCase() === c.name.trim().toLowerCase()).length;
+        return `
+          <div class="content-card" style="margin:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="window.setAdminSiswaSubView('menu', ${targetLevel}, '${c.name}', 'menu')">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:36px; height:36px; border-radius:8px; background:#e2e8f0; display:flex; align-items:center; justify-content:center;">🏫</div>
+              <div>
+                <h5 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin:0;">${c.name}</h5>
+                <p style="font-size:0.72rem; color:#64748b; margin:2px 0 0 0;">${studentCount} Peserta Didik Terdaftar</p>
+              </div>
+            </div>
+            <span>›</span>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function renderSiswaMenuView(state) {
+  const className = state.adminSubView.selectedClass || '10 TKJ 1';
+
+  return `
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+      <button style="background:none; border:none; cursor:pointer; font-size:1.1rem; font-weight:700;" onclick="window.setAdminSiswaSubView('rooms')">← Kembali</button>
+      <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin:0;">Menu ${className}</h4>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div class="content-card" style="margin:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="window.setAdminSiswaSubView('daftar', null, '${className}', 'daftar')">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:1.2rem;">👥</span>
+          <div>
+            <span style="font-weight:700; color:#1e293b; font-size:0.88rem; display:block;">Daftar Siswa</span>
+            <span style="font-size:0.72rem; color:#64748b;">Kelola, tambah, edit, dan hapus data siswa</span>
+          </div>
+        </div>
+        <span>›</span>
+      </div>
+
+      <div class="content-card" style="margin:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="window.setAdminSiswaSubView('rekap', null, '${className}', 'rekap')">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:1.2rem;">☑️</span>
+          <div>
+            <span style="font-weight:700; color:#1e293b; font-size:0.88rem; display:block;">Rekap Absensi</span>
+            <span style="font-size:0.72rem; color:#64748b;">Lihat kehadiran Hadir/Sakit/Izin/Alpa</span>
+          </div>
+        </div>
+        <span>›</span>
+      </div>
+
+      <div class="content-card" style="margin:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="window.setAdminSiswaSubView('nilai', null, '${className}', 'nilai')">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:1.2rem;">📊</span>
+          <div>
+            <span style="font-weight:700; color:#1e293b; font-size:0.88rem; display:block;">Nilai Akademik</span>
+            <span style="font-size:0.72rem; color:#64748b;">Lihat rekapitulasi nilai siswa per mapel</span>
+          </div>
+        </div>
+        <span>›</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderSiswaDaftarView(state) {
+  const className = state.adminSubView.selectedClass || '10 TKJ 1';
+  const students = (state.students || []).filter(s => (s.class || '10 TKJ 1').trim().toLowerCase() === className.trim().toLowerCase());
+
+  return `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button style="background:none; border:none; cursor:pointer; font-size:1.1rem; font-weight:700;" onclick="window.setAdminSiswaSubView('menu', null, '${className}', 'menu')">←</button>
+        <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin:0;">Daftar Siswa - ${className}</h4>
+      </div>
+      <button class="btn-add-primary" onclick="window.addStudentModal('${className}')">+ Tambah Siswa</button>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      ${students.length === 0 ? `
+        <div class="content-card text-center" style="padding:20px; color:#94a3b8;">
+          Belum ada siswa di kelas ${className}. Klik + Tambah Siswa untuk menambahkan.
+        </div>
+      ` : students.map((s, idx) => `
+        <div class="list-item-card" style="margin:0;">
+          <div class="list-item-left">
+            <div class="list-item-avatar" style="background:#e0f2fe; color:#0369a1; font-weight:700; font-size:0.8rem;">
+              ${idx + 1}
+            </div>
             <div>
-              <h5 style="font-size:0.9rem; font-weight:700; color:#1e293b;">${c.name}</h5>
-              <p style="font-size:0.72rem; color:#64748b;">${c.count || 3} Peserta Didik</p>
+              <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin:0;">${s.name}</h4>
+              <p style="font-size:0.75rem; color:#64748b; margin:2px 0 0 0;">NIS: ${s.nis || '-'}</p>
             </div>
           </div>
-          <span>›</span>
+          <div class="item-actions">
+            <button class="icon-btn-action edit" onclick="window.editStudentModal('${s.id}')" title="Edit Siswa">✏️</button>
+            <button class="icon-btn-action delete" onclick="window.deleteStudent('${s.id}', '${(s.name || '').replace(/'/g, "\\'")}')" title="Hapus Siswa">🗑️</button>
+          </div>
         </div>
       `).join('')}
     </div>
   `;
 }
 
-function renderSiswaMenuView(state) {
-  const className = state.adminSubView.selectedClass;
+function renderSiswaRekapView(state) {
+  const className = state.adminSubView.selectedClass || '10 TKJ 1';
+  const students = (state.students || []).filter(s => (s.class || '10 TKJ 1').trim().toLowerCase() === className.trim().toLowerCase());
+  const attendanceSessions = (state.attendance || []).filter(a => (a.class || '10 TKJ 1').trim().toLowerCase() === className.trim().toLowerCase());
+
+  const studentStats = students.map(s => {
+    let hadir = 0, sakit = 0, izin = 0, alpa = 0;
+    attendanceSessions.forEach(sess => {
+      if (sess.records) {
+        const st = sess.records[s.id] || sess.records[s.nis];
+        if (st === 'H' || st === 'Hadir') hadir++;
+        else if (st === 'S' || st === 'Sakit') sakit++;
+        else if (st === 'I' || st === 'Izin') izin++;
+        else if (st === 'A' || st === 'Alpa' || st === 'Alpha') alpa++;
+      }
+    });
+    return { ...s, hadir, sakit, izin, alpa };
+  });
 
   return `
-    <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
-      <button style="background:none; border:none; cursor:pointer;" onclick="window.setAdminSiswaSubView('rooms')">←</button>
-      <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b;">Menu ${className}</h4>
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+      <button style="background:none; border:none; cursor:pointer; font-size:1.1rem; font-weight:700;" onclick="window.setAdminSiswaSubView('menu', null, '${className}', 'menu')">←</button>
+      <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin:0;">Rekap Absensi - ${className}</h4>
     </div>
 
-    <div style="display:flex; flex-direction:column; gap:10px;">
-      <div class="content-card" style="margin:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="alert('Daftar Siswa untuk ${className}')">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <span style="font-size:1.2rem;">👥</span>
-          <span style="font-weight:700; color:#1e293b; font-size:0.88rem;">Daftar Siswa</span>
-        </div>
-        <span>›</span>
-      </div>
+    <div class="content-card" style="padding:12px; margin-bottom:12px; background:#f8fafc;">
+      <div style="font-size:0.75rem; color:#64748b;">Total Sesi Presensi Tercatat: <b>${attendanceSessions.length} sesi</b></div>
+    </div>
 
-      <div class="content-card" style="margin:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="alert('Rekap Absensi untuk ${className}')">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <span style="font-size:1.2rem;">☑️</span>
-          <span style="font-weight:700; color:#1e293b; font-size:0.88rem;">Rekap Absensi</span>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      ${studentStats.length === 0 ? `
+        <div class="content-card text-center" style="padding:20px; color:#94a3b8;">
+          Belum ada data siswa di kelas ${className}.
         </div>
-        <span>›</span>
-      </div>
+      ` : studentStats.map((s, idx) => `
+        <div class="content-card" style="margin:0; padding:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h5 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin:0;">${idx + 1}. ${s.name}</h5>
+              <p style="font-size:0.72rem; color:#64748b; margin:2px 0 0 0;">NIS: ${s.nis || '-'}</p>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <span style="background:#dcfce7; color:#166534; font-weight:700; font-size:0.72rem; padding:4px 8px; border-radius:6px;" title="Hadir">H: ${s.hadir}</span>
+              <span style="background:#fef9c3; color:#854d0e; font-weight:700; font-size:0.72rem; padding:4px 8px; border-radius:6px;" title="Sakit">S: ${s.sakit}</span>
+              <span style="background:#e0f2fe; color:#075985; font-weight:700; font-size:0.72rem; padding:4px 8px; border-radius:6px;" title="Izin">I: ${s.izin}</span>
+              <span style="background:#fee2e2; color:#991b1b; font-weight:700; font-size:0.72rem; padding:4px 8px; border-radius:6px;" title="Alpa">A: ${s.alpa}</span>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
 
-      <div class="content-card" style="margin:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="alert('Nilai Akademik untuk ${className}')">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <span style="font-size:1.2rem;">📊</span>
-          <span style="font-weight:700; color:#1e293b; font-size:0.88rem;">Nilai Akademik</span>
+function renderSiswaNilaiView(state) {
+  const className = state.adminSubView.selectedClass || '10 TKJ 1';
+  const students = (state.students || []).filter(s => (s.class || '10 TKJ 1').trim().toLowerCase() === className.trim().toLowerCase());
+  const grades = (state.grades || []).filter(g => (g.class || '10 TKJ 1').trim().toLowerCase() === className.trim().toLowerCase());
+
+  const studentScores = students.map(s => {
+    const sGrades = [];
+    grades.forEach(g => {
+      if (g.scores) {
+        const val = g.scores[s.id] !== undefined ? g.scores[s.id] : g.scores[s.nis];
+        if (val !== undefined) sGrades.push({ mapel: g.mapel, score: val });
+      }
+    });
+    const avg = sGrades.length > 0 ? (sGrades.reduce((sum, item) => sum + Number(item.score || 0), 0) / sGrades.length).toFixed(1) : '-';
+    return { ...s, gradesCount: sGrades.length, avg };
+  });
+
+  return `
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+      <button style="background:none; border:none; cursor:pointer; font-size:1.1rem; font-weight:700;" onclick="window.setAdminSiswaSubView('menu', null, '${className}', 'menu')">←</button>
+      <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin:0;">Nilai Akademik - ${className}</h4>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      ${studentScores.length === 0 ? `
+        <div class="content-card text-center" style="padding:20px; color:#94a3b8;">
+          Belum ada data siswa di kelas ${className}.
         </div>
-        <span>›</span>
-      </div>
+      ` : studentScores.map((s, idx) => `
+        <div class="content-card" style="margin:0; padding:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h5 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin:0;">${idx + 1}. ${s.name}</h5>
+              <p style="font-size:0.72rem; color:#64748b; margin:2px 0 0 0;">NIS: ${s.nis || '-'} | ${s.gradesCount} Nilai Tugas/Ujian</p>
+            </div>
+            <div style="background:#e0f2fe; color:#0284c7; font-weight:800; font-size:0.9rem; padding:6px 12px; border-radius:8px;">
+              Rata: ${s.avg}
+            </div>
+          </div>
+        </div>
+      `).join('')}
     </div>
   `;
 }
@@ -427,8 +616,8 @@ function renderJadwalListView(state) {
   return `
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
       <div style="display:flex; align-items:center; gap:8px;">
-        <button style="background:none; border:none; cursor:pointer;" onclick="window.setAdminJadwalSubView('level')">←</button>
-        <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b;">Jadwal Kelas ${targetLevel}</h4>
+        <button style="background:none; border:none; cursor:pointer; font-size:1.1rem; font-weight:700;" onclick="window.setAdminJadwalSubView('level')">←</button>
+        <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin:0;">Jadwal Kelas ${targetLevel}</h4>
       </div>
       <button class="btn-add-primary" onclick="window.setAdminJadwalSubView('create')">+ Tambah</button>
     </div>
@@ -452,7 +641,10 @@ function renderJadwalListView(state) {
             <p style="font-size:0.75rem; color:#64748b;">⏰ ${s.waktu}</p>
             <p style="font-size:0.72rem; color:#0284c7; font-weight:600; margin-top:4px;">${s.guru} | ${s.ruangan}</p>
           </div>
-          <button class="icon-btn-action delete" onclick="store.deleteSchedule('${s.id}')">🗑️</button>
+          <div style="display:flex; gap:6px;">
+            <button class="icon-btn-action edit" onclick="window.editScheduleModal('${s.id}')" title="Edit Jadwal">✏️</button>
+            <button class="icon-btn-action delete" onclick="window.deleteSchedule('${s.id}', '${(s.mapel || '').replace(/'/g, "\\'")}')" title="Hapus Jadwal">🗑️</button>
+          </div>
         </div>
       </div>
     `).join('')}

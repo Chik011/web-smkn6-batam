@@ -560,10 +560,11 @@ window.simulateExportData = function(className = '10 TKJ 1') {
   }, 900);
 };
 
-window.setAdminSiswaSubView = function(view, level = null, className = null) {
+window.setAdminSiswaSubView = function(view, level = null, className = null, mode = null) {
   store.state.adminSubView.siswa = view;
-  if (level) store.state.adminSubView.selectedLevel = level;
+  if (level !== null && level !== undefined) store.state.adminSubView.selectedLevel = level;
   if (className) store.state.adminSubView.selectedClass = className;
+  store.state.adminSubView.siswaViewMode = mode || (['daftar', 'rekap', 'nilai'].includes(view) ? view : 'menu');
   store.saveState();
 };
 
@@ -1122,6 +1123,375 @@ window.handleCreateTeacher = function(e) {
 
   store.addTeacher({ name, username, mapel });
   window.showToast(`👨‍🏫 Guru ${name} berhasil ditambahkan!`, 'success');
+  window.closeModal();
+};
+
+window.editNewsVideoModal = function(id) {
+  const news = (store.state.broadcastNews || []).find(n => String(n.id) === String(id));
+  if (!news) return;
+
+  const overlay = document.getElementById('globalModal');
+  const card = document.getElementById('modalCardContent');
+
+  card.innerHTML = `
+    <div class="modal-title">✏️ Edit Video News</div>
+    <form onsubmit="window.handleEditNewsVideo(event, '${id}')">
+      <div class="form-group">
+        <label class="form-label">Judul Pengumuman</label>
+        <input type="text" id="editNewsTitle" class="form-input" value="${(news.title || '').replace(/"/g, '&quot;')}" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Link YouTube Video</label>
+        <input type="text" id="editNewsUrl" class="form-input" value="${(news.url || '').replace(/"/g, '&quot;')}" required />
+      </div>
+      <div style="display:flex; gap:10px; margin-top:16px;">
+        <button type="button" class="btn-primary" style="flex:1; background:#64748b;" onclick="window.closeModal()">Batal</button>
+        <button type="submit" class="btn-primary" style="flex:1;">Simpan Perubahan</button>
+      </div>
+    </form>
+  `;
+  overlay.classList.add('open');
+};
+
+window.handleEditNewsVideo = function(e, id) {
+  e.preventDefault();
+  const title = document.getElementById('editNewsTitle').value.trim();
+  const url = document.getElementById('editNewsUrl').value.trim();
+  store.updateNews(id, title, url);
+  window.showToast('Video News berhasil diperbarui!', 'success');
+  window.closeModal();
+};
+
+/* Drag and Drop Handlers for Video Reordering */
+let draggedNewsIndex = null;
+
+window.handleNewsDragStart = function(e, index) {
+  draggedNewsIndex = index;
+  if (e.dataTransfer) {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(index));
+  }
+  const card = e.currentTarget;
+  card.classList.add('dragging');
+};
+
+window.handleNewsDragOver = function(e, index) {
+  e.preventDefault();
+  if (e.dataTransfer) {
+    e.dataTransfer.dropEffect = 'move';
+  }
+  const card = e.currentTarget;
+  if (draggedNewsIndex !== null && draggedNewsIndex !== index) {
+    card.classList.add('drag-over');
+  }
+};
+
+window.handleNewsDragLeave = function(e) {
+  const card = e.currentTarget;
+  card.classList.remove('drag-over');
+};
+
+window.handleNewsDrop = function(e, targetIndex) {
+  e.preventDefault();
+  const card = e.currentTarget;
+  card.classList.remove('drag-over');
+
+  if (draggedNewsIndex !== null && draggedNewsIndex !== targetIndex) {
+    const list = store.state.broadcastNews;
+    const [movedItem] = list.splice(draggedNewsIndex, 1);
+    list.splice(targetIndex, 0, movedItem);
+    store.saveState();
+    window.showToast('✨ Urutan video berhasil diperbarui!', 'success');
+  }
+  draggedNewsIndex = null;
+};
+
+window.handleNewsDragEnd = function(e) {
+  const card = e.currentTarget;
+  card.classList.remove('dragging');
+  document.querySelectorAll('.video-drag-item').forEach(el => el.classList.remove('drag-over', 'dragging'));
+  draggedNewsIndex = null;
+};
+
+window.moveNewsUp = function(index) {
+  store.moveNews(index, 'up');
+  window.showToast('Urutan video dipindah ke atas ⬆️', 'info');
+};
+
+window.moveNewsDown = function(index) {
+  store.moveNews(index, 'down');
+  window.showToast('Urutan video dipindah ke bawah ⬇️', 'info');
+};
+
+window.deleteNews = function(id) {
+  if (confirm('Hapus video pengumuman ini?')) {
+    store.deleteNews(id);
+    window.showToast('Video pengumuman berhasil dihapus.', 'info');
+  }
+};
+
+window.deleteTeacher = function(id, name) {
+  if (confirm(`Hapus pengajar ${name || ''}?`)) {
+    store.deleteTeacher(id);
+    window.showToast('Pengajar berhasil dihapus.', 'info');
+  }
+};
+
+window.deleteMapel = function(id, name) {
+  if (confirm(`Hapus mata pelajaran ${name || ''}?`)) {
+    store.deleteMapel(id);
+    window.showToast('Mata pelajaran berhasil dihapus.', 'info');
+  }
+};
+
+window.deleteStudent = function(id, name) {
+  if (confirm(`Hapus siswa ${name || ''}?`)) {
+    store.deleteStudent(id);
+    window.showToast('Siswa berhasil dihapus.', 'info');
+  }
+};
+
+window.deleteSchedule = function(id, mapel) {
+  if (confirm(`Hapus jadwal ${mapel || ''}?`)) {
+    store.deleteSchedule(id);
+    window.showToast('Jadwal berhasil dihapus.', 'info');
+  }
+};
+
+window.editTeacherModal = function(id) {
+  const teacher = (store.state.teachers || []).find(t => String(t.id) === String(id));
+  if (!teacher) return;
+
+  const overlay = document.getElementById('globalModal');
+  const card = document.getElementById('modalCardContent');
+  const mapelOptions = (store.state.mapel || []).map(m => m.name);
+
+  card.innerHTML = `
+    <div class="modal-title">✏️ Edit Data Guru</div>
+    <form onsubmit="window.handleEditTeacher(event, '${id}')">
+      <div class="form-group">
+        <label class="form-label">Nama Lengkap</label>
+        <input type="text" id="editTName" class="form-input" value="${(teacher.name || '').replace(/"/g, '&quot;')}" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Username Akun</label>
+        <input type="text" id="editTUser" class="form-input" value="${(teacher.username || '').replace(/"/g, '&quot;')}" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mata Pelajaran</label>
+        <select class="form-select" id="editTMapel">
+          ${mapelOptions.map(m => `<option value="${m}" ${m === teacher.mapel ? 'selected' : ''}>${m}</option>`).join('')}
+        </select>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:16px;">
+        <button type="button" class="btn-primary" style="flex:1; background:#64748b;" onclick="window.closeModal()">Batal</button>
+        <button type="submit" class="btn-primary" style="flex:1;">Simpan Perubahan</button>
+      </div>
+    </form>
+  `;
+  overlay.classList.add('open');
+};
+
+window.handleEditTeacher = function(e, id) {
+  e.preventDefault();
+  const name = document.getElementById('editTName').value.trim();
+  const username = document.getElementById('editTUser').value.trim();
+  const mapel = document.getElementById('editTMapel').value;
+
+  store.updateTeacher(id, name, username, mapel);
+  window.showToast(`Data guru ${name} berhasil diperbarui!`, 'success');
+  window.closeModal();
+};
+
+window.editMapelModal = function(id) {
+  const item = (store.state.mapel || []).find(m => String(m.id) === String(id));
+  if (!item) return;
+
+  const overlay = document.getElementById('globalModal');
+  const card = document.getElementById('modalCardContent');
+
+  card.innerHTML = `
+    <div class="modal-title">✏️ Edit Mata Pelajaran</div>
+    <form onsubmit="window.handleEditMapel(event, '${id}')">
+      <div class="form-group">
+        <label class="form-label">Nama Mata Pelajaran</label>
+        <input type="text" id="editMName" class="form-input" value="${(item.name || '').replace(/"/g, '&quot;')}" required />
+      </div>
+      <div style="display:flex; gap:10px; margin-top:16px;">
+        <button type="button" class="btn-primary" style="flex:1; background:#64748b;" onclick="window.closeModal()">Batal</button>
+        <button type="submit" class="btn-primary" style="flex:1;">Simpan Perubahan</button>
+      </div>
+    </form>
+  `;
+  overlay.classList.add('open');
+};
+
+window.handleEditMapel = function(e, id) {
+  e.preventDefault();
+  const name = document.getElementById('editMName').value.trim();
+  store.updateMapel(id, name);
+  window.showToast(`Mata pelajaran ${name} berhasil diperbarui!`, 'success');
+  window.closeModal();
+};
+
+window.addStudentModal = function(className) {
+  const overlay = document.getElementById('globalModal');
+  const card = document.getElementById('modalCardContent');
+
+  card.innerHTML = `
+    <div class="modal-title">👥 Tambah Siswa Baru</div>
+    <form onsubmit="window.handleAddStudent(event)">
+      <div class="form-group">
+        <label class="form-label">Nama Lengkap Siswa</label>
+        <input type="text" id="addStName" class="form-input" placeholder="Nama Siswa" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">NIS / NISN</label>
+        <input type="text" id="addStNis" class="form-input" placeholder="Nomor Induk Siswa" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kelas</label>
+        <input type="text" id="addStClass" class="form-input" value="${className || '10 TKJ 1'}" required />
+      </div>
+      <div style="display:flex; gap:10px; margin-top:16px;">
+        <button type="button" class="btn-primary" style="flex:1; background:#64748b;" onclick="window.closeModal()">Batal</button>
+        <button type="submit" class="btn-primary" style="flex:1;">Simpan Siswa</button>
+      </div>
+    </form>
+  `;
+  overlay.classList.add('open');
+};
+
+window.handleAddStudent = function(e) {
+  e.preventDefault();
+  const name = document.getElementById('addStName').value.trim();
+  const nis = document.getElementById('addStNis').value.trim();
+  const className = document.getElementById('addStClass').value.trim();
+
+  store.addStudent({ name, nis, class: className });
+  window.showToast(`Siswa ${name} berhasil ditambahkan!`, 'success');
+  window.closeModal();
+};
+
+window.editStudentModal = function(id) {
+  const student = (store.state.students || []).find(s => String(s.id) === String(id) || String(s.nis) === String(id));
+  if (!student) return;
+
+  const overlay = document.getElementById('globalModal');
+  const card = document.getElementById('modalCardContent');
+
+  card.innerHTML = `
+    <div class="modal-title">✏️ Edit Data Siswa</div>
+    <form onsubmit="window.handleEditStudent(event, '${id}')">
+      <div class="form-group">
+        <label class="form-label">Nama Lengkap Siswa</label>
+        <input type="text" id="editStName" class="form-input" value="${(student.name || '').replace(/"/g, '&quot;')}" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">NIS / NISN</label>
+        <input type="text" id="editStNis" class="form-input" value="${(student.nis || '').replace(/"/g, '&quot;')}" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kelas</label>
+        <input type="text" id="editStClass" class="form-input" value="${(student.class || '10 TKJ 1').replace(/"/g, '&quot;')}" required />
+      </div>
+      <div style="display:flex; gap:10px; margin-top:16px;">
+        <button type="button" class="btn-primary" style="flex:1; background:#64748b;" onclick="window.closeModal()">Batal</button>
+        <button type="submit" class="btn-primary" style="flex:1;">Simpan Perubahan</button>
+      </div>
+    </form>
+  `;
+  overlay.classList.add('open');
+};
+
+window.handleEditStudent = function(e, id) {
+  e.preventDefault();
+  const name = document.getElementById('editStName').value.trim();
+  const nis = document.getElementById('editStNis').value.trim();
+  const className = document.getElementById('editStClass').value.trim();
+
+  store.updateStudent(id, name, nis, className);
+  window.showToast(`Data siswa ${name} berhasil diperbarui!`, 'success');
+  window.closeModal();
+};
+
+window.editScheduleModal = function(id) {
+  const sched = (store.state.schedules || []).find(s => String(s.id) === String(id));
+  if (!sched) return;
+
+  const overlay = document.getElementById('globalModal');
+  const card = document.getElementById('modalCardContent');
+  const mapelList = store.state.mapel || [];
+  const teachersList = store.state.teachers || [];
+
+  const timeParts = (sched.waktu || '07:30 - 11:30').split('-').map(t => t.trim());
+  const startTime = timeParts[0] || '07:30';
+  const endTime = timeParts[1] || '11:30';
+
+  card.innerHTML = `
+    <div class="modal-title">✏️ Edit Jadwal Pelajaran</div>
+    <form onsubmit="window.handleEditSchedule(event, '${id}')">
+      <div class="form-group">
+        <label class="form-label">Mata Pelajaran</label>
+        <select class="form-select" id="editSchedMapel" required>
+          ${mapelList.map(m => `<option value="${m.name}" ${m.name === sched.mapel ? 'selected' : ''}>${m.name}</option>`).join('')}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Guru Pengajar</label>
+        <select class="form-select" id="editSchedGuru" required>
+          ${teachersList.map(t => `<option value="${t.name}" ${t.name === sched.guru ? 'selected' : ''}>${t.name}</option>`).join('')}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ruangan</label>
+        <input type="text" id="editSchedRuangan" class="form-input" value="${(sched.ruangan || 'Lab TKJ').replace(/"/g, '&quot;')}" required />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Hari</label>
+        <select class="form-select" id="editSchedHari">
+          ${['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'].map(h => `<option value="${h}" ${h === sched.hari ? 'selected' : ''}>${h}</option>`).join('')}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Waktu Belajar</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <input type="text" id="editSchedStart" class="form-input" value="${startTime}" placeholder="Mulai" />
+          <input type="text" id="editSchedEnd" class="form-input" value="${endTime}" placeholder="Selesai" />
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:16px;">
+        <button type="button" class="btn-primary" style="flex:1; background:#64748b;" onclick="window.closeModal()">Batal</button>
+        <button type="submit" class="btn-primary" style="flex:1;">Simpan Perubahan</button>
+      </div>
+    </form>
+  `;
+  overlay.classList.add('open');
+};
+
+window.handleEditSchedule = function(e, id) {
+  e.preventDefault();
+  const mapel = document.getElementById('editSchedMapel').value;
+  const guru = document.getElementById('editSchedGuru').value;
+  const ruangan = document.getElementById('editSchedRuangan').value.trim();
+  const hari = document.getElementById('editSchedHari').value;
+  const start = document.getElementById('editSchedStart').value.trim();
+  const end = document.getElementById('editSchedEnd').value.trim();
+
+  store.updateSchedule(id, {
+    mapel,
+    guru,
+    ruangan,
+    hari,
+    waktu: `${start} - ${end}`
+  });
+
+  window.showToast(`Jadwal ${mapel} berhasil diperbarui!`, 'success');
   window.closeModal();
 };
 

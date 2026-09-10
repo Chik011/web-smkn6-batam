@@ -805,6 +805,37 @@ class Store {
     }
   }
 
+  updateNews(id, newTitle, newUrl) {
+    const idStr = String(id);
+    const item = this.state.broadcastNews.find(n => String(n.id) === idStr);
+    if (item) {
+      item.title = newTitle;
+      item.url = newUrl;
+      this.saveState();
+
+      if (isFirebaseConnected && db) {
+        const newsObj = { id: idStr, title: newTitle, url: newUrl };
+        setDoc(doc(db, 'news', idStr), newsObj, { merge: true }).catch(err => console.warn(err));
+        setDoc(doc(db, 'broadcastNews', idStr), newsObj, { merge: true }).catch(err => console.warn(err));
+      }
+    }
+  }
+
+  moveNews(index, direction) {
+    const news = this.state.broadcastNews;
+    if (direction === 'up' && index > 0) {
+      const temp = news[index];
+      news[index] = news[index - 1];
+      news[index - 1] = temp;
+      this.saveState();
+    } else if (direction === 'down' && index < news.length - 1) {
+      const temp = news[index];
+      news[index] = news[index + 1];
+      news[index + 1] = temp;
+      this.saveState();
+    }
+  }
+
   deleteNews(id) {
     const idStr = String(id);
     this.state.broadcastNews = this.state.broadcastNews.filter(n => String(n.id) !== idStr);
@@ -813,6 +844,111 @@ class Store {
     if (isFirebaseConnected && db) {
       deleteDoc(doc(db, 'news', idStr)).catch(err => console.warn(err));
       deleteDoc(doc(db, 'broadcastNews', idStr)).catch(err => console.warn(err));
+    }
+  }
+
+  updateTeacher(id, name, username, mapel) {
+    const idStr = String(id);
+    const item = this.state.teachers.find(t => String(t.id) === idStr);
+    if (item) {
+      item.name = name;
+      item.username = username;
+      item.mapel = mapel;
+      this.saveState();
+
+      if (isFirebaseConnected && db) {
+        const teacherObj = { id: idStr, name, username, mapel };
+        setDoc(doc(db, 'teachers', idStr), teacherObj, { merge: true }).catch(err => console.warn(err));
+      }
+    }
+  }
+
+  updateMapel(id, newName) {
+    const idStr = String(id);
+    const item = this.state.mapel.find(m => String(m.id) === idStr);
+    if (item) {
+      item.name = newName;
+      item.nama_mapel = newName;
+      this.saveState();
+
+      if (isFirebaseConnected && db) {
+        setDoc(doc(db, 'subjects', idStr), { id: idStr, name: newName, nama_mapel: newName }, { merge: true }).catch(err => console.warn(err));
+      }
+    }
+  }
+
+  deleteMapel(id) {
+    const idStr = String(id);
+    this.state.mapel = this.state.mapel.filter(m => String(m.id) !== idStr);
+    this.saveState();
+
+    if (isFirebaseConnected && db) {
+      deleteDoc(doc(db, 'subjects', idStr)).catch(err => console.warn(err));
+    }
+  }
+
+  addStudent(student) {
+    const newId = student.id || String(Date.now());
+    const studentObj = {
+      id: String(newId),
+      name: student.name,
+      nis: student.nis || String(newId),
+      class: student.class || '10 TKJ 1',
+      role: 'siswa'
+    };
+    this.state.students.push(studentObj);
+    this.saveState();
+
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'users', String(newId)), {
+        studentName: studentObj.name,
+        studentId: studentObj.nis,
+        className: studentObj.class,
+        role: 'siswa'
+      }, { merge: true }).catch(err => console.warn(err));
+    }
+  }
+
+  updateStudent(id, name, nis, className) {
+    const idStr = String(id);
+    const item = this.state.students.find(s => String(s.id) === idStr || String(s.nis) === idStr);
+    if (item) {
+      item.name = name;
+      item.nis = nis;
+      item.class = className;
+      this.saveState();
+
+      if (isFirebaseConnected && db) {
+        setDoc(doc(db, 'users', idStr), {
+          studentName: name,
+          studentId: nis,
+          className: className,
+          role: 'siswa'
+        }, { merge: true }).catch(err => console.warn(err));
+      }
+    }
+  }
+
+  deleteStudent(id) {
+    const idStr = String(id);
+    this.state.students = this.state.students.filter(s => String(s.id) !== idStr && String(s.nis) !== idStr);
+    this.saveState();
+
+    if (isFirebaseConnected && db) {
+      deleteDoc(doc(db, 'users', idStr)).catch(err => console.warn(err));
+    }
+  }
+
+  updateSchedule(id, updatedData) {
+    const idStr = String(id);
+    const item = this.state.schedules.find(s => String(s.id) === idStr);
+    if (item) {
+      Object.assign(item, updatedData);
+      this.saveState();
+
+      if (isFirebaseConnected && db) {
+        setDoc(doc(db, 'schedules', idStr), item, { merge: true }).catch(err => console.warn(err));
+      }
     }
   }
 
@@ -916,4 +1052,7 @@ class Store {
 }
 
 export const store = new Store();
+if (typeof window !== 'undefined') {
+  window.store = store;
+}
 

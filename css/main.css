@@ -1766,3 +1766,173 @@ body.dark-theme {
 [data-theme="dark"] tr:nth-child(even) {
   background: rgba(255, 255, 255, 0.03) !important;
 }
+
+/* ==========================================================================
+   Modern List Cards, Drag & Drop, & Action Buttons System
+   ========================================================================== */
+.list-item-card {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--line-soft, #e2e8f0);
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.list-item-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.list-item-card.dragging {
+  opacity: 0.45;
+  border: 2px dashed #0284c7 !important;
+  background: #f0f9ff !important;
+  transform: scale(0.98);
+}
+
+.list-item-card.drag-over {
+  border: 2px solid #0284c7 !important;
+  background: #e0f2fe !important;
+  transform: translateY(-2px);
+}
+
+.drag-handle {
+  cursor: grab;
+  color: #94a3b8;
+  font-size: 1.15rem;
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.drag-handle:hover {
+  color: #0284c7;
+  background: rgba(2, 132, 199, 0.08);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.item-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Modern Action Buttons Styling */
+.icon-btn-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  border: none;
+  background: #f1f5f9;
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+.icon-btn-action:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.icon-btn-action:active {
+  transform: scale(0.95);
+}
+
+.icon-btn-action.move-up,
+.icon-btn-action.move-down {
+  background: #e0f2fe;
+  color: #0284c7;
+  font-weight: 800;
+  font-size: 0.72rem;
+}
+
+.icon-btn-action.move-up:hover,
+.icon-btn-action.move-down:hover {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.icon-btn-action.play {
+  background: #dcfce7;
+  color: #166534;
+  font-size: 0.75rem;
+}
+
+.icon-btn-action.play:hover {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.icon-btn-action.edit {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.icon-btn-action.edit:hover {
+  background: #4338ca;
+  color: #ffffff;
+}
+
+.icon-btn-action.delete {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.icon-btn-action.delete:hover {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.icon-btn-action:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+  background: #f1f5f9 !important;
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .icon-btn-action {
+  background: #334155;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .icon-btn-action.move-up,
+[data-theme="dark"] .icon-btn-action.move-down {
+  background: rgba(2, 132, 199, 0.25);
+  color: #38bdf8;
+}
+
+[data-theme="dark"] .icon-btn-action.play {
+  background: rgba(34, 197, 94, 0.25);
+  color: #4ade80;
+}
+
+[data-theme="dark"] .icon-btn-action.edit {
+  background: rgba(99, 102, 241, 0.25);
+  color: #818cf8;
+}
+
+[data-theme="dark"] .icon-btn-action.delete {
+  background: rgba(239, 68, 68, 0.25);
+  color: #f87171;
+}
+
