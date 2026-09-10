@@ -111,7 +111,8 @@ function renderApp() {
   else if (role === 'admin') screenResult = renderAdminScreen(state);
 
   const headerExists = document.querySelector('.desktop-header-block');
-  const phoneScreen = document.getElementById('phoneScreen');
+  let phoneScreen = document.getElementById('phoneScreen');
+  const activeKey = `${role}-${activeTab}`;
 
   if (!headerExists || !phoneScreen) {
     const desktopBarHtml = `
@@ -142,7 +143,7 @@ function renderApp() {
 
       <main class="desktop-layout">
         <div class="phone-frame">
-          <div class="phone-screen" id="phoneScreen">
+          <div class="phone-screen" id="phoneScreen" data-active-key="${activeKey}">
             <div class="tab-content-anim">
               ${screenResult.contentHtml}
             </div>
@@ -152,19 +153,40 @@ function renderApp() {
     `;
 
     appEl.innerHTML = appHtml;
+    phoneScreen = document.getElementById('phoneScreen');
+    if (phoneScreen) {
+      phoneScreen.dataset.lastContent = screenResult.contentHtml;
+    }
     bindBottomNavEvents(role);
   } else {
     const navRow = document.getElementById('desktopNavRow');
-    if (navRow) {
+    if (navRow && navRow.dataset.lastNav !== screenResult.bottomNavHtml) {
+      navRow.dataset.lastNav = screenResult.bottomNavHtml;
       navRow.innerHTML = screenResult.bottomNavHtml;
       bindBottomNavEvents(role);
     }
 
-    phoneScreen.innerHTML = `
-      <div class="tab-content-anim">
-        ${screenResult.contentHtml}
-      </div>
-    `;
+    const contentChanged = phoneScreen.dataset.lastContent !== screenResult.contentHtml;
+    const tabChanged = phoneScreen.dataset.activeKey !== activeKey;
+
+    if (contentChanged || tabChanged) {
+      phoneScreen.dataset.lastContent = screenResult.contentHtml;
+      phoneScreen.dataset.activeKey = activeKey;
+
+      if (tabChanged) {
+        phoneScreen.innerHTML = `
+          <div class="tab-content-anim">
+            ${screenResult.contentHtml}
+          </div>
+        `;
+      } else {
+        phoneScreen.innerHTML = `
+          <div>
+            ${screenResult.contentHtml}
+          </div>
+        `;
+      }
+    }
   }
 }
 
