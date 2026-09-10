@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/siswa", "destination": "/siswa.html" },
+    { "source": "/guru", "destination": "/guru.html" },
+    { "source": "/admin", "destination": "/admin.html" }
+  ]
+}
