@@ -79,6 +79,26 @@ if (!window._hashListenerAttached) {
   });
 }
 
+function getFooterHtml() {
+  return `
+    <footer class="app-global-footer">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <img src="img/Logo_SMKN6.png" alt="Logo SMKN 6 Batam" class="footer-logo" />
+          <div>
+            <strong>SMKN 6 Academic Hub</strong>
+            <p>Sistem Informasi Akademik Terpadu</p>
+          </div>
+        </div>
+        <div class="footer-meta">
+          <p>© 2026 SMK Negeri 6 Batam. Hak Cipta Dilindungi.</p>
+          <p class="footer-address">📍 Jl. Kabil, Kota Batam, Kepulauan Riau</p>
+        </div>
+      </div>
+    </footer>
+  `;
+}
+
 function renderApp() {
   const state = store.state;
   const appEl = document.getElementById('app');
@@ -146,6 +166,7 @@ function renderApp() {
           <div class="phone-screen" id="phoneScreen" data-active-key="${activeKey}">
             <div class="tab-content-anim">
               ${screenResult.contentHtml}
+              ${getFooterHtml()}
             </div>
           </div>
         </div>
@@ -177,12 +198,14 @@ function renderApp() {
         phoneScreen.innerHTML = `
           <div class="tab-content-anim">
             ${screenResult.contentHtml}
+            ${getFooterHtml()}
           </div>
         `;
       } else {
         phoneScreen.innerHTML = `
           <div>
             ${screenResult.contentHtml}
+            ${getFooterHtml()}
           </div>
         `;
       }
@@ -192,52 +215,55 @@ function renderApp() {
 
 function renderLoginPage() {
   return `
-    <main class="login-page">
-      <section class="login-showcase">
-        <img src="img/Logo_SMKN6.png" alt="Logo SMKN 6 Batam" class="login-brand-mark" />
-        <p class="login-eyebrow">SMK NEGERI 6</p>
-        <h1>Semua aktivitas sekolah, satu ruang.</h1>
-        <div class="login-feature-list">
-          <span><b>01</b> Portal siswa</span>
-          <span><b>02</b> Ruang kerja guru</span>
-          <span><b>03</b> Panel administrasi</span>
-        </div>
-      </section>
-
-      <section class="login-card-wrap">
-        <div class="login-card">
-          <div class="login-card-heading">
-            <span class="login-lock-icon">↗</span>
-            <p class="login-eyebrow">SMKN 6 Batam</p>
-            <h2>Selamat datang kembali</h2>
-            <p>Masuk untuk melanjutkan aktivitasmu.</p>
+    <div style="display:flex; flex-direction:column; min-height:100vh;">
+      <main class="login-page" style="flex:1;">
+        <section class="login-showcase">
+          <img src="img/Logo_SMKN6.png" alt="Logo SMKN 6 Batam" class="login-brand-mark" />
+          <p class="login-eyebrow">SMK NEGERI 6</p>
+          <h1>Semua aktivitas sekolah, satu ruang.</h1>
+          <div class="login-feature-list">
+            <span><b>01</b> Portal siswa</span>
+            <span><b>02</b> Ruang kerja guru</span>
+            <span><b>03</b> Panel administrasi</span>
           </div>
-          <form class="login-form" id="mainLoginForm" onsubmit="window.handleLogin(event)">
-            <label class="form-label" for="loginRole">Masuk sebagai</label>
-            <select class="form-select" id="loginRole">
-              <option value="siswa">Siswa</option>
-              <option value="guru">Guru</option>
-              <option value="admin">Admin</option>
-            </select>
-            <label class="form-label" for="loginUsername">Username</label>
-            <input class="form-input" id="loginUsername" type="text" placeholder="Masukkan username" required />
-            <label class="form-label" for="loginPassword">Password</label>
-            <input class="form-input" id="loginPassword" type="password" placeholder="Masukkan password" required />
-            <p class="login-error" id="loginError"></p>
-            <button class="btn-primary login-submit" type="submit">Masuk ke Dashboard <span>→</span></button>
-          </form>
+        </section>
 
-          <div class="login-quick-roles">
-            <span class="quick-role-label">⚡ Akses Cepat Akun Demo (1-Klik):</span>
-            <div class="quick-role-chips">
-              <button type="button" class="quick-chip" onclick="window.quickFillLogin('siswa')">🎓 Siswa</button>
-              <button type="button" class="quick-chip" onclick="window.quickFillLogin('guru')">👨‍🏫 Guru</button>
-              <button type="button" class="quick-chip" onclick="window.quickFillLogin('admin')">🛡️ Admin</button>
+        <section class="login-card-wrap">
+          <div class="login-card">
+            <div class="login-card-heading">
+              <span class="login-lock-icon">↗</span>
+              <p class="login-eyebrow">SMKN 6 Batam</p>
+              <h2>Selamat datang kembali</h2>
+              <p>Masuk untuk melanjutkan aktivitasmu.</p>
+            </div>
+            <form class="login-form" id="mainLoginForm" onsubmit="window.handleLogin(event)">
+              <label class="form-label" for="loginRole">Masuk sebagai</label>
+              <select class="form-select" id="loginRole">
+                <option value="siswa">Siswa</option>
+                <option value="guru">Guru</option>
+                <option value="admin">Admin</option>
+              </select>
+              <label class="form-label" for="loginUsername">Username</label>
+              <input class="form-input" id="loginUsername" type="text" placeholder="Masukkan username" required />
+              <label class="form-label" for="loginPassword">Password</label>
+              <input class="form-input" id="loginPassword" type="password" placeholder="Masukkan password" required />
+              <p class="login-error" id="loginError"></p>
+              <button class="btn-primary login-submit" type="submit">Masuk ke Dashboard <span>→</span></button>
+            </form>
+
+            <div class="login-quick-roles">
+              <span class="quick-role-label">⚡ Akses Cepat Akun Demo (1-Klik):</span>
+              <div class="quick-role-chips">
+                <button type="button" class="quick-chip" onclick="window.quickFillLogin('siswa')">🎓 Siswa</button>
+                <button type="button" class="quick-chip" onclick="window.quickFillLogin('guru')">👨‍🏫 Guru</button>
+                <button type="button" class="quick-chip" onclick="window.quickFillLogin('admin')">🛡️ Admin</button>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-    </main>
+        </section>
+      </main>
+      ${getFooterHtml()}
+    </div>
   `;
 }
 

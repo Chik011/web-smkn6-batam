@@ -71,25 +71,6 @@ function renderBeranda(state) {
     </div>
 
     <div style="padding:16px;">
-      <!-- Teaching Stats Cards -->
-      <div class="stat-cards-grid" style="padding:0 0 14px;">
-        <div class="stat-card" onclick="window.showToast('Jam Mengajar: 18 Jam / Minggu', 'info')">
-          <div class="class-label">Jam Ajar</div>
-          <div class="class-num">18</div>
-          <div class="class-sub">Jam / Minggu</div>
-        </div>
-        <div class="stat-card" onclick="window.showToast('Tingkat Kehadiran Kelas Rata-rata 96%', 'info')">
-          <div class="class-label">Kehadiran</div>
-          <div class="class-num" style="color:#10b981;">96%</div>
-          <div class="class-sub">Rata-rata</div>
-        </div>
-        <div class="stat-card" onclick="window.showToast('Total Siswa diampu: ' + store.state.students.length, 'info')">
-          <div class="class-label">Siswa Aktif</div>
-          <div class="class-num">${state.students.length}</div>
-          <div class="class-sub">10 TKJ 1</div>
-        </div>
-      </div>
-
       <div class="section-title" style="margin:0 0 10px;">Jadwal Mengajar Hari Ini</div>
       <div class="content-card" style="padding:16px; border:1px solid #d4e3f0; background:linear-gradient(135deg, #f8fbff, #eef6fc);">
         <div style="display:flex; justify-content:space-between; align-items:flex-start;">
