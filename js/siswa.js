@@ -36,6 +36,12 @@ export function renderSiswaScreen(state) {
     case 'pelajaran':
       contentHtml = renderPelajaran(state);
       break;
+    case 'nilai':
+      contentHtml = renderNilaiView(state);
+      break;
+    case 'nilaidetail':
+      contentHtml = renderNilaiDetailView(state);
+      break;
     case 'scan':
       contentHtml = renderScan(state);
       break;
@@ -182,11 +188,25 @@ function renderHome(state) {
         <span>Kalender</span>
       </button>
 
+      <button class="app-icon-item" onclick="window.switchSiswaTab('nilai')">
+        <div class="icon-box" style="background:#fef9c3; color:#ca8a04;">
+          📊
+        </div>
+        <span>Nilai Saya</span>
+      </button>
+
       <button class="app-icon-item" onclick="window.switchSiswaTab('galerisiswa')">
         <div class="icon-box" style="background:#f3e8ff; color:#9333ea;">
           🖼️
         </div>
         <span>Galeri Siswa</span>
+      </button>
+
+      <button class="app-icon-item" onclick="window.openMasukanForm()">
+        <div class="icon-box" style="background:#ecfdf5; color:#059669;">
+          📝
+        </div>
+        <span>Masukan</span>
       </button>
 
       <button class="app-icon-item" onclick="window.openSiswaModal('lainnya')">
@@ -286,24 +306,20 @@ function renderPelajaran(state) {
 
 function renderScan(state) {
   return `
-    <div class="scan-screen-container">
-      <div class="scanner-viewfinder">
-        <div class="scanner-corner tl"></div>
-        <div class="scanner-corner tr"></div>
-        <div class="scanner-corner bl"></div>
-        <div class="scanner-corner br"></div>
-        <div class="scanner-laser"></div>
-        <div class="scan-target-reticle">
-          <svg width="68" height="68" fill="none" stroke="rgba(56, 189, 248, 0.75)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:70vh; padding:32px 24px; text-align:center;">
+      <div style="width:120px; height:120px; border-radius:28px; background:linear-gradient(135deg, #e0f2fe, #bfdbfe); display:flex; align-items:center; justify-content:center; margin-bottom:24px; box-shadow:0 8px 24px rgba(2,132,199,0.15);">
+        <svg width="60" height="60" fill="none" stroke="#0284c7" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+      </div>
+      <div style="background:linear-gradient(135deg, #fbbf24, #f59e0b); color:white; padding:4px 16px; border-radius:20px; font-size:0.7rem; font-weight:800; letter-spacing:1px; text-transform:uppercase; margin-bottom:16px;">Segera Hadir</div>
+      <h2 style="font-size:1.4rem; font-weight:800; color:#0f172a; margin-bottom:10px; line-height:1.3;">Fitur Sedang<br>Dikembangkan</h2>
+      <p style="font-size:0.84rem; color:#64748b; max-width:260px; line-height:1.65; margin-bottom:28px;">Fitur Scan QR untuk presensi otomatis sedang dalam tahap pengembangan. Silakan tunggu pembaruan selanjutnya.</p>
+      <div style="display:flex; gap:12px; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:14px 20px; max-width:280px; width:100%;">
+        <div style="width:40px; height:40px; border-radius:10px; background:#e0f2fe; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          <svg width="20" height="20" fill="none" stroke="#0284c7" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
+        <p style="font-size:0.76rem; color:#475569; line-height:1.5; margin:0; text-align:left;">Presensi sementara dilakukan secara manual melalui guru pengampu kelas.</p>
       </div>
-
-      <h3 style="font-size:1.1rem; font-weight:800; color:#1e293b; margin-bottom:6px;">Pemindai Presensi QR Code</h3>
-      <p style="font-size:0.8rem; color:#64748b; max-width:280px; margin-bottom:20px; line-height:1.5;">Arahkan kamera ke QR Code kelas yang ditampilkan guru untuk konfirmasi kehadiran otomatis.</p>
-
-      <div style="display:flex; gap:10px; width:100%; max-width:280px;">
-        <button class="btn-primary" style="flex:1;" onclick="window.simulateScanQR()">📸 Simulasi Pindai QR</button>
-      </div>
+      <button style="margin-top:24px; background:#0f172a; color:white; border:none; padding:12px 28px; border-radius:12px; font-size:0.85rem; font-weight:700; cursor:pointer;" onclick="window.switchSiswaTab('home')">← Kembali ke Beranda</button>
     </div>
   `;
 }
@@ -816,33 +832,72 @@ window.openGaleriDetailModal = function(idOrIdx) {
   overlay.classList.add('open');
 };
 
+window.librarySearchQuery = window.librarySearchQuery || '';
+window.filterLibrary = function(q) {
+  window.librarySearchQuery = q || '';
+  store.notify();
+};
+
 function renderLibraryView(state) {
-  const books = (state.elibraryBooks && state.elibraryBooks.length > 0) ? state.elibraryBooks : [
-    { id: '1', title: 'Jaringan Dasar & Cisco Routing', category: 'Modular TKJ', desc: 'Modul praktikum konfigurasi Mikrotik, Cisco Packet Tracer & VLAN.', color: '#0284c7', icon: '📘' },
-    { id: '2', title: 'Administrasi System & Server Linux', category: 'Server & Cloud', desc: 'Panduan lengkap instalasi Debian, DNS Server, Web Server Apache & Nginx.', color: '#10b981', icon: '📗' },
-    { id: '3', title: 'Cyber Security & Network Defense', category: 'Security', desc: 'Dasar-dasar keamanan jaringan, Firewall, Penetration Testing & Enkripsi.', color: '#6366f1', icon: '📙' }
+  const allBooks = (state.elibraryBooks && state.elibraryBooks.length > 0) ? state.elibraryBooks : [
+    { id: '1', title: 'Jaringan Dasar & Cisco Routing', category: 'Modular TKJ', desc: 'Modul praktikum konfigurasi Mikrotik, Cisco Packet Tracer & VLAN.', color: '#0284c7', icon: '📘', coverColor: 'linear-gradient(135deg, #0284c7, #0369a1)' },
+    { id: '2', title: 'Administrasi System & Server Linux', category: 'Server & Cloud', desc: 'Panduan lengkap instalasi Debian, DNS Server, Web Server Apache & Nginx.', color: '#10b981', icon: '📗', coverColor: 'linear-gradient(135deg, #10b981, #047857)' },
+    { id: '3', title: 'Cyber Security & Network Defense', category: 'Security', desc: 'Dasar-dasar keamanan jaringan, Firewall, Penetration Testing & Enkripsi.', color: '#6366f1', icon: '📙', coverColor: 'linear-gradient(135deg, #6366f1, #4338ca)' },
+    { id: '4', title: 'Desain Grafis & Multimedia', category: 'Multimedia', desc: 'Panduan dasar desain grafis, CorelDraw, Photoshop untuk pembelajaran TKJ.', color: '#f59e0b', icon: '📒', coverColor: 'linear-gradient(135deg, #f59e0b, #d97706)' },
+    { id: '5', title: 'Pemrograman Web & Database', category: 'Coding', desc: 'HTML, CSS, JavaScript, PHP, MySQL untuk pembuatan aplikasi web modern.', color: '#ec4899', icon: '📓', coverColor: 'linear-gradient(135deg, #ec4899, #db2777)' },
+    { id: '6', title: 'Troubleshooting & Diagnosa Jaringan', category: 'Teknis', desc: 'Panduan troubleshooting masalah jaringan, kabel, dan perangkat keras.', color: '#14b8a6', icon: '📔', coverColor: 'linear-gradient(135deg, #14b8a6, #0d9488)' }
   ];
 
+  const q = (window.librarySearchQuery || '').trim().toLowerCase();
+  const books = q ? allBooks.filter(b =>
+    (b.title || '').toLowerCase().includes(q) ||
+    (b.category || '').toLowerCase().includes(q) ||
+    (b.desc || '').toLowerCase().includes(q)
+  ) : allBooks;
+
   return `
-    <div style="background:white; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">
+    <div style="background:white; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; position:sticky; top:0; z-index:10;">
       <div style="display:flex; align-items:center; gap:12px;">
         <button style="background:none; border:none; cursor:pointer;" onclick="window.switchSiswaTab('home')">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </button>
-        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b;">📚 E-Library & Buku Digital TKJ</h3>
+        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b;">📚 E-Library TKJ</h3>
+      </div>
+      <span style="background:#e0f2fe; color:#0284c7; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${allBooks.length} Buku</span>
+    </div>
+
+    <div style="padding:12px 16px 4px;">
+      <div style="position:relative;">
+        <svg style="position:absolute; left:12px; top:50%; transform:translateY(-50%); pointer-events:none;" width="16" height="16" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" placeholder="Cari buku, kategori, atau deskripsi..." value="${window.librarySearchQuery || ''}" oninput="window.filterLibrary(this.value)" style="width:100%; border:1px solid #e2e8f0; border-radius:12px; padding:9px 12px 9px 36px; font-size:0.82rem; outline:none; background:#f8fafc; box-sizing:border-box;" />
       </div>
     </div>
-    <div style="padding:16px; display:flex; flex-direction:column; gap:12px;">
-      ${books.map(b => `
-        <div style="background:white; border:1px solid #e2e8f0; padding:14px; border-radius:14px; display:flex; gap:14px; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-          <div style="width:48px; height:58px; border-radius:10px; background:${b.color || '#0284c7'}; color:white; display:flex; align-items:center; justify-content:center; font-size:1.6rem; flex-shrink:0; box-shadow:0 4px 10px rgba(0,0,0,0.15);">${b.icon || '📘'}</div>
-          <div style="flex:1; min-width:0;">
-            <h4 style="font-size:0.92rem; font-weight:700; color:#0f172a; margin:0 0 3px 0;">${b.title}</h4>
-            <p style="font-size:0.76rem; color:#64748b; margin:0 0 8px 0;">${b.desc}</p>
-            <button style="background:${b.color || '#0284c7'}; color:white; border:none; padding:6px 12px; border-radius:8px; font-size:0.75rem; font-weight:700; cursor:pointer;" onclick="window.showToast('📖 Membuka E-Book ${b.title}...', 'success')">Baca Buku Digital</button>
-          </div>
+
+    <div style="padding:12px 16px 24px;">
+      ${books.length === 0 ? `
+        <div style="text-align:center; padding:40px 20px; color:#64748b;">
+          <div style="font-size:2.5rem; margin-bottom:8px;">📭</div>
+          <p style="font-size:0.85rem; font-weight:600;">Buku tidak ditemukan untuk "${q}"</p>
         </div>
-      `).join('')}
+      ` : `
+      <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:14px;">
+        ${books.map(b => `
+          <div style="background:white; border:1px solid #e2e8f0; border-radius:16px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.05); transition:transform 0.2s ease; cursor:pointer;" onclick="window.openLibraryBook('${b.id}', encodeURIComponent('${b.id}'), '${b.url || ''}')">
+            <!-- Book Cover -->
+            <div style="height:120px; background:${b.coverColor || ('linear-gradient(135deg,' + (b.color || '#0284c7') + ', #0f172a)')}; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; padding:12px;">
+              <div style="font-size:2.4rem; margin-bottom:4px;">${b.icon || '📘'}</div>
+              <div style="position:absolute; top:8px; right:8px; background:rgba(255,255,255,0.2); backdrop-filter:blur(6px); padding:2px 8px; border-radius:8px; font-size:0.6rem; font-weight:700; color:white;">${b.category || 'Umum'}</div>
+            </div>
+            <!-- Book Info -->
+            <div style="padding:10px 12px;">
+              <h4 style="font-size:0.8rem; font-weight:700; color:#0f172a; margin:0 0 4px 0; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${b.title}</h4>
+              <p style="font-size:0.68rem; color:#64748b; margin:0 0 8px 0; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${b.desc}</p>
+              <button style="width:100%; background:${b.color || '#0284c7'}; color:white; border:none; padding:6px; border-radius:8px; font-size:0.7rem; font-weight:700; cursor:pointer;">${b.url ? '📖 Buka PDF' : '📖 Baca'}</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      `}
     </div>
   `;
 }
@@ -893,3 +948,179 @@ function renderVidioTKJView(state) {
     </div>
   `;
 }
+
+// ── Nilai Siswa ──────────────────────────────────────────────────────────────
+
+window.selectedNilaiMapel = window.selectedNilaiMapel || null;
+
+window.openNilaiDetail = function(mapelId, mapelName) {
+  window.selectedNilaiMapel = { id: mapelId, name: mapelName };
+  window.switchSiswaTab('nilaidetail');
+};
+
+function renderNilaiView(state) {
+  const user = state.currentUser.siswa;
+  const grades = state.grades || [];
+  const mapelList = state.mapel || [];
+
+  // Group grades by mapel for this student
+  const groupedByMapel = {};
+  grades.forEach(g => {
+    if (!g.studentId || String(g.studentId) !== String(user.id || '1')) return;
+    const key = g.mapel || g.subject || 'Umum';
+    if (!groupedByMapel[key]) groupedByMapel[key] = [];
+    groupedByMapel[key].push(g);
+  });
+
+  // Fall back to mapel list if no real grade data
+  const displayMapel = Object.keys(groupedByMapel).length > 0
+    ? Object.keys(groupedByMapel)
+    : (mapelList.length > 0
+        ? mapelList.map(m => m.name || m)
+        : ['Matematika', 'Jaringan Dasar', 'Administrasi Infrastruktur', 'Pemrograman Web', 'Bahasa Indonesia', 'Bahasa Inggris']);
+
+  const mapelColors = ['#0284c7','#10b981','#6366f1','#f59e0b','#ec4899','#14b8a6','#ef4444','#8b5cf6'];
+
+  return `
+    <div style="background:white; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; position:sticky; top:0; z-index:10;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button style="background:none; border:none; cursor:pointer;" onclick="window.switchSiswaTab('home')">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        </button>
+        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b;">📊 Nilai Saya</h3>
+      </div>
+      <span style="background:#fef9c3; color:#ca8a04; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${displayMapel.length} Mapel</span>
+    </div>
+
+    <div style="padding:14px 16px;">
+      <div style="background:linear-gradient(135deg, #0b2545, #134074); border-radius:16px; padding:16px 18px; margin-bottom:16px; color:white; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <p style="font-size:0.7rem; opacity:0.75; margin:0 0 4px;">Siswa</p>
+          <h4 style="font-size:1.05rem; font-weight:800; margin:0 0 2px;">${user.name}</h4>
+          <p style="font-size:0.75rem; opacity:0.85; margin:0;">${user.class} • NIS: ${user.nis}</p>
+        </div>
+        <div style="width:48px; height:48px; border-radius:14px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-size:1.8rem;">🎓</div>
+      </div>
+
+      <p style="font-size:0.8rem; color:#64748b; margin:0 0 14px; font-weight:600;">Pilih mata pelajaran untuk melihat nilai per pertemuan:</p>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        ${displayMapel.map((mapelName, idx) => {
+          const items = groupedByMapel[mapelName] || [];
+          const avgNilai = items.length > 0
+            ? Math.round(items.reduce((s, g) => s + (parseFloat(g.nilai || g.score || 0)), 0) / items.length)
+            : null;
+          const color = mapelColors[idx % mapelColors.length];
+          const grade = avgNilai === null ? '-' : avgNilai >= 90 ? 'A' : avgNilai >= 80 ? 'B' : avgNilai >= 70 ? 'C' : avgNilai >= 60 ? 'D' : 'E';
+          const gradeColor = avgNilai === null ? '#94a3b8' : avgNilai >= 80 ? '#16a34a' : avgNilai >= 70 ? '#0284c7' : avgNilai >= 60 ? '#f59e0b' : '#dc2626';
+
+          return `
+            <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid ${color}; border-radius:14px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.03);" onclick="window.openNilaiDetail('${idx}', '${mapelName.replace(/'/g, "\\'")}')">
+              <div style="display:flex; align-items:center; gap:12px; min-width:0; flex:1;">
+                <div style="width:40px; height:40px; border-radius:10px; background:${color}15; color:${color}; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;">📚</div>
+                <div style="min-width:0;">
+                  <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin:0 0 3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${mapelName}</h4>
+                  <p style="font-size:0.72rem; color:#64748b; margin:0;">${items.length > 0 ? items.length + ' pertemuan' : 'Tap untuk detail nilai'}</p>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+                ${avgNilai !== null ? `<div style="text-align:right;"><div style="font-size:1.1rem; font-weight:800; color:${gradeColor};">${avgNilai}</div><div style="font-size:0.65rem; font-weight:700; color:${gradeColor};">Grade ${grade}</div></div>` : ''}
+                <svg width="16" height="16" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderNilaiDetailView(state) {
+  const selected = window.selectedNilaiMapel || { id: '0', name: 'Mata Pelajaran' };
+  const user = state.currentUser.siswa;
+  const allGrades = state.grades || [];
+
+  const mapelGrades = allGrades.filter(g =>
+    (String(g.studentId) === String(user.id || '1')) &&
+    ((g.mapel || g.subject || '') === selected.name)
+  );
+
+  // Fallback sample data if no real data
+  const pertemuanList = mapelGrades.length > 0 ? mapelGrades : [
+    { pertemuan: 1, topik: 'Pengenalan Materi', nilai: 85, keterangan: 'Tugas Harian' },
+    { pertemuan: 2, topik: 'Praktikum Dasar', nilai: 90, keterangan: 'Praktikum' },
+    { pertemuan: 3, topik: 'Kuis Tengah', nilai: 78, keterangan: 'Kuis' },
+    { pertemuan: 4, topik: 'Proyek Individu', nilai: 88, keterangan: 'Proyek' },
+    { pertemuan: 5, topik: 'UTS / PTS', nilai: 82, keterangan: 'Ujian' }
+  ];
+
+  const avgNilai = Math.round(pertemuanList.reduce((s, p) => s + parseFloat(p.nilai || p.score || 0), 0) / pertemuanList.length);
+  const grade = avgNilai >= 90 ? 'A' : avgNilai >= 80 ? 'B' : avgNilai >= 70 ? 'C' : avgNilai >= 60 ? 'D' : 'E';
+  const gradeColor = avgNilai >= 80 ? '#16a34a' : avgNilai >= 70 ? '#0284c7' : avgNilai >= 60 ? '#f59e0b' : '#dc2626';
+
+  return `
+    <div style="background:white; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; position:sticky; top:0; z-index:10;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button style="background:none; border:none; cursor:pointer;" onclick="window.switchSiswaTab('nilai')">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        </button>
+        <h3 style="font-size:1rem; font-weight:700; color:#1e293b; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📚 ${selected.name}</h3>
+      </div>
+    </div>
+
+    <div style="padding:14px 16px;">
+      <div style="background:linear-gradient(135deg, #0b2545, #134074); border-radius:16px; padding:18px; margin-bottom:16px; color:white; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <p style="font-size:0.7rem; opacity:0.75; margin:0 0 4px 0;">Rata-rata Nilai</p>
+          <div style="font-size:2.5rem; font-weight:900; line-height:1; margin-bottom:4px;">${avgNilai}</div>
+          <div style="display:inline-block; background:${gradeColor}; color:white; padding:2px 10px; border-radius:8px; font-size:0.72rem; font-weight:800;">Grade ${grade}</div>
+        </div>
+        <div>
+          <p style="font-size:0.7rem; opacity:0.75; margin:0 0 8px 0; text-align:right;">${pertemuanList.length} Pertemuan</p>
+          <div style="width:56px; height:56px; border-radius:14px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-size:1.8rem;">🏆</div>
+        </div>
+      </div>
+
+      <p style="font-size:0.8rem; font-weight:700; color:#1e293b; margin:0 0 12px;">Rincian Nilai Per Pertemuan:</p>
+
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        ${pertemuanList.map((p, idx) => {
+          const nilaiNum = parseFloat(p.nilai || p.score || 0);
+          const nilaiColor = nilaiNum >= 80 ? '#16a34a' : nilaiNum >= 70 ? '#0284c7' : nilaiNum >= 60 ? '#f59e0b' : '#dc2626';
+          const nilaiBg = nilaiNum >= 80 ? '#f0fdf4' : nilaiNum >= 70 ? '#f0f9ff' : nilaiNum >= 60 ? '#fffbeb' : '#fef2f2';
+          const pertemuanNum = p.pertemuan || p.session || (idx + 1);
+          const topik = p.topik || p.topic || p.keterangan || p.note || 'Penilaian';
+          const ket = (p.keterangan || p.type || '');
+          return `
+            <div style="background:white; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 1px 4px rgba(0,0,0,0.03);">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:36px; height:36px; border-radius:10px; background:#e0f2fe; color:#0284c7; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:800; flex-shrink:0;">P${pertemuanNum}</div>
+                <div>
+                  <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:0 0 2px;">${topik}</h4>
+                  ${ket ? `<span style="font-size:0.68rem; color:#64748b; background:#f1f5f9; padding:1px 6px; border-radius:4px;">${ket}</span>` : ''}
+                </div>
+              </div>
+              <div style="background:${nilaiBg}; border:1px solid ${nilaiColor}50; padding:6px 12px; border-radius:10px; text-align:center; flex-shrink:0; min-width:48px;">
+                <div style="font-size:1.2rem; font-weight:800; color:${nilaiColor}; line-height:1;">${nilaiNum || '-'}</div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+window.openMasukanForm = function() {
+  window.open('https://docs.google.com/forms/d/e/1FAIpQLScKiNYSRVesZ1kejenWmbHtmZ7YRk1vD9YJQ-Ul0MOGaRuWTA/viewform?usp=publish-editor', '_blank', 'noopener,noreferrer');
+};
+
+window.openLibraryBook = function(id, title, url) {
+  if (url && url !== 'undefined' && url !== '') {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  } else {
+    if (window.showToast) window.showToast('📖 Membuka: ' + title, 'success');
+  }
+};
