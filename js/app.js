@@ -282,7 +282,8 @@ function renderLoginPage() {
       <main class="login-page" style="flex:1;">
         <section class="login-showcase">
           <img src="img/Logo_SMKN6.png" alt="Logo SMKN 6 Batam" class="login-brand-mark" />
-          <p class="login-eyebrow">SMK NEGERI 6</p>
+          <p class="login-eyebrow">SMK NEGERI 6 BATAM</p>
+          <div style="color: #ffffff; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; opacity: 0.95;">Teknik Komputer Jaringan</div>
           <h1>Semua aktivitas sekolah, satu ruang.</h1>
           <div class="login-feature-list">
             <span><b>01</b> Portal siswa</span>
