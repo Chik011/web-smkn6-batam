@@ -157,7 +157,20 @@ class Store {
       onSnapshot(stateRef, (docSnap) => {
         if (docSnap.exists()) {
           const remoteData = docSnap.data();
-          const { students, teachers, attendance, classes, schedules, mapel, grades, broadcastNews, ...cleanRemote } = remoteData;
+          const {
+            students,
+            teachers,
+            attendance,
+            classes,
+            schedules,
+            mapel,
+            grades,
+            broadcastNews,
+            galeriItems,
+            kalenderAgendas,
+            elibraryBooks,
+            ...cleanRemote
+          } = remoteData;
           this.isSyncingWithFirebase = true;
           this.state = {
             ...this.state,
@@ -517,20 +530,22 @@ class Store {
       } catch (e) {}
 
       // 10. Sync galeri_siswa collection
-      try {
-        onSnapshot(collection(db, 'galeri_siswa'), (snapshot) => {
-          if (snapshot && !snapshot.empty) {
-            const items = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-            if (items.length > 0) {
-              this.state.galeriItems = items;
-              this.saveStateToLocalStorage();
-              this.notify();
+      ['galeri_siswa', 'galeriSiswa', 'galeri'].forEach(colName => {
+        try {
+          onSnapshot(collection(db, colName), (snapshot) => {
+            if (snapshot && !snapshot.empty) {
+              const items = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+              if (items.length > 0) {
+                this.state.galeriItems = items;
+                this.saveStateToLocalStorage();
+                this.notify();
+              }
             }
-          }
-        }, (err) => {
-          console.warn('Firestore galeri_siswa snapshot warning:', err && err.message ? err.message : err);
-        });
-      } catch (e) {}
+          }, (err) => {
+            console.warn(`Firestore ${colName} snapshot warning:`, err && err.message ? err.message : err);
+          });
+        } catch (e) {}
+      });
 
       // 11. Sync kalender_agenda collection
       try {
