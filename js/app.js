@@ -993,40 +993,34 @@ window.openSiswaModal = function(type) {
       <button class="btn-primary mt-4" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup Kalender</button>
     `;
   } else if (type === 'galeriSiswa') {
+    const items = (store.state.galeriItems && store.state.galeriItems.length > 0)
+      ? store.state.galeriItems
+      : [
+        { id: '1', title: 'Juara 1 LKS Network Administration', category: '🏆 PRESTASI', tagColor: '#b45309', tagBg: '#fef3c7', imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80', subtitle: 'Tim Siswa TKJ SMKN 6 Batam berhasil meraih Medali Emas LKS.' },
+        { id: '2', title: 'Praktikum Fiber Optic Splicing', category: '🛠️ PRAKTIKUM', tagColor: '#0369a1', tagBg: '#e0f2fe', imageUrl: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=600&q=80', subtitle: 'Penyambungan kabel serat optik menggunakan Fusion Splicer.' },
+        { id: '3', title: 'Deployment Server Linux Debian', category: '💻 PROJECT', tagColor: '#4338ca', tagBg: '#e0e7ff', imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80', subtitle: 'Konfigurasi Web Server, DNS, dan Virtual Host Debian Server.' }
+      ];
+
     card.innerHTML = `
-      <div class="modal-title" style="font-weight:800; font-size:1.1rem; color:#0f172a;">🖼️ Galeri & Prestasi Siswa TKJ</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <div class="modal-title" style="font-weight:800; font-size:1.1rem; color:#0f172a; margin:0;">🖼️ Galeri & Prestasi Siswa TKJ</div>
+        <span style="background:#e0f2fe; color:#0284c7; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${items.length} Foto</span>
+      </div>
       <p style="font-size:0.78rem; color:#64748b; margin-bottom:12px;">Showcase Karya, Praktikum Lab & Prestasi LKS:</p>
       
-      <div style="max-height:300px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-right:4px;">
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <span style="background:#fef3c7; color:#b45309; font-weight:800; font-size:0.68rem; padding:2px 8px; border-radius:6px;">🏆 PRESTASI</span>
-            <span style="font-size:0.7rem; color:#64748b;">LKS 2026</span>
+      <div style="max-height:360px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-right:4px;">
+        ${items.map(item => `
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px; display:flex; gap:12px; align-items:center;">
+            ${item.imageUrl ? `<img src="${item.imageUrl}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; flex-shrink:0;" onerror="this.style.display='none'" />` : ''}
+            <div style="flex:1; min-width:0;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <span style="background:${item.tagBg || '#fef3c7'}; color:${item.tagColor || '#b45309'}; font-weight:800; font-size:0.68rem; padding:2px 8px; border-radius:6px;">${item.category || '🖼️ GALERI'}</span>
+              </div>
+              <h4 style="font-size:0.88rem; font-weight:700; color:#0f172a; margin:0 0 4px 0;">${item.title}</h4>
+              <p style="font-size:0.73rem; color:#475569; margin:0; line-height:1.4;">${item.subtitle || 'Dokumentasi kegiatan siswa TKJ SMKN 6.'}</p>
+            </div>
           </div>
-          <h4 style="font-size:0.88rem; font-weight:700; color:#0f172a; margin:0 0 4px 0;">🥇 Juara 1 LKS IT Network Systems Administration</h4>
-          <p style="font-size:0.73rem; color:#475569; margin:0 0 6px 0;">Tim TKJ SMKN 6 berhasil meraih Medali Emas pada Lomba Kompetensi Siswa bidang Jaringan Komputer.</p>
-          <span style="font-size:0.7rem; font-weight:600; color:#0284c7;">Oleh: Tim Siswa XI TKJ 1</span>
-        </div>
-
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <span style="background:#e0f2fe; color:#0369a1; font-weight:800; font-size:0.68rem; padding:2px 8px; border-radius:6px;">🛠️ PRAKTIKUM LAB</span>
-            <span style="font-size:0.7rem; color:#64748b;">Lab TKJ 2</span>
-          </div>
-          <h4 style="font-size:0.88rem; font-weight:700; color:#0f172a; margin:0 0 4px 0;">🌐 Praktikum Fiber Optic Splicing & OTDR Test</h4>
-          <p style="font-size:0.73rem; color:#475569; margin:0 0 6px 0;">Penyambungan kabel serat optik menggunakan Fusion Splicer dan pengukuran redaman sinyal.</p>
-          <span style="font-size:0.7rem; font-weight:600; color:#0284c7;">Oleh: Kelompok 3 - 10 TKJ 1</span>
-        </div>
-
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <span style="background:#e0e7ff; color:#4338ca; font-weight:800; font-size:0.68rem; padding:2px 8px; border-radius:6px;">💻 PROJECT</span>
-            <span style="font-size:0.7rem; color:#64748b;">Cloud Server</span>
-          </div>
-          <h4 style="font-size:0.88rem; font-weight:700; color:#0f172a; margin:0 0 4px 0;">🚀 Deployment Server Linux Debian & DNS Server</h4>
-          <p style="font-size:0.73rem; color:#475569; margin:0 0 6px 0;">Konfigurasi Web Server Apache, MySQL Database, dan Virtual Host lokal sekolah.</p>
-          <span style="font-size:0.7rem; font-weight:600; color:#0284c7;">Oleh: Siswa 10 TKJ 1</span>
-        </div>
+        `).join('')}
       </div>
       <button class="btn-primary mt-4" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup Galeri Siswa</button>
     `;
