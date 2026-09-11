@@ -170,7 +170,7 @@ function renderApp() {
     if (currentPath !== 'index.html' && currentPath !== '') {
       try {
         history.replaceState(null, '', './index.html');
-      } catch (e) {}
+      } catch (e) { }
     }
     return;
   }
@@ -185,7 +185,7 @@ function renderApp() {
   if (currentPath !== `${role}.html` || window.location.hash !== '#' + activeTab) {
     try {
       history.replaceState(null, '', targetUrl);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   let screenResult = { contentHtml: '', bottomNavHtml: '' };
@@ -283,7 +283,7 @@ function renderLoginPage() {
         <section class="login-showcase">
           <img src="img/Logo_SMKN6.png" alt="Logo SMKN 6 Batam" class="login-brand-mark" />
           <p class="login-eyebrow">SMK NEGERI 6 BATAM</p>
-          <div style="color: #ffffff; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; opacity: 0.95;">Teknik Komputer Jaringan</div>
+          <div style="color: #ffffff; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; opacity: 0.95;">Teknik Komputer Dan Jaringan!</div>
           <h1>Semua aktivitas sekolah, satu ruang.</h1>
           <div class="login-feature-list">
             <span><b>01</b> Portal siswa</span>
@@ -344,7 +344,7 @@ function bindBottomNavEvents(role) {
 }
 
 // Global Window Helpers for Interactive Inline Click Triggers
-window.showToast = function(message, type = 'success') {
+window.showToast = function (message, type = 'success') {
   let container = document.getElementById('globalToastContainer');
   if (!container) {
     container = document.createElement('div');
@@ -377,7 +377,7 @@ window.showToast = function(message, type = 'success') {
   }, 3200);
 };
 
-window.quickFillLogin = function(role) {
+window.quickFillLogin = function (role) {
   const roleSelect = document.getElementById('loginRole');
   const userInp = document.getElementById('loginUsername');
   const passInp = document.getElementById('loginPassword');
@@ -403,7 +403,7 @@ window.quickFillLogin = function(role) {
   roleSelect.value = role;
   userInp.value = demoUser;
   passInp.value = demoPass;
-  
+
   [userInp, passInp].forEach(inp => {
     inp.style.transition = 'all 0.3s ease';
     inp.style.borderColor = '#0284c7';
@@ -415,11 +415,11 @@ window.quickFillLogin = function(role) {
   });
 };
 
-window.switchRole = function(role) {
+window.switchRole = function (role) {
   store.setRole(role);
 };
 
-window.handleLogin = function(event) {
+window.handleLogin = function (event) {
   event.preventDefault();
   const form = document.getElementById('mainLoginForm') || event.target;
   const role = document.getElementById('loginRole').value;
@@ -432,8 +432,8 @@ window.handleLogin = function(event) {
   let loggedName = username;
 
   if (role === 'siswa') {
-    const found = (state.students || []).find(s => 
-      (s.name && s.name.toLowerCase() === username.toLowerCase()) || 
+    const found = (state.students || []).find(s =>
+      (s.name && s.name.toLowerCase() === username.toLowerCase()) ||
       (s.nis && String(s.nis) === username) ||
       (s.id && String(s.id) === username) ||
       username.toLowerCase() === 'siswa' ||
@@ -450,8 +450,8 @@ window.handleLogin = function(event) {
       }
     }
   } else if (role === 'guru') {
-    const found = (state.teachers || []).find(t => 
-      (t.username && t.username.toLowerCase() === username.toLowerCase()) || 
+    const found = (state.teachers || []).find(t =>
+      (t.username && t.username.toLowerCase() === username.toLowerCase()) ||
       (t.name && t.name.toLowerCase() === username.toLowerCase()) ||
       username.toLowerCase() === 'guru'
     );
@@ -484,12 +484,12 @@ window.handleLogin = function(event) {
     const defaultTab = (role === 'guru') ? 'beranda' : 'home';
     try {
       history.replaceState(null, '', `./${role}.html#${defaultTab}`);
-    } catch (e) {}
+    } catch (e) { }
     renderApp();
   }, 450);
 };
 
-window.confirmLogout = function() {
+window.confirmLogout = function () {
   const pageRole = document.body.getAttribute('data-role') || 'siswa';
   let username = 'Pengguna';
 
@@ -523,19 +523,19 @@ window.confirmLogout = function() {
   overlay.classList.add('open');
 };
 
-window.performLogout = function() {
+window.performLogout = function () {
   window.showToast('Anda telah keluar dari sesi.', 'info');
   setTimeout(() => {
     store.logout();
     delete document.body.dataset.role;
     try {
       history.replaceState(null, '', './index.html');
-    } catch (e) {}
+    } catch (e) { }
     renderApp();
   }, 400);
 };
 
-window.logout = function(skipConfirm) {
+window.logout = function (skipConfirm) {
   if (skipConfirm === true) {
     window.performLogout();
   } else {
@@ -543,12 +543,12 @@ window.logout = function(skipConfirm) {
   }
 };
 
-window.toggleViewMode = function() {
+window.toggleViewMode = function () {
   const newMode = store.state.activeViewMode === 'phone' ? 'grid' : 'phone';
   store.setViewMode(newMode);
 };
 
-window.switchRoleTab = function(role, tab) {
+window.switchRoleTab = function (role, tab) {
   if (role && tab) {
     if (window.location.hash !== '#' + tab) {
       history.replaceState(null, '', '#' + tab);
@@ -557,30 +557,30 @@ window.switchRoleTab = function(role, tab) {
   }
 };
 
-window.switchSiswaTab = function(tab) {
+window.switchSiswaTab = function (tab) {
   window.switchRoleTab('siswa', tab);
 };
 
-window.switchGuruTab = function(tab) {
+window.switchGuruTab = function (tab) {
   window.switchRoleTab('guru', tab);
 };
 
-window.switchAdminTab = function(tab) {
+window.switchAdminTab = function (tab) {
   window.switchRoleTab('admin', tab);
 };
 
-window.setGuruSubTab = function(category, tab) {
+window.setGuruSubTab = function (category, tab) {
   store.state.guruSubTab[category] = tab;
   store.saveState();
 };
 
-window.setStudentStatus = function(studentId, status) {
+window.setStudentStatus = function (studentId, status) {
   window.tempAbsensi = window.tempAbsensi || {};
   window.tempAbsensi[studentId] = status;
   renderApp();
 };
 
-window.markAllStudentsPresent = function() {
+window.markAllStudentsPresent = function () {
   window.tempAbsensi = window.tempAbsensi || {};
   store.state.students.forEach(s => {
     window.tempAbsensi[s.id] = 'H';
@@ -589,7 +589,7 @@ window.markAllStudentsPresent = function() {
   renderApp();
 };
 
-window.submitAbsensiForm = function() {
+window.submitAbsensiForm = function () {
   const dateInput = document.getElementById('absensiDate');
   const todayStr = new Date().toISOString().split('T')[0];
   const date = dateInput?.value || todayStr;
@@ -609,7 +609,7 @@ window.submitAbsensiForm = function() {
   window.showToast(`✅ Data Absensi (${mapel} - ${className}) Pertemuan ${pertemuan} Berhasil Disimpan ke Firebase!`, 'success');
 };
 
-window.editScore = function(pertemuan, studentId, currentScore) {
+window.editScore = function (pertemuan, studentId, currentScore) {
   const newScore = prompt(`Masukkan nilai baru untuk Pertemuan ${pertemuan}:`, currentScore);
   if (newScore !== null && !isNaN(newScore)) {
     const gradesObj = store.state.grades.find(g => g.pertemuan === pertemuan) || { scores: {} };
@@ -619,14 +619,14 @@ window.editScore = function(pertemuan, studentId, currentScore) {
   }
 };
 
-window.simulateExportData = function(className = '10 TKJ 1') {
+window.simulateExportData = function (className = '10 TKJ 1') {
   window.showToast(`Menyiapkan data unduhan untuk kelas ${className}...`, 'info');
   setTimeout(() => {
     window.showToast(`✅ File rekap_${className}.xlsx berhasil diekspor!`, 'success');
   }, 900);
 };
 
-window.setAdminSiswaSubView = function(view, level = null, className = null, mode = null) {
+window.setAdminSiswaSubView = function (view, level = null, className = null, mode = null) {
   store.state.adminSubView.siswa = view;
   if (level !== null && level !== undefined) store.state.adminSubView.selectedLevel = level;
   if (className) store.state.adminSubView.selectedClass = className;
@@ -634,13 +634,13 @@ window.setAdminSiswaSubView = function(view, level = null, className = null, mod
   store.saveState();
 };
 
-window.setAdminJadwalSubView = function(view, level = null) {
+window.setAdminJadwalSubView = function (view, level = null) {
   store.state.adminSubView.jadwal = view;
   if (level) store.state.adminSubView.selectedJadwalLevel = level;
   store.saveState();
 };
 
-window.handleBroadcastSubmit = function(e) {
+window.handleBroadcastSubmit = function (e) {
   e.preventDefault();
   const title = document.getElementById('newsTitle').value;
   const url = document.getElementById('newsUrl').value;
@@ -650,7 +650,7 @@ window.handleBroadcastSubmit = function(e) {
   document.getElementById('newsUrl').value = '';
 };
 
-window.handleMapelSubmit = function(e) {
+window.handleMapelSubmit = function (e) {
   e.preventDefault();
   const name = document.getElementById('mapelName').value;
   store.addMapel(name);
@@ -658,19 +658,19 @@ window.handleMapelSubmit = function(e) {
   document.getElementById('mapelName').value = '';
 };
 
-window.selectRoom = function(el, room) {
+window.selectRoom = function (el, room) {
   document.querySelectorAll('.room-selector-pills .pill-option').forEach(p => p.classList.remove('selected'));
   el.classList.add('selected');
   document.getElementById('schedRuangan').value = room;
 };
 
-window.selectDay = function(el, day) {
+window.selectDay = function (el, day) {
   document.querySelectorAll('.day-selector-pills .pill-option').forEach(p => p.classList.remove('selected'));
   el.classList.add('selected');
   document.getElementById('schedHari').value = day;
 };
 
-window.handleCreateSchedule = function(e) {
+window.handleCreateSchedule = function (e) {
   e.preventDefault();
   const mapel = document.getElementById('schedMapel').value;
   const guru = document.getElementById('schedGuru').value;
@@ -693,14 +693,14 @@ window.handleCreateSchedule = function(e) {
   window.setAdminJadwalSubView('list');
 };
 
-window.toggleFlipCard = function() {
+window.toggleFlipCard = function () {
   const inner = document.getElementById('ktsFlipInner');
   if (inner) {
     inner.classList.toggle('flipped');
   }
 };
 
-window.simulateScanQR = function() {
+window.simulateScanQR = function () {
   window.showToast('📡 Memindai QR Code presensi...', 'info');
   setTimeout(() => {
     window.showToast('✅ Presensi berhasil! Kehadiran Anda hari ini telah dicatat.', 'success');
@@ -708,7 +708,7 @@ window.simulateScanQR = function() {
 };
 
 // Modal Windows Handler
-window.openSiswaModal = function(type) {
+window.openSiswaModal = function (type) {
   const overlay = document.getElementById('globalModal');
   const card = document.getElementById('modalCardContent');
 
@@ -1036,9 +1036,9 @@ window.openSiswaModal = function(type) {
         ${newsList.length === 0 ? `
           <div style="text-align:center; padding:24px; color:#64748b; font-size:0.8rem;">Belum ada video pengumuman terdaftar di Firebase.</div>
         ` : newsList.map((item, idx) => {
-          const yt = getYouTubeDetails(item.url);
-          const directUrl = (item.url && item.url.startsWith('http')) ? item.url : (yt.id ? `https://www.youtube.com/watch?v=${yt.id}` : '#');
-          return `
+      const yt = getYouTubeDetails(item.url);
+      const directUrl = (item.url && item.url.startsWith('http')) ? item.url : (yt.id ? `https://www.youtube.com/watch?v=${yt.id}` : '#');
+      return `
             <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px; display:flex; gap:12px; align-items:center;">
               <div style="width:100px; height:60px; border-radius:8px; background:#0f172a; position:relative; overflow:hidden; flex-shrink:0; cursor:pointer;" onclick="window.playNewsVideoById('${item.id}', ${idx})">
                 ${yt.thumbnailUrl ? `
@@ -1064,7 +1064,7 @@ window.openSiswaModal = function(type) {
               </div>
             </div>
           `;
-        }).join('')}
+    }).join('')}
       </div>
 
       <button class="btn-primary mt-4" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup Beranda Video</button>
@@ -1197,7 +1197,7 @@ window.openSiswaModal = function(type) {
   overlay.classList.add('open');
 };
 
-window.openAdminModal = function(type) {
+window.openAdminModal = function (type) {
   const overlay = document.getElementById('globalModal');
   const card = document.getElementById('modalCardContent');
 
@@ -1242,7 +1242,7 @@ window.openAdminModal = function(type) {
   overlay.classList.add('open');
 };
 
-window.handleCreateTeacher = function(e) {
+window.handleCreateTeacher = function (e) {
   e.preventDefault();
   const name = document.getElementById('tName').value;
   const username = document.getElementById('tUser').value;
@@ -1253,7 +1253,7 @@ window.handleCreateTeacher = function(e) {
   window.closeModal();
 };
 
-window.editNewsVideoModal = function(id) {
+window.editNewsVideoModal = function (id) {
   const news = (store.state.broadcastNews || []).find(n => String(n.id) === String(id));
   if (!news) return;
 
@@ -1280,7 +1280,7 @@ window.editNewsVideoModal = function(id) {
   overlay.classList.add('open');
 };
 
-window.handleEditNewsVideo = function(e, id) {
+window.handleEditNewsVideo = function (e, id) {
   e.preventDefault();
   const title = document.getElementById('editNewsTitle').value.trim();
   const url = document.getElementById('editNewsUrl').value.trim();
@@ -1292,7 +1292,7 @@ window.handleEditNewsVideo = function(e, id) {
 /* Drag and Drop Handlers for Video Reordering */
 let draggedNewsIndex = null;
 
-window.handleNewsDragStart = function(e, index) {
+window.handleNewsDragStart = function (e, index) {
   draggedNewsIndex = index;
   if (e.dataTransfer) {
     e.dataTransfer.effectAllowed = 'move';
@@ -1302,7 +1302,7 @@ window.handleNewsDragStart = function(e, index) {
   card.classList.add('dragging');
 };
 
-window.handleNewsDragOver = function(e, index) {
+window.handleNewsDragOver = function (e, index) {
   e.preventDefault();
   if (e.dataTransfer) {
     e.dataTransfer.dropEffect = 'move';
@@ -1313,12 +1313,12 @@ window.handleNewsDragOver = function(e, index) {
   }
 };
 
-window.handleNewsDragLeave = function(e) {
+window.handleNewsDragLeave = function (e) {
   const card = e.currentTarget;
   card.classList.remove('drag-over');
 };
 
-window.handleNewsDrop = function(e, targetIndex) {
+window.handleNewsDrop = function (e, targetIndex) {
   e.preventDefault();
   const card = e.currentTarget;
   card.classList.remove('drag-over');
@@ -1333,59 +1333,59 @@ window.handleNewsDrop = function(e, targetIndex) {
   draggedNewsIndex = null;
 };
 
-window.handleNewsDragEnd = function(e) {
+window.handleNewsDragEnd = function (e) {
   const card = e.currentTarget;
   card.classList.remove('dragging');
   document.querySelectorAll('.video-drag-item').forEach(el => el.classList.remove('drag-over', 'dragging'));
   draggedNewsIndex = null;
 };
 
-window.moveNewsUp = function(index) {
+window.moveNewsUp = function (index) {
   store.moveNews(index, 'up');
   window.showToast('Urutan video dipindah ke atas ⬆️', 'info');
 };
 
-window.moveNewsDown = function(index) {
+window.moveNewsDown = function (index) {
   store.moveNews(index, 'down');
   window.showToast('Urutan video dipindah ke bawah ⬇️', 'info');
 };
 
-window.deleteNews = function(id) {
+window.deleteNews = function (id) {
   if (confirm('Hapus video pengumuman ini?')) {
     store.deleteNews(id);
     window.showToast('Video pengumuman berhasil dihapus.', 'info');
   }
 };
 
-window.deleteTeacher = function(id, name) {
+window.deleteTeacher = function (id, name) {
   if (confirm(`Hapus pengajar ${name || ''}?`)) {
     store.deleteTeacher(id);
     window.showToast('Pengajar berhasil dihapus.', 'info');
   }
 };
 
-window.deleteMapel = function(id, name) {
+window.deleteMapel = function (id, name) {
   if (confirm(`Hapus mata pelajaran ${name || ''}?`)) {
     store.deleteMapel(id);
     window.showToast('Mata pelajaran berhasil dihapus.', 'info');
   }
 };
 
-window.deleteStudent = function(id, name) {
+window.deleteStudent = function (id, name) {
   if (confirm(`Hapus siswa ${name || ''}?`)) {
     store.deleteStudent(id);
     window.showToast('Siswa berhasil dihapus.', 'info');
   }
 };
 
-window.deleteSchedule = function(id, mapel) {
+window.deleteSchedule = function (id, mapel) {
   if (confirm(`Hapus jadwal ${mapel || ''}?`)) {
     store.deleteSchedule(id);
     window.showToast('Jadwal berhasil dihapus.', 'info');
   }
 };
 
-window.editTeacherModal = function(id) {
+window.editTeacherModal = function (id) {
   const teacher = (store.state.teachers || []).find(t => String(t.id) === String(id));
   if (!teacher) return;
 
@@ -1419,7 +1419,7 @@ window.editTeacherModal = function(id) {
   overlay.classList.add('open');
 };
 
-window.handleEditTeacher = function(e, id) {
+window.handleEditTeacher = function (e, id) {
   e.preventDefault();
   const name = document.getElementById('editTName').value.trim();
   const username = document.getElementById('editTUser').value.trim();
@@ -1430,7 +1430,7 @@ window.handleEditTeacher = function(e, id) {
   window.closeModal();
 };
 
-window.editMapelModal = function(id) {
+window.editMapelModal = function (id) {
   const item = (store.state.mapel || []).find(m => String(m.id) === String(id));
   if (!item) return;
 
@@ -1453,7 +1453,7 @@ window.editMapelModal = function(id) {
   overlay.classList.add('open');
 };
 
-window.handleEditMapel = function(e, id) {
+window.handleEditMapel = function (e, id) {
   e.preventDefault();
   const name = document.getElementById('editMName').value.trim();
   store.updateMapel(id, name);
@@ -1461,7 +1461,7 @@ window.handleEditMapel = function(e, id) {
   window.closeModal();
 };
 
-window.addStudentModal = function(className) {
+window.addStudentModal = function (className) {
   const overlay = document.getElementById('globalModal');
   const card = document.getElementById('modalCardContent');
 
@@ -1489,7 +1489,7 @@ window.addStudentModal = function(className) {
   overlay.classList.add('open');
 };
 
-window.handleAddStudent = function(e) {
+window.handleAddStudent = function (e) {
   e.preventDefault();
   const name = document.getElementById('addStName').value.trim();
   const nis = document.getElementById('addStNis').value.trim();
@@ -1500,7 +1500,7 @@ window.handleAddStudent = function(e) {
   window.closeModal();
 };
 
-window.editStudentModal = function(id) {
+window.editStudentModal = function (id) {
   const student = (store.state.students || []).find(s => String(s.id) === String(id) || String(s.nis) === String(id));
   if (!student) return;
 
@@ -1531,7 +1531,7 @@ window.editStudentModal = function(id) {
   overlay.classList.add('open');
 };
 
-window.handleEditStudent = function(e, id) {
+window.handleEditStudent = function (e, id) {
   e.preventDefault();
   const name = document.getElementById('editStName').value.trim();
   const nis = document.getElementById('editStNis').value.trim();
@@ -1542,7 +1542,7 @@ window.handleEditStudent = function(e, id) {
   window.closeModal();
 };
 
-window.editScheduleModal = function(id) {
+window.editScheduleModal = function (id) {
   const sched = (store.state.schedules || []).find(s => String(s.id) === String(id));
   if (!sched) return;
 
@@ -1601,7 +1601,7 @@ window.editScheduleModal = function(id) {
   overlay.classList.add('open');
 };
 
-window.handleEditSchedule = function(e, id) {
+window.handleEditSchedule = function (e, id) {
   e.preventDefault();
   const mapel = document.getElementById('editSchedMapel').value;
   const guru = document.getElementById('editSchedGuru').value;
@@ -1622,10 +1622,10 @@ window.handleEditSchedule = function(e, id) {
   window.closeModal();
 };
 
-window.playNewsVideo = function(title, url) {
+window.playNewsVideo = function (title, url) {
   const overlay = document.getElementById('globalModal');
   const card = document.getElementById('modalCardContent');
-  
+
   const yt = getYouTubeDetails(url);
   const directUrl = (url && url.startsWith('http')) ? url : (yt.id ? `https://www.youtube.com/watch?v=${yt.id}` : '#');
 
@@ -1661,7 +1661,7 @@ window.playNewsVideo = function(title, url) {
   overlay.classList.add('open');
 };
 
-window.playNewsVideoById = function(id, index) {
+window.playNewsVideoById = function (id, index) {
   const newsList = store.state.broadcastNews || [];
   let item = newsList.find(n => String(n.id) === String(id));
 
@@ -1687,7 +1687,7 @@ window.playNewsVideoById = function(id, index) {
 // Global Event Listener for TKJ News Cards
 if (!window._newsCardClickListenerAttached) {
   window._newsCardClickListenerAttached = true;
-  document.addEventListener('click', function(e) {
+  document.addEventListener('click', function (e) {
     const card = e.target.closest('.news-card-item');
     if (card) {
       const idxAttr = card.getAttribute('data-index');
@@ -1703,7 +1703,7 @@ if (!window._newsCardClickListenerAttached) {
   });
 }
 
-window.closeModal = function() {
+window.closeModal = function () {
   const modal = document.getElementById('globalModal');
   if (modal) modal.classList.remove('open');
   document.body.classList.remove('modal-open');
@@ -1736,13 +1736,13 @@ if (typeof window !== 'undefined' && !window._modalObserverAttached) {
   }
 }
 
-window.toggleBiometric = function(checked) {
+window.toggleBiometric = function (checked) {
   store.state.biometricEnabled = checked;
   store.saveState();
   window.showToast(`Login Biometrik ${checked ? 'Diaktifkan 🔒' : 'Dinonaktifkan 🔓'}`, 'info');
 };
 
-window.handleSaveProfileSettings = function(e) {
+window.handleSaveProfileSettings = function (e) {
   if (e) e.preventDefault();
   const name = document.getElementById('profName')?.value.trim();
   const nis = document.getElementById('profNis')?.value.trim();
@@ -1778,7 +1778,7 @@ window.handleSaveProfileSettings = function(e) {
   window.showToast('⚙️ Profil siswa berhasil diperbarui!', 'success');
 };
 
-window.toggleThemeMode = function(checked) {
+window.toggleThemeMode = function (checked) {
   const newTheme = checked ? 'dark' : 'light';
   store.setThemeMode(newTheme);
   window.showToast(`Tema ${checked ? 'Mode Gelap 🌙' : 'Mode Terang ☀️'} Diaktifkan!`, 'info');
@@ -1795,7 +1795,7 @@ function scheduleRenderApp() {
   }, 20);
 }
 
-window.syncFirebase = function() {
+window.syncFirebase = function () {
   store.seedDatabaseToFirebase();
 };
 
