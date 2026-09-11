@@ -413,8 +413,6 @@ window.quickFillLogin = function(role) {
       inp.style.boxShadow = '';
     }, 600);
   });
-
-  window.showToast(`Akun Firebase ${role.toUpperCase()} (${demoUser}) dimuat!`, 'info');
 };
 
 window.switchRole = function(role) {
