@@ -1158,6 +1158,22 @@ window.openSiswaModal = function (type) {
           </div>
         </button>
 
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('nilai');">
+          <span style="font-size:1.3rem;">📊</span>
+          <div>
+            <div>Nilai Saya</div>
+            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Rincian Nilai Mapel</span>
+          </div>
+        </button>
+
+        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openMasukanForm();">
+          <span style="font-size:1.3rem;">📝</span>
+          <div>
+            <div>Masukan</div>
+            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Form Kritik & Saran</span>
+          </div>
+        </button>
+
         <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('library');">
           <span style="font-size:1.3rem;">📚</span>
           <div>
@@ -1166,27 +1182,11 @@ window.openSiswaModal = function (type) {
           </div>
         </button>
 
-        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('pelajaran');">
-          <span style="font-size:1.3rem;">📊</span>
-          <div>
-            <div>Nilai Siswa</div>
-            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Jadwal & Rekap</span>
-          </div>
-        </button>
-
         <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('scan');">
           <span style="font-size:1.3rem;">📸</span>
           <div>
             <div>Presensi</div>
             <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Scan QR Presensi</span>
-          </div>
-        </button>
-
-        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.openSiswaModal('survey');">
-          <span style="font-size:1.3rem;">📋</span>
-          <div>
-            <div>Survey</div>
-            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Evaluasi Pembelajaran</span>
           </div>
         </button>
       </div>

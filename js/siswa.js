@@ -195,20 +195,6 @@ function renderHome(state) {
         <span>Nilai Saya</span>
       </button>
 
-      <button class="app-icon-item" onclick="window.switchSiswaTab('galerisiswa')">
-        <div class="icon-box" style="background:#f3e8ff; color:#9333ea;">
-          🖼️
-        </div>
-        <span>Galeri Siswa</span>
-      </button>
-
-      <button class="app-icon-item" onclick="window.openMasukanForm()">
-        <div class="icon-box" style="background:#ecfdf5; color:#059669;">
-          📝
-        </div>
-        <span>Masukan</span>
-      </button>
-
       <button class="app-icon-item" onclick="window.openSiswaModal('lainnya')">
         <div class="icon-box" style="background:#f8fafc; color:#64748b;">
           ⚙️
