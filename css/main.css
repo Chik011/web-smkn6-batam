@@ -440,9 +440,9 @@ body::before {
   z-index: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 0;
-  gap: 20px;
+  justify-content: space-around;
+  padding: 32px 16px;
+  gap: 24px;
   pointer-events: none;
   overflow: hidden;
 }
@@ -456,26 +456,27 @@ body::before {
 
 .parallelogram-wrapper {
   position: relative;
-  width: 130%;
+  width: 94%;
   flex: 1;
-  min-height: 320px;
+  max-height: 380px;
   margin: 0 auto;
-  left: -15%;
-  transform: skewY(-6deg);
+  left: 0;
+  transform: skewY(-4deg);
+  border-radius: 20px;
   overflow: hidden;
   z-index: 1;
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6), 0 0 45px rgba(56, 189, 248, 0.3);
-  border-top: 2px solid rgba(255, 255, 255, 0.25);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(56, 189, 248, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .parallelogram-card {
   position: absolute;
-  inset: -60px;
-  transform: skewY(6deg) scale(1.42);
-  background-size: cover;
-  background-position: center 30%;
-  filter: brightness(0.96) contrast(1.12);
+  inset: -10px;
+  transform: skewY(4deg) scale(1.05);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+  filter: brightness(0.96) contrast(1.08);
 }
 
 .bg-img-guru {
@@ -490,10 +491,10 @@ body::before {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(ellipse at center, transparent 40%, rgba(9, 44, 76, 0.45) 75%, rgba(9, 44, 76, 0.88) 100%);
-  box-shadow: inset 0 0 65px 30px rgba(9, 44, 76, 0.85);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(9, 44, 76, 0.35) 85%, rgba(9, 44, 76, 0.85) 100%);
+  box-shadow: inset 0 0 45px 15px rgba(9, 44, 76, 0.75);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
 }
 
 .bg-overlay-blue-tint {
@@ -502,8 +503,8 @@ body::before {
   z-index: 2;
   background: linear-gradient(
     180deg,
-    rgba(9, 44, 76, 0.20) 0%,
-    rgba(9, 44, 76, 0.28) 50%,
+    rgba(9, 44, 76, 0.22) 0%,
+    rgba(9, 44, 76, 0.30) 50%,
     rgba(9, 44, 76, 0.38) 100%
   );
   pointer-events: none;
