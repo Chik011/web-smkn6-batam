@@ -282,9 +282,21 @@ function renderLoginPage() {
       <main class="login-page" style="flex:1;">
         <section class="login-showcase">
           <div class="login-showcase-stacked-bg">
-            <div class="bg-img-top"></div>
-            <div class="bg-img-bottom"></div>
-            <div class="bg-overlay-blue"></div>
+            <div class="bg-overlay-blue-base"></div>
+            
+            <div class="parallelogram-wrapper top-wrapper">
+              <div class="parallelogram-card bg-img-guru"></div>
+              <div class="edge-blur-overlay"></div>
+              <div class="parallelogram-label">👨‍🏫 Tenaga Pendidik TKJ</div>
+            </div>
+            
+            <div class="parallelogram-wrapper bottom-wrapper">
+              <div class="parallelogram-card bg-img-murid"></div>
+              <div class="edge-blur-overlay"></div>
+              <div class="parallelogram-label">🎓 Siswa-Siswi TKJ</div>
+            </div>
+
+            <div class="bg-overlay-blue-tint"></div>
           </div>
           <div class="login-showcase-content">
             <img src="img/Logo_SMKN6.png" alt="Logo SMKN 6 Batam" class="login-brand-mark" />
