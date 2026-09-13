@@ -438,48 +438,76 @@ body::before {
   position: absolute;
   inset: 0;
   z-index: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 36px 18px;
+  gap: 28px;
   pointer-events: none;
   overflow: hidden;
   background: #061c33;
 }
 
-.full-bg-top {
-  position: absolute;
-  top: -6%;
-  left: -6%;
-  right: -6%;
-  height: 60%;
-  background: url('../img/TKJ%20guru.jpg') center top / cover no-repeat;
-  filter: blur(3px) brightness(0.92) contrast(1.1);
-  opacity: 0.82;
-  transform: scale(1.06) skewY(-3deg);
-}
-
-.full-bg-bottom {
-  position: absolute;
-  bottom: -6%;
-  left: -6%;
-  right: -6%;
-  height: 60%;
-  background: url('../img/TKJ%20murid.jpg') center bottom / cover no-repeat;
-  filter: blur(3px) brightness(0.92) contrast(1.1);
-  opacity: 0.82;
-  transform: scale(1.06) skewY(-3deg);
-}
-
-.full-bg-overlay {
+.bg-overlay-blue-base {
   position: absolute;
   inset: 0;
+  background: linear-gradient(140deg, #05182d 0%, #0b325c 50%, #07203b 100%);
+  z-index: 0;
+}
+
+.tilted-photo-frame {
+  position: relative;
+  width: 90%;
+  flex: 1;
+  max-height: 340px;
+  margin: 0 auto;
+  transform: skewY(-4.5deg);
+  border-radius: 20px;
+  overflow: hidden;
   z-index: 1;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(56, 189, 248, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+}
+
+.tilted-photo {
+  position: absolute;
+  inset: -15px;
+  transform: skewY(4.5deg) scale(1.1);
+  background-size: cover;
+  background-position: center 30%;
+  filter: brightness(0.94) contrast(1.08);
+  opacity: 0.88;
+}
+
+.bg-img-guru {
+  background-image: url('../img/TKJ%20guru.jpg');
+}
+
+.bg-img-murid {
+  background-image: url('../img/TKJ%20murid.jpg');
+}
+
+.tilted-edge-blur {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(9, 44, 76, 0.55) 78%, rgba(9, 44, 76, 0.92) 100%);
+  box-shadow: inset 0 0 50px 22px rgba(9, 44, 76, 0.85);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.bg-overlay-blue-tint {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
   background: linear-gradient(
     180deg,
-    rgba(9, 44, 76, 0.45) 0%,
-    rgba(12, 50, 90, 0.38) 45%,
-    rgba(14, 58, 102, 0.38) 55%,
-    rgba(9, 44, 76, 0.52) 100%
+    rgba(9, 44, 76, 0.25) 0%,
+    rgba(9, 44, 76, 0.32) 50%,
+    rgba(9, 44, 76, 0.40) 100%
   );
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
+  pointer-events: none;
 }
 
 .login-showcase-content {
