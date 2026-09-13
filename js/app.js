@@ -282,19 +282,9 @@ function renderLoginPage() {
       <main class="login-page" style="flex:1;">
         <section class="login-showcase">
           <div class="login-showcase-stacked-bg">
-            <div class="bg-overlay-blue-base"></div>
-            
-            <div class="parallelogram-wrapper top-wrapper">
-              <div class="parallelogram-card bg-img-guru"></div>
-              <div class="edge-blur-overlay"></div>
-            </div>
-            
-            <div class="parallelogram-wrapper bottom-wrapper">
-              <div class="parallelogram-card bg-img-murid"></div>
-              <div class="edge-blur-overlay"></div>
-            </div>
-
-            <div class="bg-overlay-blue-tint"></div>
+            <div class="full-bg-top bg-img-guru"></div>
+            <div class="full-bg-bottom bg-img-murid"></div>
+            <div class="full-bg-overlay"></div>
           </div>
           <div class="login-showcase-content">
             <img src="img/Logo_SMKN6.png" alt="Logo SMKN 6 Batam" class="login-brand-mark" />
