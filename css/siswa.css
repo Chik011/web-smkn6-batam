@@ -1,11 +1,15 @@
 /* Siswa Specific Styles */
 
 .siswa-header-profile {
-  background: linear-gradient(135deg, #092c4c 0%, #12467d 100%);
+  position: relative;
+  background: linear-gradient(135deg, rgba(9, 44, 76, 0.88) 0%, rgba(18, 70, 125, 0.92) 100%),
+              url('../img/TKJ%20murid.jpg') center/cover no-repeat;
   padding: 24px 20px 36px;
   color: white;
   border-bottom-left-radius: 28px;
   border-bottom-right-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(9, 44, 76, 0.25);
 }
 
 .empty-schedule-box {
