@@ -474,17 +474,18 @@ body::before {
   inset: -20px;
   transform: skewY(4deg) scale(1.1);
   background-size: cover;
-  background-position: center 30%;
   filter: brightness(0.95) contrast(1.08);
   opacity: 0.90;
 }
 
 .bg-img-guru {
   background-image: url('../img/TKJ%20guru.jpg');
+  background-position: center 0%;
 }
 
 .bg-img-murid {
   background-image: url('../img/TKJ%20murid.jpg');
+  background-position: center 35%;
 }
 
 .strip-edge-blur {
@@ -540,18 +541,15 @@ body::before {
 }
 
 .login-brand-mark {
-  width: 58px;
-  height: 58px;
-  display: grid;
-  place-items: center;
-  border-radius: 15px;
-  background: #ffffff;
-  font-size: 1.7rem;
-  font-weight: 800;
-  box-shadow: 0 12px 28px rgba(2, 132, 199, 0.35);
+  width: 64px;
+  height: 64px;
+  display: block;
+  background: transparent;
+  box-shadow: none;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.4));
   animation: fadeUp 0.6s 0.1s ease both;
   object-fit: contain;
-  padding: 5px;
+  padding: 0;
 }
 
 .login-eyebrow {
