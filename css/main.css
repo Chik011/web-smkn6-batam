@@ -457,12 +457,10 @@ body::before {
 
 .full-width-strip {
   position: relative;
-  width: 110%;
+  width: 100%;
   flex: 1;
   max-height: 320px;
   margin: 0 auto;
-  left: -5%;
-  transform: skewY(-4deg);
   border: none;
   border-radius: 0;
   overflow: hidden;
@@ -471,11 +469,10 @@ body::before {
 
 .strip-photo {
   position: absolute;
-  inset: -20px;
-  transform: skewY(4deg) scale(1.1);
+  inset: 0;
   background-size: cover;
   filter: brightness(0.95) contrast(1.08);
-  opacity: 0.90;
+  opacity: 0.92;
 }
 
 .bg-img-guru {
@@ -493,21 +490,16 @@ body::before {
   inset: 0;
   pointer-events: none;
   background: linear-gradient(
-      90deg,
-      rgba(9, 44, 76, 0.9) 0%,
-      transparent 12%,
-      transparent 88%,
-      rgba(9, 44, 76, 0.9) 100%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(9, 44, 76, 0.85) 0%,
-      transparent 18%,
-      transparent 82%,
-      rgba(9, 44, 76, 0.85) 100%
-    );
-  backdrop-filter: blur(2.5px);
-  -webkit-backdrop-filter: blur(2.5px);
+    180deg,
+    rgba(9, 44, 76, 0.95) 0%,
+    rgba(9, 44, 76, 0.4) 15%,
+    transparent 30%,
+    transparent 70%,
+    rgba(9, 44, 76, 0.4) 85%,
+    rgba(9, 44, 76, 0.95) 100%
+  );
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 .bg-overlay-blue-tint {
