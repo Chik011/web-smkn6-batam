@@ -281,27 +281,16 @@ function renderLoginPage() {
     <div style="display:flex; flex-direction:column; min-height:100vh;">
       <main class="login-page" style="flex:1;">
         <section class="login-showcase">
-          <div class="login-showcase-bg-slideshow">
-            <div class="login-bg-slide login-bg-slide-1"></div>
-            <div class="login-bg-slide login-bg-slide-2"></div>
+          <div class="login-showcase-stacked-bg">
+            <div class="bg-img-top"></div>
+            <div class="bg-img-bottom"></div>
+            <div class="bg-overlay-blue"></div>
           </div>
           <div class="login-showcase-content">
             <img src="img/Logo_SMKN6.png" alt="Logo SMKN 6 Batam" class="login-brand-mark" />
             <p class="login-eyebrow">SMK NEGERI 6 BATAM</p>
             <div style="color: #ffffff; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; opacity: 0.95;">Teknik Komputer Dan Jaringan!</div>
             <h1>Semua aktivitas sekolah, satu ruang.</h1>
-
-            <div class="login-hero-badges" style="display:flex; gap:12px; margin-top: 24px; flex-wrap:wrap;">
-              <div style="display:flex; align-items:center; gap:8px; padding:6px 14px 6px 8px; background:rgba(255,255,255,0.12); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.25); border-radius:30px;">
-                <img src="img/TKJ%20guru.jpg" style="width:28px; height:28px; border-radius:50%; object-fit:cover; border:1.5px solid white;" alt="Guru TKJ" />
-                <span style="font-size:0.78rem; font-weight:600; color:#e0f2fe;">Komunitas Guru TKJ</span>
-              </div>
-              <div style="display:flex; align-items:center; gap:8px; padding:6px 14px 6px 8px; background:rgba(255,255,255,0.12); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.25); border-radius:30px;">
-                <img src="img/TKJ%20murid.jpg" style="width:28px; height:28px; border-radius:50%; object-fit:cover; border:1.5px solid white;" alt="Siswa TKJ" />
-                <span style="font-size:0.78rem; font-weight:600; color:#e0f2fe;">Siswa & Siswi TKJ</span>
-              </div>
-            </div>
-
             <div class="login-feature-list">
               <span><b>01</b> Portal siswa</span>
               <span><b>02</b> Ruang kerja guru</span>

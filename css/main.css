@@ -434,39 +434,41 @@ body::before {
   background: #092c4c;
 }
 
-.login-showcase-bg-slideshow {
+.login-showcase-stacked-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   pointer-events: none;
+  overflow: hidden;
 }
 
-.login-bg-slide {
+.bg-img-top {
+  height: 50%;
+  width: 100%;
+  background: url('../img/TKJ%20guru.jpg') center top / cover no-repeat;
+  filter: brightness(0.88) contrast(1.05);
+}
+
+.bg-img-bottom {
+  height: 50%;
+  width: 100%;
+  background: url('../img/TKJ%20murid.jpg') center bottom / cover no-repeat;
+  filter: brightness(0.88) contrast(1.05);
+}
+
+.bg-overlay-blue {
   position: absolute;
   inset: 0;
-  background-size: cover;
-  background-position: center;
-  opacity: 0;
-  animation: bgCrossfade 12s infinite ease-in-out;
-}
-
-.login-bg-slide-1 {
-  background-image: linear-gradient(135deg, rgba(9, 44, 76, 0.82) 0%, rgba(15, 60, 110, 0.90) 100%), url('../img/TKJ%20guru.jpg');
-  animation-delay: 0s;
-}
-
-.login-bg-slide-2 {
-  background-image: linear-gradient(135deg, rgba(9, 44, 76, 0.82) 0%, rgba(15, 60, 110, 0.90) 100%), url('../img/TKJ%20murid.jpg');
-  animation-delay: 6s;
-}
-
-@keyframes bgCrossfade {
-  0% { opacity: 0; transform: scale(1.05); }
-  10% { opacity: 1; transform: scale(1); }
-  45% { opacity: 1; transform: scale(1.02); }
-  55% { opacity: 0; transform: scale(1.05); }
-  100% { opacity: 0; transform: scale(1.05); }
+  background: linear-gradient(
+    180deg,
+    rgba(9, 44, 76, 0.72) 0%,
+    rgba(14, 55, 96, 0.78) 45%,
+    rgba(9, 44, 76, 0.82) 55%,
+    rgba(15, 60, 110, 0.88) 100%
+  );
+  box-shadow: inset 0 0 100px rgba(9, 44, 76, 0.5);
 }
 
 .login-showcase-content {
