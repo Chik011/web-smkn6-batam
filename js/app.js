@@ -284,14 +284,14 @@ function renderLoginPage() {
           <div class="login-showcase-stacked-bg">
             <div class="bg-overlay-blue-base"></div>
             
-            <div class="tilted-photo-frame top-frame">
-              <div class="tilted-photo bg-img-guru"></div>
-              <div class="tilted-edge-blur"></div>
+            <div class="full-width-strip top-strip">
+              <div class="strip-photo bg-img-guru"></div>
+              <div class="strip-edge-blur"></div>
             </div>
             
-            <div class="tilted-photo-frame bottom-frame">
-              <div class="tilted-photo bg-img-murid"></div>
-              <div class="tilted-edge-blur"></div>
+            <div class="full-width-strip bottom-strip">
+              <div class="strip-photo bg-img-murid"></div>
+              <div class="strip-edge-blur"></div>
             </div>
 
             <div class="bg-overlay-blue-tint"></div>
