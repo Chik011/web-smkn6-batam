@@ -450,9 +450,9 @@ body::before {
   right: -6%;
   height: 60%;
   background: url('../img/TKJ%20guru.jpg') center top / cover no-repeat;
-  filter: blur(8px) brightness(0.85) contrast(1.1);
-  opacity: 0.42;
-  transform: scale(1.08) skewY(-3deg);
+  filter: blur(3px) brightness(0.92) contrast(1.1);
+  opacity: 0.82;
+  transform: scale(1.06) skewY(-3deg);
 }
 
 .full-bg-bottom {
@@ -462,9 +462,9 @@ body::before {
   right: -6%;
   height: 60%;
   background: url('../img/TKJ%20murid.jpg') center bottom / cover no-repeat;
-  filter: blur(8px) brightness(0.85) contrast(1.1);
-  opacity: 0.42;
-  transform: scale(1.08) skewY(-3deg);
+  filter: blur(3px) brightness(0.92) contrast(1.1);
+  opacity: 0.82;
+  transform: scale(1.06) skewY(-3deg);
 }
 
 .full-bg-overlay {
@@ -473,13 +473,13 @@ body::before {
   z-index: 1;
   background: linear-gradient(
     180deg,
-    rgba(9, 44, 76, 0.70) 0%,
-    rgba(12, 50, 90, 0.60) 45%,
-    rgba(14, 55, 96, 0.60) 55%,
-    rgba(9, 44, 76, 0.78) 100%
+    rgba(9, 44, 76, 0.45) 0%,
+    rgba(12, 50, 90, 0.38) 45%,
+    rgba(14, 58, 102, 0.38) 55%,
+    rgba(9, 44, 76, 0.52) 100%
   );
-  backdrop-filter: blur(1.5px);
-  -webkit-backdrop-filter: blur(1.5px);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
 }
 
 .login-showcase-content {
