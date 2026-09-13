@@ -2,14 +2,12 @@
 
 .guru-header {
   position: relative;
-  background: linear-gradient(135deg, rgba(29, 78, 216, 0.88) 0%, rgba(15, 23, 42, 0.92) 100%),
-              url('../img/TKJ%20guru.jpg') center/cover no-repeat;
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
   color: white;
   padding: 22px 20px 26px;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(29, 78, 216, 0.25);
+  box-shadow: 0 8px 24px rgba(29, 78, 216, 0.2);
 }
 
 .guru-header h2 {

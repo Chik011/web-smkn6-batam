@@ -312,7 +312,6 @@ function renderLoginPage() {
         <section class="login-card-wrap">
           <div class="login-card">
             <div class="login-card-heading">
-              <span class="login-lock-icon">↗</span>
               <p class="login-eyebrow">SMKN 6 Batam</p>
               <h2>Selamat datang kembali</h2>
               <p>Masuk untuk melanjutkan aktivitasmu.</p>

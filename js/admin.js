@@ -82,6 +82,13 @@ export function renderAdminScreen(state) {
         </div>
         <span>Setting</span>
       </button>
+
+      <button class="nav-item nav-logout-btn" type="button" onclick="window.logout()" title="Logout">
+        <div class="nav-icon-wrapper">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        </div>
+        <span>Logout</span>
+      </button>
     </nav>
   `;
 

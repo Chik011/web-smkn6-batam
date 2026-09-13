@@ -163,6 +163,15 @@ body::before {
   font-weight: 700;
 }
 
+.nav-item.nav-logout-btn {
+  color: #ef4444 !important;
+}
+
+.nav-item.nav-logout-btn:hover {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+
 .desktop-nav-row .phone-bottom-nav .nav-icon-wrapper {
   display: flex;
   align-items: center;
@@ -1320,15 +1329,13 @@ body::before {
 
 /* Header Cards with Curved Blue Theme */
 .app-header-card {
-  background: linear-gradient(135deg, rgba(9, 44, 76, 0.88) 0%, rgba(20, 80, 145, 0.92) 100%),
-              url('../img/TKJ%20murid.jpg') center/cover no-repeat;
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-blue) 100%);
   color: white;
   padding: 20px 18px 28px;
   border-bottom-left-radius: 24px;
   border-bottom-right-radius: 24px;
   position: relative;
   box-shadow: 0 6px 16px rgba(11, 52, 94, 0.2);
-  overflow: hidden;
 }
 
 .header-top-row {
