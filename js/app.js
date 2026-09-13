@@ -287,13 +287,11 @@ function renderLoginPage() {
             <div class="parallelogram-wrapper top-wrapper">
               <div class="parallelogram-card bg-img-guru"></div>
               <div class="edge-blur-overlay"></div>
-              <div class="parallelogram-label">👨‍🏫 Tenaga Pendidik TKJ</div>
             </div>
             
             <div class="parallelogram-wrapper bottom-wrapper">
               <div class="parallelogram-card bg-img-murid"></div>
               <div class="edge-blur-overlay"></div>
-              <div class="parallelogram-label">🎓 Siswa-Siswi TKJ</div>
             </div>
 
             <div class="bg-overlay-blue-tint"></div>
