@@ -1350,7 +1350,9 @@ window.handleGaleriDetailFilesSelect = function(e) {
 
   const imagesArea = document.getElementById('gImagesList');
   const previewContainer = document.getElementById('gDetailPreviews');
-  if (previewContainer) previewContainer.innerHTML = '<span style="font-size:0.75rem; color:#9333ea;">Mengompres & memproses gambar...</span>';
+  if (previewContainer) {
+    previewContainer.innerHTML = `<span style="font-size:0.75rem; color:#9333ea; font-weight:600;">Memproses ${files.length} gambar...</span>`;
+  }
 
   let processedCount = 0;
   const newUrls = [];
@@ -1362,7 +1364,7 @@ window.handleGaleriDetailFilesSelect = function(e) {
       const img = new Image();
       img.onload = function() {
         const canvas = document.createElement('canvas');
-        const maxDim = 800;
+        const maxDim = 900;
         let width = img.width;
         let height = img.height;
 
@@ -1386,17 +1388,20 @@ window.handleGaleriDetailFilesSelect = function(e) {
         processedCount++;
         if (processedCount === files.length) {
           const currentText = imagesArea ? imagesArea.value.trim() : '';
-          const existingUrls = currentText ? currentText.split('\n').filter(Boolean) : [];
+          const existingUrls = currentText ? currentText.split('\n').map(x => x.trim()).filter(Boolean) : [];
           const combined = [...existingUrls, ...newUrls];
           if (imagesArea) imagesArea.value = combined.join('\n');
 
           if (previewContainer) {
-            previewContainer.innerHTML = combined.map(u => `
-              <img src="${u}" style="width:50px; height:50px; object-fit:cover; border-radius:6px; border:1px solid #d8b4fe;" />
+            previewContainer.innerHTML = combined.map((u, i) => `
+              <div style="position:relative; display:inline-block;">
+                <img src="${u}" style="width:52px; height:52px; object-fit:cover; border-radius:8px; border:1px solid #d8b4fe;" />
+                <span style="position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.6); color:white; font-size:0.6rem; padding:1px 4px; border-radius:4px;">#${i+1}</span>
+              </div>
             `).join('');
           }
           if (typeof window.showToast === 'function') {
-            window.showToast(`📸 ${files.length} foto detail berhasil ditambahkan!`, 'success');
+            window.showToast(`📸 ${files.length} foto detail berhasil dimuat (Total: ${combined.length} foto)!`, 'success');
           }
         }
       };
@@ -1552,7 +1557,9 @@ window.handleEditGaleriDetailFileSelect = function(e) {
 
   const imagesArea = document.getElementById('editGImagesList');
   const previewContainer = document.getElementById('editGDetailPreviews');
-  if (previewContainer) previewContainer.innerHTML = '<span style="font-size:0.75rem; color:#9333ea;">Mengompres & memproses gambar...</span>';
+  if (previewContainer) {
+    previewContainer.innerHTML = `<span style="font-size:0.75rem; color:#9333ea; font-weight:600;">Memproses ${files.length} gambar...</span>`;
+  }
 
   let processedCount = 0;
   const newUrls = [];
@@ -1564,7 +1571,7 @@ window.handleEditGaleriDetailFileSelect = function(e) {
       const img = new Image();
       img.onload = function() {
         const canvas = document.createElement('canvas');
-        const maxDim = 800;
+        const maxDim = 900;
         let width = img.width;
         let height = img.height;
 
@@ -1588,17 +1595,20 @@ window.handleEditGaleriDetailFileSelect = function(e) {
         processedCount++;
         if (processedCount === files.length) {
           const currentText = imagesArea ? imagesArea.value.trim() : '';
-          const existingUrls = currentText ? currentText.split('\n').filter(Boolean) : [];
+          const existingUrls = currentText ? currentText.split('\n').map(x => x.trim()).filter(Boolean) : [];
           const combined = [...existingUrls, ...newUrls];
           if (imagesArea) imagesArea.value = combined.join('\n');
 
           if (previewContainer) {
-            previewContainer.innerHTML = combined.map(u => `
-              <img src="${u}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; border:1px solid #d8b4fe;" />
+            previewContainer.innerHTML = combined.map((u, i) => `
+              <div style="position:relative; display:inline-block;">
+                <img src="${u}" style="width:42px; height:42px; object-fit:cover; border-radius:6px; border:1px solid #d8b4fe;" />
+                <span style="position:absolute; bottom:1px; right:1px; background:rgba(0,0,0,0.6); color:white; font-size:0.55rem; padding:1px 3px; border-radius:3px;">#${i+1}</span>
+              </div>
             `).join('');
           }
           if (typeof window.showToast === 'function') {
-            window.showToast(`📸 ${files.length} foto detail berhasil ditambahkan!`, 'success');
+            window.showToast(`📸 ${files.length} foto detail berhasil ditambahkan (Total: ${combined.length} foto)!`, 'success');
           }
         }
       };
