@@ -1,7 +1,7 @@
 /* Guru View Renderer */
 
 import { store } from './state.js';
-import { getYouTubeDetails } from './firebase.js';
+import { getYouTubeDetails } from './supabase.js';
 
 export function renderGuruScreen(state) {
   const activeTab = state.activeTabs.guru || 'beranda';

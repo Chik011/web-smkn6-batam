@@ -1,7 +1,7 @@
 /* Admin View Renderer */
 
 import { store } from './state.js';
-import { uploadFileToCloudinary } from './firebase.js';
+import { uploadFileToCloudinary } from './supabase.js';
 
 export function renderAdminScreen(state) {
   const activeTab = state.activeTabs.admin || 'home';
@@ -782,32 +782,32 @@ function renderSetting(state) {
     </div>
 
     <!-- Firebase Connection Status Card -->
-    <div class="content-card mt-4" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; border: 1px solid #334155;">
-      <div style="display:flex; align-items:center; justify-between; margin-bottom:12px;">
+    <div class="content-card mt-4" style="background: linear-gradient(135deg, #064e3b 0%, #022c22 100%); color: #ffffff; border: 1px solid #059669;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
         <div style="display:flex; align-items:center; gap:10px;">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4.33 16.03l2.84-15.54a.75.75 0 011.41-.12l2.36 10.3 2.1-3.95a.75.75 0 011.36.08l4.9 14.54a.75.75 0 01-1.07.87L3.92 16.89a.75.75 0 01-.41-.86z" fill="#FFCA28"/><path d="M3.92 16.89l8.6-4.8 4.79 8.87a.75.75 0 01-1.07.87L3.92 16.89z" fill="#FFA000"/><path d="M12.52 10.67l2.1-3.95a.75.75 0 011.36.08l4.9 14.54-8.36-10.67z" fill="#F57C00"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12.92 2.39a1 1 0 00-1.74 0L3.4 16.29A1 1 0 004.28 17.8h6.44l-1.39 4.88a1 1 0 001.76.84l7.78-13.9a1 1 0 00-.88-1.51H11.5l1.42-5.72z" fill="#3ECF8E"/></svg>
           <div>
-            <h4 style="font-size:0.95rem; font-weight:700; color:#f8fafc; margin:0;">Firebase Cloud Database Status</h4>
-            <p style="font-size:0.75rem; color:#94a3b8; margin:2px 0 0 0;">Terhubung & Sinkron Realtime</p>
+            <h4 style="font-size:0.95rem; font-weight:700; color:#f8fafc; margin:0;">Supabase Cloud Database Status</h4>
+            <p style="font-size:0.75rem; color:#a7f3d0; margin:2px 0 0 0;">Unlimited Writes • PostgreSQL Engine</p>
           </div>
         </div>
-        <span style="display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.15); color:#4ade80; padding:4px 10px; border-radius:20px; font-size:0.72rem; font-weight:600; border:1px solid rgba(34,197,94,0.3);">
-          <span style="width:8px; height:8px; background:#4ade80; border-radius:50%; display:inline-block; box-shadow:0 0 8px #4ade80;"></span> Live Sync
+        <span style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.2); color:#6ee7b7; padding:4px 10px; border-radius:20px; font-size:0.72rem; font-weight:600; border:1px solid rgba(16,185,129,0.4);">
+          <span style="width:8px; height:8px; background:#10b981; border-radius:50%; display:inline-block; box-shadow:0 0 8px #10b981;"></span> Active Sync
         </span>
       </div>
 
-      <div style="background:rgba(15,23,42,0.6); padding:12px; border-radius:8px; font-size:0.78rem; display:flex; flex-direction:column; gap:6px; border:1px solid rgba(255,255,255,0.05);">
+      <div style="background:rgba(2,44,34,0.7); padding:12px; border-radius:8px; font-size:0.78rem; display:flex; flex-direction:column; gap:6px; border:1px solid rgba(255,255,255,0.08);">
         <div style="display:flex; justify-content:space-between;">
-          <span style="color:#94a3b8;">Project ID:</span>
-          <span style="font-family:monospace; color:#38bdf8; font-weight:600;">tkjsmk6-714ce</span>
+          <span style="color:#94a3b8;">Project Ref:</span>
+          <span style="font-family:monospace; color:#6ee7b7; font-weight:600;">npjraxiuwtchokzfknka</span>
         </div>
         <div style="display:flex; justify-content:space-between;">
-          <span style="color:#94a3b8;">Auth Domain:</span>
-          <span style="font-family:monospace; color:#e2e8f0;">tkjsmk6-714ce.firebaseapp.com</span>
+          <span style="color:#94a3b8;">Database URL:</span>
+          <span style="font-family:monospace; color:#e2e8f0;">https://npjraxiuwtchokzfknka.supabase.co</span>
         </div>
         <div style="display:flex; justify-content:space-between;">
-          <span style="color:#94a3b8;">Storage Bucket:</span>
-          <span style="font-family:monospace; color:#e2e8f0;">tkjsmk6-714ce.firebasestorage.app</span>
+          <span style="color:#94a3b8;">Image CDN:</span>
+          <span style="font-family:monospace; color:#e2e8f0;">Cloudinary Storage</span>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 /* Siswa - Home View Module */
-import { getYouTubeDetails } from '../firebase.js';
+import { getYouTubeDetails } from '../supabase.js';
 
 export function renderHome(state) {
   const user = state.currentUser.siswa;

@@ -1,7 +1,7 @@
 /* App Main Orchestrator & Global Handlers */
 
 import { store } from './state.js';
-import { getYouTubeDetails } from './firebase.js';
+import { getYouTubeDetails } from './supabase.js';
 import { renderSiswaScreen } from './siswa.js';
 import { renderGuruScreen } from './guru.js';
 import { renderAdminScreen } from './admin.js';
