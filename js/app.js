@@ -319,14 +319,15 @@ function renderLoginPage() {
             <form class="login-form" id="mainLoginForm" onsubmit="window.handleLogin(event)">
               <label class="form-label" for="loginRole">Masuk sebagai</label>
               <select class="form-select" id="loginRole">
-                <option value="siswa">Siswa</option>
-                <option value="guru">Guru</option>
-                <option value="admin">Admin</option>
+                <option value="siswa">🎓 Siswa</option>
+                <option value="guru">👨‍🏫 Guru</option>
+                <option value="admin">🛡️ Admin</option>
+                <option value="guest">👤 Guest (Tamu / Pengunjung)</option>
               </select>
-              <label class="form-label" for="loginUsername">Username</label>
-              <input class="form-input" id="loginUsername" type="text" placeholder="Masukkan username" required />
+              <label class="form-label" for="loginUsername">Username / Nama</label>
+              <input class="form-input" id="loginUsername" type="text" placeholder="Masukkan username / nama" required />
               <label class="form-label" for="loginPassword">Password</label>
-              <input class="form-input" id="loginPassword" type="password" placeholder="Masukkan password" required />
+              <input class="form-input" id="loginPassword" type="password" placeholder="Masukkan password (opsional untuk guest)" required />
               <p class="login-error" id="loginError"></p>
               <button class="btn-primary login-submit" type="submit">Masuk ke Dashboard <span>→</span></button>
             </form>
@@ -334,6 +335,7 @@ function renderLoginPage() {
             <div class="login-quick-roles">
               <span class="quick-role-label">⚡ Akses Cepat Akun Demo (1-Klik):</span>
               <div class="quick-role-chips">
+                <button type="button" class="quick-chip" onclick="window.quickFillLogin('guest')" style="background:#f1f5f9; border-color:#cbd5e1; color:#334155; font-weight:700;">👤 Guest</button>
                 <button type="button" class="quick-chip" onclick="window.quickFillLogin('siswa')">🎓 Siswa</button>
                 <button type="button" class="quick-chip" onclick="window.quickFillLogin('guru')">👨‍🏫 Guru</button>
                 <button type="button" class="quick-chip" onclick="window.quickFillLogin('admin')">🛡️ Admin</button>
@@ -403,7 +405,10 @@ window.quickFillLogin = function (role) {
   let demoUser = 'siswa';
   let demoPass = 'siswa123';
 
-  if (role === 'siswa') {
+  if (role === 'guest') {
+    demoUser = 'Tamu';
+    demoPass = 'guest123';
+  } else if (role === 'siswa') {
     const firstSiswa = (state.students && state.students.length > 0) ? state.students[0] : null;
     demoUser = firstSiswa ? (firstSiswa.name || firstSiswa.nis || 'tes2') : 'tes2';
     demoPass = 'siswa123';
@@ -447,7 +452,10 @@ window.handleLogin = function (event) {
   let isValid = false;
   let loggedName = username;
 
-  if (role === 'siswa') {
+  if (role === 'guest') {
+    isValid = true;
+    loggedName = username || 'Tamu / Pengunjung';
+  } else if (role === 'siswa') {
     const found = (state.students || []).find(s =>
       (s.name && s.name.toLowerCase() === username.toLowerCase()) ||
       (s.nis && String(s.nis) === username) ||
@@ -485,11 +493,11 @@ window.handleLogin = function (event) {
   }
 
   if (!isValid) {
-    if (error) error.textContent = 'Username belum terdaftar di Firebase.';
+    if (error) error.textContent = 'Username belum terdaftar.';
     form.classList.remove('shake');
     void form.offsetWidth; // trigger reflow
     form.classList.add('shake');
-    window.showToast('Username tidak ditemukan di Firebase!', 'danger');
+    window.showToast('Username tidak ditemukan!', 'danger');
     return;
   }
 
@@ -499,7 +507,8 @@ window.handleLogin = function (event) {
     document.body.dataset.role = role;
     const defaultTab = (role === 'guru') ? 'beranda' : 'home';
     try {
-      history.replaceState(null, '', `./${role}.html#${defaultTab}`);
+      const pageRole = (role === 'guest') ? 'siswa' : role;
+      history.replaceState(null, '', `./${pageRole}.html#${defaultTab}`);
     } catch (e) { }
     renderApp();
   }, 450);

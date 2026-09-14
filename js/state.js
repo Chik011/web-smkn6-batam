@@ -12,7 +12,8 @@ const defaultState = {
   currentUser: {
     siswa: { id: '1', name: 'Siswa', nis: '123456789', class: '10 TKJ 1' },
     guru: { id: '1', name: 'Guru TKJ', username: 'guru', mapel: 'MTK' },
-    admin: { username: 'admin', lastUpdate: '2026-08-12' }
+    admin: { username: 'admin', lastUpdate: '2026-08-12' },
+    guest: { id: 'guest', name: 'Tamu / Pengunjung', role: 'guest' }
   },
 
   // Students Database
@@ -374,6 +375,18 @@ class Store {
       }
     } else if (role === 'admin') {
       this.state.currentUser.admin.username = username;
+    } else if (role === 'guest') {
+      this.state.currentUser.guest = {
+        id: 'guest',
+        name: username || 'Tamu / Pengunjung',
+        role: 'guest'
+      };
+      this.state.currentUser.siswa = {
+        id: 'guest',
+        name: username || 'Tamu / Pengunjung',
+        nis: 'GUEST-ACCOUNT',
+        class: 'Pengunjung Web'
+      };
     }
 
     this.saveState();
