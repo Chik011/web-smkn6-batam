@@ -950,7 +950,7 @@ function renderGaleriAdmin(state) {
             </div>
             <div class="item-actions" style="display:flex; gap:6px;">
               <button type="button" class="icon-btn-action edit" onclick="window.editGaleriModal('${g.id}')" title="Edit Foto Galeri">✏️</button>
-              <button type="button" class="icon-btn-action delete" onclick="if(confirm('Hapus foto galeri ini?')){ store.deleteGaleriItem('${g.id}'); window.showToast('Foto galeri dihapus', 'info'); }" title="Hapus Gambar">🗑️</button>
+              <button type="button" class="icon-btn-action delete" onclick="if(confirm('Hapus foto galeri ini?')){ store.deleteGaleriItem('${g.id}'); window.showToast('Foto galeri dihapus', 'info'); if (typeof window.renderApp === 'function') window.renderApp(); }" title="Hapus Gambar">🗑️</button>
             </div>
           </div>
         `).join('')}
@@ -1255,6 +1255,7 @@ window.handleAddGaleriSubmit = function(e) {
   const detailPreviews = document.getElementById('gDetailPreviews');
   if (detailPreviews) detailPreviews.innerHTML = '';
   window.closeModal();
+  if (typeof window.renderApp === 'function') window.renderApp();
 };
 
 window.handleAddAgendaSubmit = function(e) {
@@ -1495,6 +1496,7 @@ window.handleEditGaleriSubmit = function(e, id) {
   store.updateGaleriItem(id, { title, category, imageUrl, images, subtitle });
   window.showToast('✏️ Foto galeri berhasil diperbarui!', 'success');
   window.closeModal();
+  if (typeof window.renderApp === 'function') window.renderApp();
 };
 
 window.handleEditGaleriFileSelect = function(e) {
