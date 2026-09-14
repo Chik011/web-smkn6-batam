@@ -11,6 +11,7 @@ import {
   serverTimestamp,
   getYouTubeDetails 
 } from './firebase.js';
+import { supabase } from './supabase.js';
 
 const STORAGE_KEY = 'SMKN6_APP_DATA_V3';
 
@@ -576,6 +577,36 @@ class Store {
       } catch (e) {}
     } catch (e) {
       console.error("Failed to setup Firebase real-time sync:", e);
+    }
+
+    this.initSupabaseSync();
+  }
+
+  async initSupabaseSync() {
+    if (!supabase) return;
+    try {
+      // Fetch Galeri Siswa from Supabase
+      const { data: galeriData, error: gErr } = await supabase.from('galeri_siswa').select('*');
+      if (!gErr && galeriData && galeriData.length > 0) {
+        this.state.galeriItems = galeriData;
+        this.saveStateToLocalStorage();
+        this.notify();
+      }
+
+      // Realtime listener for Galeri Siswa
+      supabase
+        .channel('public:galeri_siswa')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'galeri_siswa' }, async () => {
+          const { data } = await supabase.from('galeri_siswa').select('*');
+          if (data && data.length > 0) {
+            this.state.galeriItems = data;
+            this.saveStateToLocalStorage();
+            this.notify();
+          }
+        })
+        .subscribe();
+    } catch (err) {
+      console.warn('Supabase sync note:', err);
     }
   }
 
@@ -1299,6 +1330,11 @@ class Store {
     if (isFirebaseConnected && db) {
       setDoc(doc(db, 'galeri_siswa', newItem.id), newItem).catch(e => console.warn(e));
     }
+    if (supabase) {
+      supabase.from('galeri_siswa').upsert([newItem]).then(({ error }) => {
+        if (error) console.warn('Supabase galeri_siswa upsert note:', error.message);
+      }).catch(e => console.warn(e));
+    }
   }
 
   updateGaleriItem(id, updatedData) {
@@ -1312,6 +1348,11 @@ class Store {
       if (isFirebaseConnected && db) {
         setDoc(doc(db, 'galeri_siswa', idStr), item, { merge: true }).catch(e => console.warn(e));
       }
+      if (supabase) {
+        supabase.from('galeri_siswa').upsert([item]).then(({ error }) => {
+          if (error) console.warn('Supabase galeri_siswa update note:', error.message);
+        }).catch(e => console.warn(e));
+      }
     }
   }
 
@@ -1323,6 +1364,11 @@ class Store {
 
     if (isFirebaseConnected && db) {
       deleteDoc(doc(db, 'galeri_siswa', idStr)).catch(e => console.warn(e));
+    }
+    if (supabase) {
+      supabase.from('galeri_siswa').delete().eq('id', idStr).then(({ error }) => {
+        if (error) console.warn('Supabase galeri_siswa delete note:', error.message);
+      }).catch(e => console.warn(e));
     }
   }
 
