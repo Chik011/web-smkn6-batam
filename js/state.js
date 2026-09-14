@@ -1289,8 +1289,9 @@ class Store {
       category: item.category || '🖼️ GALERI',
       tagColor: item.tagColor || '#0284c7',
       tagBg: item.tagBg || '#e0f2fe',
-      imageUrl: item.imageUrl || 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80',
-      subtitle: item.subtitle || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+      imageUrl: item.imageUrl || (item.images && item.images[0]) || 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80',
+      images: Array.isArray(item.images) && item.images.length > 0 ? item.images : [(item.imageUrl || 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80')],
+      subtitle: item.subtitle || 'Dokumentasi kegiatan siswa TKJ.'
     };
     this.state.galeriItems.unshift(newItem);
     this.saveState();

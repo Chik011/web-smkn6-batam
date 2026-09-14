@@ -903,10 +903,18 @@ function renderGaleriAdmin(state) {
       <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin-bottom:12px;">🖼️ Tambah Foto Galeri Baru</h4>
       
       <form onsubmit="window.handleAddGaleriSubmit(event)">
-        <div class="form-group">
-          <label class="form-label">📁 Pilih File Gambar dari Perangkat (HP / Komputer)</label>
-          <input type="file" id="gFileInput" accept="image/*" class="form-input" onchange="window.handleGaleriFileSelect(event)" style="padding:6px 10px;" />
-          <div id="gUploadStatus" style="display:none; font-size:0.75rem; margin-top:4px;"></div>
+        <div class="form-group" style="background:#f8fafc; padding:12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+          <label class="form-label" style="font-weight:700; color:#0f172a;">🖼️ 1. Gambar Sampul / Thumbnail (Kartu Galeri)</label>
+          <input type="file" id="gThumbFileInput" accept="image/*" class="form-input" onchange="window.handleGaleriThumbFileSelect(event)" style="padding:6px 10px; background:white;" />
+          <input type="text" id="gUrl" class="form-input mt-2" placeholder="URL Thumbnail (otomatis saat pilih file atau tempel link)" required />
+          <img id="gPreviewImg" src="" style="display:none; width:100%; height:130px; object-fit:cover; border-radius:8px; margin-top:8px; border:1px solid #cbd5e1;" />
+        </div>
+
+        <div class="form-group" style="background:#fdf4ff; padding:12px; border-radius:10px; border:1px solid #f5d0fe; margin-bottom:12px;">
+          <label class="form-label" style="font-weight:700; color:#86198f;">📸 2. Foto-Foto Detail Kegiatan (Bisa Banyak Foto)</label>
+          <input type="file" id="gDetailFilesInput" accept="image/*" multiple class="form-input" onchange="window.handleGaleriDetailFilesSelect(event)" style="padding:6px 10px; background:white;" />
+          <textarea id="gImagesList" class="form-input mt-2" rows="3" placeholder="URL foto tambahan per baris (otomatis terisi saat memilih file)"></textarea>
+          <div id="gDetailPreviews" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
         </div>
 
         <div class="form-group">
@@ -918,13 +926,8 @@ function renderGaleriAdmin(state) {
           <input type="text" id="gCategory" class="form-input" placeholder="Kategori (contoh: 🏆 PRESTASI, 🛠️ PRAKTIKUM)" required />
         </div>
         <div class="form-group">
-          <label class="form-label">URL Gambar / Link Foto</label>
-          <input type="text" id="gUrl" class="form-input" placeholder="Otomatis terisi saat memilih file atau tempel link (https://...)" required />
-          <img id="gPreviewImg" src="" style="display:none; width:100%; height:140px; object-fit:cover; border-radius:10px; margin-top:8px; border:1px solid #e2e8f0;" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Keterangan Singkat</label>
-          <input type="text" id="gSub" class="form-input" placeholder="Keterangan singkat kegiatan" />
+          <label class="form-label">Keterangan Singkat / Deskripsi</label>
+          <textarea id="gSub" class="form-input" rows="2" placeholder="Keterangan singkat kegiatan..."></textarea>
         </div>
         <button type="submit" class="btn-primary" style="width:100%; font-weight:700; background:#9333ea; border:none; padding:12px; cursor:pointer;">+ Simpan Ke Galeri Siswa</button>
       </form>
@@ -1230,21 +1233,27 @@ window.handleAddGaleriSubmit = function(e) {
   const title = document.getElementById('gTitle')?.value.trim();
   const category = document.getElementById('gCategory')?.value.trim();
   const imageUrl = document.getElementById('gUrl')?.value.trim();
+  const imagesText = document.getElementById('gImagesList')?.value.trim() || '';
   const subtitle = document.getElementById('gSub')?.value.trim();
 
+  let images = imagesText.split('\n').map(u => u.trim()).filter(Boolean);
+  if (imageUrl && !images.includes(imageUrl)) {
+    images.unshift(imageUrl);
+  }
+
   if (!title || !category || !imageUrl) {
-    window.showToast('Mohon lengkapi Judul, Kategori, dan File/URL Gambar!', 'error');
+    window.showToast('Mohon lengkapi Judul, Kategori, dan Gambar Sampul!', 'error');
     return;
   }
 
-  store.addGaleriItem({ title, category, imageUrl, subtitle });
-  window.showToast('🖼️ Foto galeri berhasil ditambahkan!', 'success');
+  store.addGaleriItem({ title, category, imageUrl, images, subtitle });
+  window.showToast('🖼️ Foto galeri & dokumentasi berhasil ditambahkan!', 'success');
 
   if (form) form.reset();
   const previewImg = document.getElementById('gPreviewImg');
   if (previewImg) previewImg.style.display = 'none';
-  const statusEl = document.getElementById('gUploadStatus');
-  if (statusEl) statusEl.style.display = 'none';
+  const detailPreviews = document.getElementById('gDetailPreviews');
+  if (detailPreviews) detailPreviews.innerHTML = '';
   window.closeModal();
 };
 
@@ -1287,11 +1296,10 @@ window.handleAddBookSubmit = function(e) {
   window.closeModal();
 };
 
-window.handleGaleriFileSelect = function(e) {
+window.handleGaleriThumbFileSelect = function(e) {
   const file = e.target.files && e.target.files[0];
   if (!file) return;
 
-  const statusEl = document.getElementById('gUploadStatus');
   const urlInput = document.getElementById('gUrl');
   const previewImg = document.getElementById('gPreviewImg');
 
@@ -1326,13 +1334,8 @@ window.handleGaleriFileSelect = function(e) {
         previewImg.src = compressedDataUrl;
         previewImg.style.display = 'block';
       }
-      if (statusEl) {
-        statusEl.style.display = 'block';
-        statusEl.style.color = '#10b981';
-        statusEl.textContent = '✅ Gambar berhasil dimuat dan dioptimasi!';
-      }
       if (typeof window.showToast === 'function') {
-        window.showToast('🖼️ Gambar berhasil dioptimasi!', 'success');
+        window.showToast('🖼️ Gambar sampul berhasil dioptimasi!', 'success');
       }
     };
     img.src = rawDataUrl;
@@ -1340,7 +1343,70 @@ window.handleGaleriFileSelect = function(e) {
   reader.readAsDataURL(file);
 };
 
-window.handleCloudinaryFileSelect = window.handleGaleriFileSelect;
+window.handleGaleriDetailFilesSelect = function(e) {
+  const files = Array.from(e.target.files || []);
+  if (files.length === 0) return;
+
+  const imagesArea = document.getElementById('gImagesList');
+  const previewContainer = document.getElementById('gDetailPreviews');
+  if (previewContainer) previewContainer.innerHTML = '<span style="font-size:0.75rem; color:#9333ea;">Mengompres & memproses gambar...</span>';
+
+  let processedCount = 0;
+  const newUrls = [];
+
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      const rawDataUrl = evt.target.result;
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const maxDim = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+        newUrls.push(compressedDataUrl);
+
+        processedCount++;
+        if (processedCount === files.length) {
+          const currentText = imagesArea ? imagesArea.value.trim() : '';
+          const existingUrls = currentText ? currentText.split('\n').filter(Boolean) : [];
+          const combined = [...existingUrls, ...newUrls];
+          if (imagesArea) imagesArea.value = combined.join('\n');
+
+          if (previewContainer) {
+            previewContainer.innerHTML = combined.map(u => `
+              <img src="${u}" style="width:50px; height:50px; object-fit:cover; border-radius:6px; border:1px solid #d8b4fe;" />
+            `).join('');
+          }
+          if (typeof window.showToast === 'function') {
+            window.showToast(`📸 ${files.length} foto detail berhasil ditambahkan!`, 'success');
+          }
+        }
+      };
+      img.src = rawDataUrl;
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
+window.handleGaleriFileSelect = window.handleGaleriThumbFileSelect;
+window.handleCloudinaryFileSelect = window.handleGaleriThumbFileSelect;
 
 window.handleSearchAdminSiswa = function(val, containerId) {
   const container = document.getElementById(containerId);
@@ -1362,12 +1428,25 @@ window.editGaleriModal = function(id) {
   const card = document.getElementById('modalCardContent');
   if (!overlay || !card) return;
 
+  const itemImages = item.images || (item.imageUrl ? [item.imageUrl] : []);
+
   card.innerHTML = `
-    <div class="modal-title">✏️ Edit Foto Galeri Siswa</div>
+    <div class="modal-title">✏️ Edit Foto & Galeri Kegiatan Siswa</div>
     <form onsubmit="window.handleEditGaleriSubmit(event, '${id}')">
-      <div class="form-group">
-        <label class="form-label">📁 Pilih File Gambar Baru (Opsional)</label>
-        <input type="file" id="editGFileInput" accept="image/*" class="form-input" onchange="window.handleEditGaleriFileSelect(event)" style="padding:6px 10px;" />
+      <div class="form-group" style="background:#f8fafc; padding:12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:12px;">
+        <label class="form-label" style="font-weight:700; color:#0f172a;">🖼️ 1. Gambar Sampul / Thumbnail</label>
+        <input type="file" id="editGFileInput" accept="image/*" class="form-input" onchange="window.handleEditGaleriFileSelect(event)" style="padding:6px 10px; background:white;" />
+        <input type="text" id="editGUrl" class="form-input mt-2" value="${(item.imageUrl || '').replace(/"/g, '&quot;')}" placeholder="URL Gambar Sampul" required />
+        <img id="editGPreviewImg" src="${item.imageUrl || ''}" style="display:${item.imageUrl ? 'block' : 'none'}; width:100%; height:120px; object-fit:cover; border-radius:8px; margin-top:8px; border:1px solid #cbd5e1;" />
+      </div>
+
+      <div class="form-group" style="background:#fdf4ff; padding:12px; border-radius:10px; border:1px solid #f5d0fe; margin-bottom:12px;">
+        <label class="form-label" style="font-weight:700; color:#86198f;">📸 2. Foto-Foto Detail Kegiatan (Bisa Banyak Foto)</label>
+        <input type="file" id="editGDetailFileInput" accept="image/*" multiple class="form-input" onchange="window.handleEditGaleriDetailFileSelect(event)" style="padding:6px 10px; background:white;" />
+        <textarea id="editGImagesList" class="form-input mt-2" rows="3" placeholder="URL foto tambahan per baris">${itemImages.join('\n')}</textarea>
+        <div id="editGDetailPreviews" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+          ${itemImages.map(u => `<img src="${u}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; border:1px solid #d8b4fe;" />`).join('')}
+        </div>
       </div>
 
       <div class="form-group">
@@ -1381,14 +1460,8 @@ window.editGaleriModal = function(id) {
       </div>
 
       <div class="form-group">
-        <label class="form-label">URL Gambar / Link Foto</label>
-        <input type="text" id="editGUrl" class="form-input" value="${(item.imageUrl || '').replace(/"/g, '&quot;')}" required />
-        <img id="editGPreviewImg" src="${item.imageUrl || ''}" style="display:${item.imageUrl ? 'block' : 'none'}; width:100%; height:140px; object-fit:cover; border-radius:10px; margin-top:8px; border:1px solid #e2e8f0;" />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Keterangan Singkat</label>
-        <input type="text" id="editGSub" class="form-input" value="${(item.subtitle || '').replace(/"/g, '&quot;')}" />
+        <label class="form-label">Keterangan Singkat / Deskripsi</label>
+        <textarea id="editGSub" class="form-input" rows="2">${(item.subtitle || '').replace(/"/g, '&quot;')}</textarea>
       </div>
 
       <div style="display:flex; gap:10px; margin-top:16px;">
@@ -1406,14 +1479,20 @@ window.handleEditGaleriSubmit = function(e, id) {
   const title = document.getElementById('editGTitle')?.value.trim();
   const category = document.getElementById('editGCategory')?.value.trim();
   const imageUrl = document.getElementById('editGUrl')?.value.trim();
+  const imagesText = document.getElementById('editGImagesList')?.value.trim() || '';
   const subtitle = document.getElementById('editGSub')?.value.trim();
 
+  let images = imagesText.split('\n').map(u => u.trim()).filter(Boolean);
+  if (imageUrl && !images.includes(imageUrl)) {
+    images.unshift(imageUrl);
+  }
+
   if (!title || !category || !imageUrl) {
-    window.showToast('Mohon lengkapi Judul, Kategori, dan File/URL Gambar!', 'error');
+    window.showToast('Mohon lengkapi Judul, Kategori, dan Gambar Sampul!', 'error');
     return;
   }
 
-  store.updateGaleriItem(id, { title, category, imageUrl, subtitle });
+  store.updateGaleriItem(id, { title, category, imageUrl, images, subtitle });
   window.showToast('✏️ Foto galeri berhasil diperbarui!', 'success');
   window.closeModal();
 };
@@ -1463,6 +1542,68 @@ window.handleEditGaleriFileSelect = function(e) {
     img.src = rawDataUrl;
   };
   reader.readAsDataURL(file);
+};
+
+window.handleEditGaleriDetailFileSelect = function(e) {
+  const files = Array.from(e.target.files || []);
+  if (files.length === 0) return;
+
+  const imagesArea = document.getElementById('editGImagesList');
+  const previewContainer = document.getElementById('editGDetailPreviews');
+  if (previewContainer) previewContainer.innerHTML = '<span style="font-size:0.75rem; color:#9333ea;">Mengompres & memproses gambar...</span>';
+
+  let processedCount = 0;
+  const newUrls = [];
+
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      const rawDataUrl = evt.target.result;
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const maxDim = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+        newUrls.push(compressedDataUrl);
+
+        processedCount++;
+        if (processedCount === files.length) {
+          const currentText = imagesArea ? imagesArea.value.trim() : '';
+          const existingUrls = currentText ? currentText.split('\n').filter(Boolean) : [];
+          const combined = [...existingUrls, ...newUrls];
+          if (imagesArea) imagesArea.value = combined.join('\n');
+
+          if (previewContainer) {
+            previewContainer.innerHTML = combined.map(u => `
+              <img src="${u}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; border:1px solid #d8b4fe;" />
+            `).join('');
+          }
+          if (typeof window.showToast === 'function') {
+            window.showToast(`📸 ${files.length} foto detail berhasil ditambahkan!`, 'success');
+          }
+        }
+      };
+      img.src = rawDataUrl;
+    };
+    reader.readAsDataURL(file);
+  });
 };
 
 

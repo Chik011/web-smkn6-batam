@@ -864,6 +864,20 @@ function renderGaleriDetailPage(state) {
           <p>${item.subtitle || 'Dokumentasi kegiatan dan prestasi siswa jurusan Teknik Komputer dan Jaringan (TKJ) SMKN 6 Batam. Kegiatan ini merupakan bagian dari program pembelajaran aktif dan pengembangan kompetensi siswa.'}</p>
         </div>
 
+        ${(() => {
+          const allImgs = item.images && item.images.length > 0 ? item.images : [item.imageUrl];
+          return `
+            <div style="margin:20px 0;">
+              <h3 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin-bottom:10px;">📸 Foto Documentation (${allImgs.length})</h3>
+              <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;">
+                ${allImgs.map(imgSrc => `
+                  <img src="${imgSrc}" style="width:100%; height:130px; object-fit:cover; border-radius:10px; border:1px solid #e2e8f0; cursor:pointer; transition:transform 0.2s;" onclick="window.openModalImagePreview('${imgSrc}')" onerror="this.src='https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80'" />
+                `).join('')}
+              </div>
+            </div>
+          `;
+        })()}
+
         <!-- Prev / Next Navigation -->
         <div class="galeri-detail-nav">
           ${prevItem ? `
@@ -895,6 +909,20 @@ function renderGaleriDetailPage(state) {
     </div>
   `;
 }
+
+window.openModalImagePreview = function(imgSrc) {
+  const overlay = document.getElementById('globalModal');
+  const card = document.getElementById('modalCardContent');
+  if (!overlay || !card) return;
+
+  card.innerHTML = `
+    <div style="position:relative; text-align:center;">
+      <button style="position:absolute; top:-10px; right:-10px; background:#ef4444; color:white; border:none; border-radius:50%; width:28px; height:28px; font-weight:bold; cursor:pointer;" onclick="window.closeModal()">✕</button>
+      <img src="${imgSrc}" style="width:100%; max-height:70vh; object-fit:contain; border-radius:12px;" />
+    </div>
+  `;
+  overlay.classList.add('open');
+};
 
 window.librarySearchQuery = window.librarySearchQuery || '';
 window.filterLibrary = function(q) {
