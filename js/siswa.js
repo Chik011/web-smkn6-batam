@@ -26,6 +26,9 @@ export function renderSiswaScreen(state) {
     case 'galerisiswa':
       contentHtml = renderGaleriSiswaView(state);
       break;
+    case 'galeridetail':
+      contentHtml = renderGaleriDetailPage(state);
+      break;
     case 'library':
     case 'elibrary':
       contentHtml = renderLibraryView(state);
@@ -44,7 +47,6 @@ export function renderSiswaScreen(state) {
       break;
     case 'scan':
     case 'galeri':
-    case 'galerisiswa':
       contentHtml = renderGaleriSiswaView(state);
       break;
     case 'notifikasi':
@@ -73,7 +75,7 @@ export function renderSiswaScreen(state) {
         <span>Pelajaran</span>
       </button>
 
-      <button class="nav-item ${activeTab === 'galerisiswa' || activeTab === 'galeri' || activeTab === 'scan' ? 'active' : ''}" data-tab="galerisiswa">
+      <button class="nav-item ${activeTab === 'galerisiswa' || activeTab === 'galeri' || activeTab === 'galeridetail' || activeTab === 'scan' ? 'active' : ''}" data-tab="galerisiswa">
         <div class="nav-icon-wrapper">
           <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
         </div>
@@ -771,7 +773,7 @@ function renderGaleriSiswaView(state) {
     <div style="padding:14px 16px 24px;">
       <div class="galeri-siswa-grid">
         ${items.map((item, idx) => `
-          <div class="galeri-card-item" onclick="window.openGaleriDetailModal('${item.id || idx}')">
+          <div class="galeri-card-item" onclick="window.openGaleriDetail('${item.id || idx}')">
             <div class="galeri-card-img-wrapper">
               <img src="${item.imageUrl}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80'" />
               <span class="galeri-card-badge" style="background:${item.tagBg || '#fef3c7'}; color:${item.tagColor || '#b45309'};">
@@ -791,12 +793,16 @@ function renderGaleriSiswaView(state) {
   `;
 }
 
-window.openGaleriDetailModal = function(idOrIdx) {
-  const overlay = document.getElementById('globalModal');
-  const card = document.getElementById('modalCardContent');
-  if (!overlay || !card) return;
+// ── Galeri Detail Navigation (Full Page, bukan modal) ──
+window.selectedGaleriItemId = window.selectedGaleriItemId || null;
 
-  const items = (window.store && window.store.state && window.store.state.galeriItems && window.store.state.galeriItems.length > 0)
+window.openGaleriDetail = function(idOrIdx) {
+  window.selectedGaleriItemId = String(idOrIdx);
+  window.switchSiswaTab('galeridetail');
+};
+
+function getGaleriItems() {
+  return (window.store && window.store.state && window.store.state.galeriItems && window.store.state.galeriItems.length > 0)
     ? window.store.state.galeriItems
     : [
       { id: '1', title: 'Juara 1 LKS Network Administration', category: '🏆 PRESTASI', tagColor: '#b45309', tagBg: '#fef3c7', imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80', subtitle: 'Tim Siswa TKJ SMKN 6 Batam berhasil meraih Medali Emas LKS.' },
@@ -806,6 +812,11 @@ window.openGaleriDetailModal = function(idOrIdx) {
       { id: '5', title: 'Workshop Cyber Security & Defense', category: '⚡ WORKSHOP', tagColor: '#9333ea', tagBg: '#faf5ff', imageUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80', subtitle: 'Pelatihan dasar keamanan jaringan, firewall & pencegahan serangan.' },
       { id: '6', title: 'Perakitan & Trouble-shooting PC Lab', category: '🖥️ HARDWARE', tagColor: '#0d9488', tagBg: '#ccfbf1', imageUrl: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=600&q=80', subtitle: 'Praktikum perakitan komputer hardware dan instalasi sistem.' }
     ];
+}
+
+function renderGaleriDetailPage(state) {
+  const items = getGaleriItems();
+  const idOrIdx = window.selectedGaleriItemId || '1';
 
   let item = items.find(g => String(g.id) === String(idOrIdx));
   if (!item && !isNaN(parseInt(idOrIdx, 10))) {
@@ -813,19 +824,77 @@ window.openGaleriDetailModal = function(idOrIdx) {
   }
   if (!item) item = items[0];
 
-  card.innerHTML = `
-    <div style="border-radius:12px; overflow:hidden; margin:-16px -16px 12px -16px; background:#0f172a; max-height:260px; position:relative;">
-      <img src="${item.imageUrl}" style="width:100%; height:220px; object-fit:cover; display:block;" onerror="this.src='https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80'" />
-      <span style="position:absolute; top:12px; left:12px; background:${item.tagBg || '#fef3c7'}; color:${item.tagColor || '#b45309'}; font-weight:800; font-size:0.7rem; padding:4px 10px; border-radius:8px; backdrop-filter:blur(8px);">
-        ${item.category || '🖼️ GALERI'}
-      </span>
+  // Find current index for prev/next navigation
+  const currentIdx = items.findIndex(g => String(g.id) === String(item.id));
+  const prevItem = currentIdx > 0 ? items[currentIdx - 1] : null;
+  const nextItem = currentIdx < items.length - 1 ? items[currentIdx + 1] : null;
+
+  return `
+    <div class="galeri-detail-page">
+      <!-- Hero Image Section -->
+      <div class="galeri-detail-hero">
+        <img src="${item.imageUrl}" alt="${item.title}" class="galeri-detail-hero-img" onerror="this.src='https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80'" />
+        <div class="galeri-detail-hero-overlay"></div>
+        <button class="galeri-detail-back-btn" onclick="window.switchSiswaTab('galerisiswa')">
+          <svg width="20" height="20" fill="none" stroke="white" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        </button>
+        <span class="galeri-detail-badge" style="background:${item.tagBg || '#fef3c7'}; color:${item.tagColor || '#b45309'};">
+          ${item.category || '🖼️ GALERI'}
+        </span>
+      </div>
+
+      <!-- Content Section -->
+      <div class="galeri-detail-content">
+        <h1 class="galeri-detail-title">${item.title}</h1>
+        <p class="galeri-detail-subtitle">${item.subtitle || 'Dokumentasi kegiatan dan prestasi siswa TKJ SMKN 6 Batam.'}</p>
+
+        <div class="galeri-detail-meta">
+          <div class="galeri-detail-meta-item">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+            <span>${item.category || 'Galeri'}</span>
+          </div>
+          <div class="galeri-detail-meta-item">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            <span>SMKN 6 Batam - TKJ</span>
+          </div>
+        </div>
+
+        <div class="galeri-detail-description">
+          <h3>📋 Deskripsi</h3>
+          <p>${item.subtitle || 'Dokumentasi kegiatan dan prestasi siswa jurusan Teknik Komputer dan Jaringan (TKJ) SMKN 6 Batam. Kegiatan ini merupakan bagian dari program pembelajaran aktif dan pengembangan kompetensi siswa.'}</p>
+        </div>
+
+        <!-- Prev / Next Navigation -->
+        <div class="galeri-detail-nav">
+          ${prevItem ? `
+            <button class="galeri-detail-nav-btn" onclick="window.openGaleriDetail('${prevItem.id}')">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+              <div class="galeri-detail-nav-text">
+                <span class="galeri-detail-nav-label">Sebelumnya</span>
+                <span class="galeri-detail-nav-title">${prevItem.title}</span>
+              </div>
+            </button>
+          ` : '<div></div>'}
+          ${nextItem ? `
+            <button class="galeri-detail-nav-btn galeri-detail-nav-next" onclick="window.openGaleriDetail('${nextItem.id}')">
+              <div class="galeri-detail-nav-text" style="text-align:right;">
+                <span class="galeri-detail-nav-label">Selanjutnya</span>
+                <span class="galeri-detail-nav-title">${nextItem.title}</span>
+              </div>
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          ` : '<div></div>'}
+        </div>
+
+        <!-- Back to Gallery Button -->
+        <button class="galeri-detail-back-gallery" onclick="window.switchSiswaTab('galerisiswa')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          Kembali ke Galeri
+        </button>
+      </div>
     </div>
-    <h3 style="font-size:1.05rem; font-weight:800; color:#0f172a; margin:0 0 6px 0;">${item.title}</h3>
-    <p style="font-size:0.8rem; color:#475569; line-height:1.5; margin:0 0 16px 0;">${item.subtitle || 'Dokumentasi kegiatan dan prestasi siswa TKJ SMKN 6 Batam.'}</p>
-    <button class="btn-primary" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup Detail</button>
   `;
-  overlay.classList.add('open');
-};
+}
 
 window.librarySearchQuery = window.librarySearchQuery || '';
 window.filterLibrary = function(q) {
