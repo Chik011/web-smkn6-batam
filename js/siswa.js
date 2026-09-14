@@ -865,13 +865,18 @@ function renderGaleriDetailPage(state) {
         </div>
 
         ${(() => {
-          const allImgs = item.images && item.images.length > 0 ? item.images : [item.imageUrl];
+          let rawImgs = Array.isArray(item.images) && item.images.length > 0 ? item.images : [item.imageUrl];
+          const allImgs = rawImgs.filter(u => u && typeof u === 'string' && (u.trim().startsWith('http') || u.trim().startsWith('data:image')));
+          if (allImgs.length === 0 && item.imageUrl) allImgs.push(item.imageUrl);
+
           return `
             <div style="margin:20px 0;">
               <h3 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin-bottom:10px;">📸 Foto Documentation (${allImgs.length})</h3>
-              <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;">
+              <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:12px;">
                 ${allImgs.map(imgSrc => `
-                  <img src="${imgSrc}" style="width:100%; height:130px; object-fit:cover; border-radius:10px; border:1px solid #e2e8f0; cursor:pointer; transition:transform 0.2s;" onclick="window.openModalImagePreview('${imgSrc}')" onerror="this.src='https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80'" />
+                  <div style="position:relative; border-radius:12px; overflow:hidden; border:1px solid #e2e8f0; aspect-ratio:4/3; background:#f8fafc; cursor:pointer;" onclick="window.openModalImagePreview('${imgSrc}')">
+                    <img src="${imgSrc}" style="width:100%; height:100%; object-fit:cover; transition:transform 0.25s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" onerror="this.parentElement.style.display='none'" />
+                  </div>
                 `).join('')}
               </div>
             </div>

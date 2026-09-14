@@ -1434,7 +1434,9 @@ window.editGaleriModal = function(id) {
   const card = document.getElementById('modalCardContent');
   if (!overlay || !card) return;
 
-  const itemImages = item.images || (item.imageUrl ? [item.imageUrl] : []);
+  // Clean images array: ignore empty, broken, or duplicate strings
+  let rawImages = Array.isArray(item.images) ? item.images : (item.imageUrl ? [item.imageUrl] : []);
+  const validImages = rawImages.filter(u => u && typeof u === 'string' && u.trim().startsWith('http') || (typeof u === 'string' && u.trim().startsWith('data:image')));
 
   card.innerHTML = `
     <div class="modal-title">✏️ Edit Foto & Galeri Kegiatan Siswa</div>
@@ -1449,9 +1451,14 @@ window.editGaleriModal = function(id) {
       <div class="form-group" style="background:#fdf4ff; padding:12px; border-radius:10px; border:1px solid #f5d0fe; margin-bottom:12px;">
         <label class="form-label" style="font-weight:700; color:#86198f;">📸 2. Foto-Foto Detail Kegiatan (Bisa Banyak Foto)</label>
         <input type="file" id="editGDetailFileInput" accept="image/*" multiple class="form-input" onchange="window.handleEditGaleriDetailFileSelect(event)" style="padding:6px 10px; background:white;" />
-        <textarea id="editGImagesList" class="form-input mt-2" rows="3" placeholder="URL foto tambahan per baris">${itemImages.join('\n')}</textarea>
+        <textarea id="editGImagesList" class="form-input mt-2" rows="3" placeholder="Daftar gambar otomatis terisi">${validImages.join('\n\n')}</textarea>
         <div id="editGDetailPreviews" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
-          ${itemImages.map(u => `<img src="${u}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; border:1px solid #d8b4fe;" />`).join('')}
+          ${validImages.map((u, i) => `
+            <div style="position:relative; display:inline-block;">
+              <img src="${u}" style="width:44px; height:44px; object-fit:cover; border-radius:6px; border:1px solid #d8b4fe;" onerror="this.parentElement.style.display='none'" />
+              <span style="position:absolute; bottom:1px; right:1px; background:rgba(0,0,0,0.6); color:white; font-size:0.55rem; padding:1px 3px; border-radius:3px;">#${i+1}</span>
+            </div>
+          `).join('')}
         </div>
       </div>
 
@@ -1488,7 +1495,11 @@ window.handleEditGaleriSubmit = function(e, id) {
   const imagesText = document.getElementById('editGImagesList')?.value.trim() || '';
   const subtitle = document.getElementById('editGSub')?.value.trim();
 
-  let images = imagesText.split('\n').map(u => u.trim()).filter(Boolean);
+  let images = imagesText
+    .split('\n')
+    .map(u => u.trim())
+    .filter(u => u && (u.startsWith('http') || u.startsWith('data:image')));
+
   if (imageUrl && !images.includes(imageUrl)) {
     images.unshift(imageUrl);
   }
