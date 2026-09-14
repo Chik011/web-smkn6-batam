@@ -832,15 +832,19 @@ function renderGaleriDetailPage(state) {
   return `
     <div class="galeri-detail-page">
       <!-- Hero Image Section -->
-      <div class="galeri-detail-hero">
+      <div class="galeri-detail-hero" style="cursor:pointer;" onclick="window.openModalImagePreview('${item.imageUrl}', '${(item.title || 'sampul').replace(/'/g, "\\'")}')" title="Klik untuk perbesar & download">
         <img src="${item.imageUrl}" alt="${item.title}" class="galeri-detail-hero-img" onerror="this.src='https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80'" />
         <div class="galeri-detail-hero-overlay"></div>
-        <button class="galeri-detail-back-btn" onclick="window.switchSiswaTab('galerisiswa')">
+        <button class="galeri-detail-back-btn" onclick="event.stopPropagation(); window.switchSiswaTab('galerisiswa')">
           <svg width="20" height="20" fill="none" stroke="white" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </button>
         <span class="galeri-detail-badge" style="background:${item.tagBg || '#fef3c7'}; color:${item.tagColor || '#b45309'};">
           ${item.category || '🖼️ GALERI'}
         </span>
+        <button type="button" style="position:absolute; bottom:16px; right:16px; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); color:white; border:none; padding:6px 12px; border-radius:20px; font-size:0.75rem; font-weight:600; display:flex; align-items:center; gap:6px; cursor:pointer; z-index:5;" onclick="event.stopPropagation(); window.openModalImagePreview('${item.imageUrl}', '${(item.title || 'sampul').replace(/'/g, "\\'")}')">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Unduh Sampul
+        </button>
       </div>
 
       <!-- Content Section -->
@@ -915,15 +919,48 @@ function renderGaleriDetailPage(state) {
   `;
 }
 
-window.openModalImagePreview = function(imgSrc) {
+window.downloadImageFile = function(imgSrc, filename = 'galeri-smkn6.jpg') {
+  if (!imgSrc) return;
+  try {
+    // If base64 or blob or regular URL
+    const a = document.createElement('a');
+    a.href = imgSrc;
+    a.download = filename || 'dokumentasi-smkn6-' + Date.now() + '.jpg';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    if (typeof window.showToast === 'function') {
+      window.showToast('📥 Mengunduh gambar...', 'info');
+    }
+  } catch (e) {
+    console.warn("Download error:", e);
+    window.open(imgSrc, '_blank');
+  }
+};
+
+window.openModalImagePreview = function(imgSrc, title = 'Dokumentasi Galeri') {
   const overlay = document.getElementById('globalModal');
   const card = document.getElementById('modalCardContent');
   if (!overlay || !card) return;
 
+  const safeTitle = (title || 'dokumentasi-smkn6').replace(/[^a-zA-Z0-9_-]/g, '_') + '.jpg';
+
   card.innerHTML = `
-    <div style="position:relative; text-align:center;">
-      <button style="position:absolute; top:-10px; right:-10px; background:#ef4444; color:white; border:none; border-radius:50%; width:28px; height:28px; font-weight:bold; cursor:pointer;" onclick="window.closeModal()">✕</button>
-      <img src="${imgSrc}" style="width:100%; max-height:70vh; object-fit:contain; border-radius:12px;" />
+    <div style="position:relative; text-align:center; padding:4px;">
+      <button style="position:absolute; top:-12px; right:-12px; background:#ef4444; color:white; border:none; border-radius:50%; width:32px; height:32px; font-weight:bold; cursor:pointer; z-index:20; box-shadow:0 2px 8px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center;" onclick="window.closeModal()">✕</button>
+      
+      <div style="border-radius:14px; overflow:hidden; background:#0f172a; border:1px solid #334155; margin-bottom:14px; max-height:65vh; display:flex; align-items:center; justify-content:center;">
+        <img src="${imgSrc}" style="max-width:100%; max-height:65vh; object-fit:contain;" />
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn-primary" style="flex:1; background:#0284c7; border:none; padding:12px 18px; border-radius:12px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;" onclick="window.downloadImageFile('${imgSrc}', '${safeTitle}')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Download Gambar
+        </button>
+        <button type="button" class="btn-primary" style="background:#64748b; border:none; padding:12px 18px; border-radius:12px; font-weight:600; cursor:pointer;" onclick="window.closeModal()">Tutup</button>
+      </div>
     </div>
   `;
   overlay.classList.add('open');
