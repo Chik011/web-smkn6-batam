@@ -1062,7 +1062,7 @@ export function renderVidioTKJView(state) {
         <button style="background:none; border:none; cursor:pointer;" onclick="window.switchSiswaTab('home')">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </button>
-        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b;">🎬 Vidio & Learning TKJ SMKN 6</h3>
+        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b;">📰 TKJ News & Learning SMKN 6</h3>
       </div>
       <span style="background:#fee2e2; color:#dc2626; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${newsList.length} Video</span>
     </div>

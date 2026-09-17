@@ -72,7 +72,7 @@ function syncTabFromHash() {
       siswa: ['home', 'pelajaran', 'scan', 'notifikasi', 'akun', 'visimisi', 'gurutkj', 'totalsiswa', 'kalender', 'galerisiswa', 'library', 'elibrary', 'videotkj'],
       guru: ['beranda', 'absensi', 'nilai', 'profil'],
       admin: ['home', 'guru', 'mapel', 'siswa', 'jadwal', 'setting', 'galeri', 'kalender', 'elibrary'],
-      guest: ['home', 'galeri', 'galerisiswa', 'galeridetail', 'kalender', 'info', 'videotkj', 'visimisi', 'gurutkj', 'totalsiswa', 'elibrary', 'library']
+      guest: ['home', 'galeri', 'galerisiswa', 'galeridetail', 'kalender', 'videotkj', 'visimisi', 'gurutkj', 'totalsiswa', 'elibrary', 'library']
     };
     if (validTabs[role] && validTabs[role].includes(hash)) {
       if (store.state.activeTabs[role] !== hash) {
@@ -445,13 +445,8 @@ function renderGuestHome(state, guestName) {
       </button>
 
       <button class="app-icon-item" onclick="window.switchRoleTab('guest','videotkj')">
-        <div class="icon-box" style="background:#fdf4ff; color:#9333ea;">🎬</div>
-        <span>Video TKJ</span>
-      </button>
-
-      <button class="app-icon-item" onclick="window.switchRoleTab('guest','info')">
-        <div class="icon-box" style="background:#fff7ed; color:#ea580c;">ℹ️</div>
-        <span>Info Sekolah</span>
+        <div class="icon-box" style="background:#fee2e2; color:#dc2626;">📺</div>
+        <span>TKJ News</span>
       </button>
 
       <button class="app-icon-item" onclick="window.confirmLogout()">
@@ -498,71 +493,6 @@ function renderGuestHome(state, guestName) {
   `;
 }
 
-function renderGuestInfoView() {
-  return `
-    <div style="padding:16px;">
-      <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
-        <div style="width:36px; height:36px; background:linear-gradient(135deg,#f59e0b,#d97706); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">ℹ️</div>
-        <div>
-          <h2 style="font-size:1rem; font-weight:800; color:#0f172a; margin:0;">Info Sekolah</h2>
-          <p style="font-size:0.72rem; color:#64748b; margin:0;">Profil & kontak SMKN 6 Batam</p>
-        </div>
-      </div>
-
-      <div style="background:linear-gradient(135deg,#0b2545,#134074); border-radius:16px; padding:18px; margin-bottom:14px; display:flex; align-items:center; gap:14px; box-shadow:0 4px 14px rgba(11,37,69,0.25);">
-        <img src="img/Logo_SMKN6.png" alt="Logo" style="width:56px; height:56px; object-fit:contain; border-radius:12px;" />
-        <div>
-          <h3 style="font-size:1rem; font-weight:800; color:#ffffff; margin:0 0 2px 0;">SMK NEGERI 6 BATAM</h3>
-          <p style="font-size:0.72rem; color:#93c5fd; margin:0;">Teknik Komputer & Jaringan (TKJ)</p>
-          <p style="font-size:0.68rem; margin:4px 0 0 0; color:#7dd3fc; font-weight:700;">Terakreditasi A</p>
-        </div>
-      </div>
-
-      <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px;">
-          <span style="font-size:1.2rem;">📍</span>
-          <div>
-            <div style="font-size:0.78rem; font-weight:700; color:#1e293b;">Alamat</div>
-            <div style="font-size:0.72rem; color:#64748b;">Jl. Kabil, Batam Kota, Kepulauan Riau</div>
-          </div>
-        </div>
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px;">
-          <span style="font-size:1.2rem;">📞</span>
-          <div>
-            <div style="font-size:0.78rem; font-weight:700; color:#1e293b;">Telepon</div>
-            <div style="font-size:0.72rem; color:#64748b;">(0778) 123456</div>
-          </div>
-        </div>
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px;">
-          <span style="font-size:1.2rem;">✉️</span>
-          <div>
-            <div style="font-size:0.78rem; font-weight:700; color:#1e293b;">Email</div>
-            <div style="font-size:0.72rem; color:#64748b;">info@smkn6batam.sch.id</div>
-          </div>
-        </div>
-        <a href="https://www.instagram.com/tkj_smkn_6/" target="_blank" rel="noopener noreferrer"
-           style="background:#fdf2f8; border:1px solid #f9a8d4; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; text-decoration:none;">
-          <span style="font-size:1.2rem;">📷</span>
-          <div>
-            <div style="font-size:0.78rem; font-weight:700; color:#be185d;">Instagram</div>
-            <div style="font-size:0.72rem; color:#64748b;">@tkj_smkn_6</div>
-          </div>
-          <svg style="margin-left:auto;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#be185d" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-      </div>
-
-      <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:14px; padding:14px; margin-bottom:14px;">
-        <h4 style="font-size:0.82rem; font-weight:800; color:#15803d; margin:0 0 8px 0;">🎯 Visi TKJ SMKN 6 Batam</h4>
-        <p style="font-size:0.75rem; color:#166534; line-height:1.5; margin:0;">"Menjadi lembaga pendidikan kejuruan yang unggul, berkarakter, dan menghasilkan lulusan kompeten di bidang Teknik Komputer & Jaringan."</p>
-      </div>
-
-      <div style="margin-top:4px; text-align:center;">
-        <button onclick="window.logout(true)" style="background:linear-gradient(135deg,#64748b,#475569); color:white; border:none; border-radius:12px; padding:12px 24px; font-size:0.83rem; font-weight:700; cursor:pointer; width:100%;">🔐 Kembali & Login Akun Lain</button>
-      </div>
-    </div>
-  `;
-}
-
 function renderGuestScreen(state) {
   const activeTab = state.activeTabs.guest || 'home';
   const guestName = state.currentUser?.guest?.name || state.loggedName || 'Tamu / Pengunjung';
@@ -598,9 +528,6 @@ function renderGuestScreen(state) {
     case 'elibrary':
       contentHtml = renderLibraryView(state);
       break;
-    case 'info':
-      contentHtml = renderGuestInfoView();
-      break;
     default:
       contentHtml = renderGuestHome(state, guestName);
   }
@@ -630,16 +557,9 @@ function renderGuestScreen(state) {
 
       <button class="nav-item ${activeTab === 'videotkj' ? 'active' : ''}" data-tab="videotkj">
         <div class="nav-icon-wrapper">
-          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
         </div>
-        <span>Video</span>
-      </button>
-
-      <button class="nav-item ${activeTab === 'info' ? 'active' : ''}" data-tab="info">
-        <div class="nav-icon-wrapper">
-          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        </div>
-        <span>Info</span>
+        <span>TKJ News</span>
       </button>
 
       <button class="nav-item nav-logout-btn" type="button" onclick="window.confirmLogout()" title="Logout">
@@ -1440,8 +1360,8 @@ window.openSiswaModal = function (type) {
         <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('videotkj');">
           <span style="font-size:1.3rem;">📺</span>
           <div>
-            <div>Video TKJ</div>
-            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Beranda Video YT</span>
+            <div>TKJ News</div>
+            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">YouTube & Berita</span>
           </div>
         </button>
 

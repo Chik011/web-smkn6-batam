@@ -46,7 +46,7 @@ const defaultState = {
     siswa: 'home',   // 'home', 'pelajaran', 'scan', 'notifikasi', 'akun'
     guru: 'beranda', // 'beranda', 'absensi', 'nilai', 'profil'
     admin: 'home',   // 'home', 'guru', 'mapel', 'siswa', 'jadwal', 'setting'
-    guest: 'home'    // 'home', 'galeri', 'kalender', 'videotkj', 'info'
+    guest: 'home'    // 'home', 'galeri', 'kalender', 'videotkj'
   },
 
   // Sub tab filters
