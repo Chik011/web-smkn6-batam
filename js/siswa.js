@@ -115,16 +115,23 @@ window.setSiswaScheduleDay = function(day) {
 };
 
 function renderHome(state) {
-  const user = state.currentUser.siswa;
+  const user = state.currentUser.siswa || {};
   const newsList = state.broadcastNews || [];
-  const scheduleToday = state.schedules.filter(s => s.class === user.class);
+  const userClass = (user.class || '10 TKJ 1').trim();
+  const daysMap = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const todayName = daysMap[new Date().getDay()] || 'Senin';
+  const activeTodayName = (todayName === 'Minggu' || todayName === 'Sabtu') ? 'Senin' : todayName;
 
-  const currentHour = new Date().getHours();
-  let greeting = 'Selamat Datang';
-  if (currentHour >= 4 && currentHour < 11) greeting = 'Selamat Pagi ☀️';
-  else if (currentHour >= 11 && currentHour < 15) greeting = 'Selamat Siang 🌤️';
-  else if (currentHour >= 15 && currentHour < 18) greeting = 'Selamat Sore 🌇';
-  else greeting = 'Selamat Malam 🌙';
+  let scheduleToday = (state.schedules || []).filter(s => 
+    (!s.class || s.class.trim().toLowerCase() === userClass.toLowerCase()) && 
+    (!s.hari || s.hari.trim().toLowerCase() === activeTodayName.toLowerCase())
+  );
+
+  if (scheduleToday.length === 0) {
+    scheduleToday = (state.schedules || []).filter(s => 
+      !s.class || s.class.trim().toLowerCase() === userClass.toLowerCase()
+    );
+  }
 
   return `
     <div class="app-header-card">
@@ -247,7 +254,17 @@ function renderHome(state) {
 function renderPelajaran(state) {
   const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
   const activeDay = window.selectedSiswaDay || 'Senin';
-  const schedules = state.schedules.filter(s => !s.hari || s.hari === activeDay);
+  const user = state.currentUser.siswa || {};
+  const userClass = (user.class || '10 TKJ 1').trim();
+  
+  let schedules = (state.schedules || []).filter(s => 
+    (!s.hari || s.hari.trim().toLowerCase() === activeDay.toLowerCase()) &&
+    (!s.class || s.class.trim().toLowerCase() === userClass.toLowerCase())
+  );
+
+  if (schedules.length === 0) {
+    schedules = (state.schedules || []).filter(s => !s.hari || s.hari.trim().toLowerCase() === activeDay.toLowerCase());
+  }
   
   return `
     <div style="background:white; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">

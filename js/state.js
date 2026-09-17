@@ -18,19 +18,49 @@ const defaultState = {
   },
 
   // Students Database
-  students: [],
+  students: [
+    { id: '1', name: 'Siswa Demo TKJ', nis: '123456789', class: '10 TKJ 1', role: 'siswa' },
+    { id: '2', name: 'tes', nis: 'tes', class: '10 TKJ 1', role: 'siswa' },
+    { id: '3', name: 'tes2', nis: 'tes2', class: '10 TKJ 1', role: 'siswa' },
+    { id: '4', name: 'Ahmad Fauzi', nis: '1021401', class: '10 TKJ 1', role: 'siswa' },
+    { id: '5', name: 'Budi Pratama', nis: '1021402', class: '10 TKJ 1', role: 'siswa' },
+    { id: '6', name: 'Citra Dewi', nis: '1021403', class: '10 TKJ 2', role: 'siswa' },
+    { id: '7', name: 'Dwi Prasetyo', nis: '1121401', class: '11 TKJ 1', role: 'siswa' },
+    { id: '8', name: 'Eka Saputra', nis: '1221401', class: '12 TKJ 1', role: 'siswa' }
+  ],
 
   // Teachers Database
-  teachers: [],
+  teachers: [
+    { id: '1', name: 'Budi Santoso, S.Kom', username: 'budi', nip: '198501012010011001', mapel: 'Teknologi Jaringan Berbasis Luas (WAN)' },
+    { id: '2', name: 'Siti Rahmawati, S.Pd', username: 'siti', nip: '198803152012012002', mapel: 'Administrasi Infrastruktur Jaringan (AIJ)' },
+    { id: '3', name: 'Hendra Gunawan, M.T', username: 'hendra', nip: '197906202008011003', mapel: 'Administrasi Server & Cloud Computing' },
+    { id: '4', name: 'Rina Marlina, S.Kom', username: 'rina', nip: '199209102015022004', mapel: 'Dasar Pemrograman & Jaringan Dasar' }
+  ],
 
   // Subjects List
-  mapel: [],
+  mapel: [
+    { id: '1', name: 'Jaringan Komputer & WAN', code: 'TKJ-WAN', teacher: 'Budi Santoso, S.Kom' },
+    { id: '2', name: 'Administrasi Infrastruktur Jaringan (AIJ)', code: 'TKJ-AIJ', teacher: 'Siti Rahmawati, S.Pd' },
+    { id: '3', name: 'Administrasi Server & Cloud', code: 'TKJ-ASJ', teacher: 'Hendra Gunawan, M.T' },
+    { id: '4', name: 'Cyber Security & Network Defense', code: 'TKJ-SEC', teacher: 'Hendra Gunawan, M.T' },
+    { id: '5', name: 'Dasar Pemrograman & Jaringan Dasar', code: 'TKJ-DASAR', teacher: 'Rina Marlina, S.Kom' },
+    { id: '6', name: 'Fiber Optic & Splicing', code: 'TKJ-FO', teacher: 'Budi Santoso, S.Kom' }
+  ],
 
   // Classes Database
-  classes: [],
+  classes: ['10 TKJ 1', '10 TKJ 2', '11 TKJ 1', '11 TKJ 2', '12 TKJ 1', '12 TKJ 2'],
 
-  // Schedules Database
-  schedules: [],
+  // Schedules Database (Senin - Jumat)
+  schedules: [
+    { id: '1', class: '10 TKJ 1', hari: 'Senin', mapel: 'Jaringan Komputer & WAN', guru: 'Budi Santoso, S.Kom', ruangan: 'Lab Jaringan 1', waktu: '07:30 - 09:30 WIB' },
+    { id: '2', class: '10 TKJ 1', hari: 'Senin', mapel: 'Dasar Pemrograman & Jaringan Dasar', guru: 'Rina Marlina, S.Kom', ruangan: 'Lab Komputer 2', waktu: '10:00 - 12:00 WIB' },
+    { id: '3', class: '10 TKJ 1', hari: 'Selasa', mapel: 'Administrasi Server & Cloud', guru: 'Hendra Gunawan, M.T', ruangan: 'Lab Server', waktu: '07:30 - 10:00 WIB' },
+    { id: '4', class: '10 TKJ 1', hari: 'Rabu', mapel: 'Administrasi Infrastruktur Jaringan (AIJ)', guru: 'Siti Rahmawati, S.Pd', ruangan: 'Lab Jaringan 2', waktu: '08:00 - 10:30 WIB' },
+    { id: '5', class: '10 TKJ 1', hari: 'Kamis', mapel: 'Fiber Optic & Splicing', guru: 'Budi Santoso, S.Kom', ruangan: 'Lab Fiber Optic', waktu: '07:30 - 10:00 WIB' },
+    { id: '6', class: '10 TKJ 1', hari: 'Jumat', mapel: 'Cyber Security & Network Defense', guru: 'Hendra Gunawan, M.T', ruangan: 'Lab Cyber Defense', waktu: '07:30 - 09:30 WIB' },
+    { id: '7', class: '10 TKJ 2', hari: 'Senin', mapel: 'Administrasi Server & Cloud', guru: 'Hendra Gunawan, M.T', ruangan: 'Lab Server', waktu: '07:30 - 10:00 WIB' },
+    { id: '8', class: '11 TKJ 1', hari: 'Senin', mapel: 'Routing BGP & OSPF Mikrotik', guru: 'Budi Santoso, S.Kom', ruangan: 'Lab Jaringan 1', waktu: '07:30 - 10:30 WIB' }
+  ],
 
   // Attendance Records
   attendance: [],
@@ -38,8 +68,13 @@ const defaultState = {
   // Grades Database
   grades: [],
 
-  // News & Video Broadcasts
-  broadcastNews: [],
+  // News & Video Broadcasts (TKJ News)
+  broadcastNews: [
+    { id: '1', title: 'Tutorial Konfigurasi Mikrotik Router & VLAN TKJ SMKN 6 Batam', url: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ' },
+    { id: '2', title: 'Dokumentasi Praktikum Fiber Optic & Splicing Siswa TKJ', url: 'https://www.youtube.com/watch?v=0h2h4UvP-50' },
+    { id: '3', title: 'Profil Jurusan Teknik Komputer & Jaringan SMKN 6 Batam', url: 'https://www.youtube.com/watch?v=ScMzIvxBSi4' },
+    { id: '4', title: 'Workshop Cyber Security & Network Defense', url: 'https://www.youtube.com/watch?v=inWWhr5tnEA' }
+  ],
 
   // Active Tabs per role
   activeTabs: {
@@ -143,92 +178,116 @@ class Store {
     if (!supabase) return;
 
     try {
-      // 1. Fetch App State (Global state if table exists - exclude private session login)
-      const { data: stateData } = await supabase.from('app_state').select('*').limit(1).maybeSingle();
-      if (stateData && stateData.state) {
-        const { isLoggedIn, activeRole, currentUser, activeTabs, ...safeGlobalState } = stateData.state;
-        this.state = { ...this.state, ...safeGlobalState };
-        this.saveStateToLocalStorage();
-        this.notify();
-      }
+      // 1. Fetch App State (Silently handle if table not present in Supabase)
+      try {
+        const { data: stateData } = await supabase.from('app_state').select('*').limit(1).maybeSingle();
+        if (stateData && stateData.state) {
+          const { isLoggedIn, activeRole, currentUser, activeTabs, ...safeGlobalState } = stateData.state;
+          this.state = { ...this.state, ...safeGlobalState };
+          this.saveStateToLocalStorage();
+          this.notify();
+        }
+      } catch (_) {}
 
       // 2. Fetch Galeri Siswa
-      const { data: galeriData } = await supabase.from('galeri_siswa').select('*');
-      if (galeriData && galeriData.length > 0) {
-        this.state.galeriItems = galeriData;
-        this.saveStateToLocalStorage();
-        this.notify();
-      }
+      try {
+        const { data: galeriData } = await supabase.from('galeri_siswa').select('*');
+        if (galeriData && galeriData.length > 0) {
+          this.state.galeriItems = galeriData;
+          this.saveStateToLocalStorage();
+          this.notify();
+        }
+      } catch (_) {}
 
       // 3. Fetch Students / Users
-      const { data: studentsData } = await supabase.from('users').select('*');
-      if (studentsData && studentsData.length > 0) {
-        this.state.students = studentsData.map(s => ({
-          id: String(s.id),
-          name: s.studentName || s.name || 'Siswa',
-          nis: s.studentId || s.nis || String(s.id),
-          class: s.className || s.class || '10 TKJ 1',
-          role: s.role || 'siswa'
-        }));
-        this.syncCurrentUserData();
-        this.saveStateToLocalStorage();
-        this.notify();
-      }
+      try {
+        const { data: studentsData } = await supabase.from('users').select('*');
+        if (studentsData && studentsData.length > 0) {
+          this.state.students = studentsData.map(s => ({
+            id: String(s.id),
+            name: s.studentName || s.name || 'Siswa',
+            nis: s.studentId || s.nis || String(s.id),
+            class: s.className || s.class || '10 TKJ 1',
+            role: s.role || 'siswa'
+          }));
+          this.syncCurrentUserData();
+          this.saveStateToLocalStorage();
+          this.notify();
+        }
+      } catch (_) {}
 
       // 4. Fetch Teachers
-      const { data: teachersData } = await supabase.from('teachers').select('*');
-      if (teachersData && teachersData.length > 0) {
-        this.state.teachers = teachersData;
-        this.syncCurrentUserData();
-        this.saveStateToLocalStorage();
-        this.notify();
-      }
+      try {
+        const { data: teachersData } = await supabase.from('teachers').select('*');
+        if (teachersData && teachersData.length > 0) {
+          this.state.teachers = teachersData;
+          this.syncCurrentUserData();
+          this.saveStateToLocalStorage();
+          this.notify();
+        }
+      } catch (_) {}
 
       // 5. Fetch Schedules
-      const { data: schedulesData } = await supabase.from('schedules').select('*');
-      if (schedulesData && schedulesData.length > 0) {
-        this.state.schedules = schedulesData;
-        this.saveStateToLocalStorage();
-        this.notify();
-      }
+      try {
+        const { data: schedulesData } = await supabase.from('schedules').select('*');
+        if (schedulesData && schedulesData.length > 0) {
+          this.state.schedules = schedulesData;
+          this.saveStateToLocalStorage();
+          this.notify();
+        }
+      } catch (_) {}
 
-      // 6. Fetch Attendance
-      const { data: attendanceData } = await supabase.from('attendance').select('*');
-      if (attendanceData && attendanceData.length > 0) {
-        this.state.attendance = attendanceData;
-        this.deduplicateAttendance();
-        this.saveStateToLocalStorage();
-        this.notify();
-      }
+      // 6. Fetch Broadcast News
+      try {
+        const { data: newsData } = await supabase.from('broadcast_news').select('*');
+        if (newsData && newsData.length > 0) {
+          this.state.broadcastNews = newsData;
+          this.saveStateToLocalStorage();
+          this.notify();
+        }
+      } catch (_) {}
 
-      // 7. Realtime Sync Listeners via Supabase Channels
-      supabase.channel('public_db_changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'galeri_siswa' }, async () => {
-          const { data } = await supabase.from('galeri_siswa').select('*');
-          if (data && data.length > 0) {
-            this.state.galeriItems = data;
-            this.saveStateToLocalStorage();
-            this.notify();
-          }
-        })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, async () => {
-          const { data } = await supabase.from('users').select('*');
-          if (data && data.length > 0) {
-            this.state.students = data;
-            this.saveStateToLocalStorage();
-            this.notify();
-          }
-        })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance' }, async () => {
-          const { data } = await supabase.from('attendance').select('*');
-          if (data && data.length > 0) {
-            this.state.attendance = data;
-            this.deduplicateAttendance();
-            this.saveStateToLocalStorage();
-            this.notify();
-          }
-        })
-        .subscribe();
+      // 7. Fetch Attendance
+      try {
+        const { data: attendanceData } = await supabase.from('attendance').select('*');
+        if (attendanceData && attendanceData.length > 0) {
+          this.state.attendance = attendanceData;
+          this.deduplicateAttendance();
+          this.saveStateToLocalStorage();
+          this.notify();
+        }
+      } catch (_) {}
+
+      // 8. Realtime Sync Listeners via Supabase Channels
+      try {
+        supabase.channel('public_db_changes')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'galeri_siswa' }, async () => {
+            const { data } = await supabase.from('galeri_siswa').select('*');
+            if (data && data.length > 0) {
+              this.state.galeriItems = data;
+              this.saveStateToLocalStorage();
+              this.notify();
+            }
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, async () => {
+            const { data } = await supabase.from('users').select('*');
+            if (data && data.length > 0) {
+              this.state.students = data;
+              this.saveStateToLocalStorage();
+              this.notify();
+            }
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance' }, async () => {
+            const { data } = await supabase.from('attendance').select('*');
+            if (data && data.length > 0) {
+              this.state.attendance = data;
+              this.deduplicateAttendance();
+              this.saveStateToLocalStorage();
+              this.notify();
+            }
+          })
+          .subscribe();
+      } catch (_) {}
 
     } catch (err) {
       console.warn('Supabase sync note:', err.message || err);
@@ -257,6 +316,15 @@ class Store {
         this.state = {
           ...defaultState,
           ...parsed,
+          students: (parsed.students && parsed.students.length > 0) ? parsed.students : defaultState.students,
+          teachers: (parsed.teachers && parsed.teachers.length > 0) ? parsed.teachers : defaultState.teachers,
+          mapel: (parsed.mapel && parsed.mapel.length > 0) ? parsed.mapel : defaultState.mapel,
+          classes: (parsed.classes && parsed.classes.length > 0) ? parsed.classes : defaultState.classes,
+          schedules: (parsed.schedules && parsed.schedules.length > 0) ? parsed.schedules : defaultState.schedules,
+          broadcastNews: (parsed.broadcastNews && parsed.broadcastNews.length > 0) ? parsed.broadcastNews : defaultState.broadcastNews,
+          galeriItems: (parsed.galeriItems && parsed.galeriItems.length > 0) ? parsed.galeriItems : defaultState.galeriItems,
+          kalenderAgendas: (parsed.kalenderAgendas && parsed.kalenderAgendas.length > 0) ? parsed.kalenderAgendas : defaultState.kalenderAgendas,
+          elibraryBooks: (parsed.elibraryBooks && parsed.elibraryBooks.length > 0) ? parsed.elibraryBooks : defaultState.elibraryBooks,
           activeTabs: { ...defaultState.activeTabs, ...(parsed.activeTabs || {}) },
           currentUser: { ...defaultState.currentUser, ...(parsed.currentUser || {}) },
           adminSubView: { ...defaultState.adminSubView, ...(parsed.adminSubView || {}) },
