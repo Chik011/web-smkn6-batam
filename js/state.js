@@ -1,4 +1,15 @@
-/* Central Store with LocalStorage Persistence & Supabase Real-Time Sync */
+/* Central Store with LocalStorage Persistence, Firebase Real-Time Sync & Supabase Hybrid Sync */
+import { 
+  db, 
+  isFirebaseConnected, 
+  doc, 
+  setDoc, 
+  onSnapshot, 
+  collection, 
+  deleteDoc, 
+  getDocs, 
+  serverTimestamp 
+} from './firebase.js';
 import { supabase, getYouTubeDetails } from './supabase.js';
 
 const STORAGE_KEY = 'SMKN6_APP_DATA_V3';
@@ -21,12 +32,7 @@ const defaultState = {
   students: [
     { id: '1', name: 'Siswa Demo TKJ', nis: '123456789', class: '10 TKJ 1', role: 'siswa' },
     { id: '2', name: 'tes', nis: 'tes', class: '10 TKJ 1', role: 'siswa' },
-    { id: '3', name: 'tes2', nis: 'tes2', class: '10 TKJ 1', role: 'siswa' },
-    { id: '4', name: 'Ahmad Fauzi', nis: '1021401', class: '10 TKJ 1', role: 'siswa' },
-    { id: '5', name: 'Budi Pratama', nis: '1021402', class: '10 TKJ 1', role: 'siswa' },
-    { id: '6', name: 'Citra Dewi', nis: '1021403', class: '10 TKJ 2', role: 'siswa' },
-    { id: '7', name: 'Dwi Prasetyo', nis: '1121401', class: '11 TKJ 1', role: 'siswa' },
-    { id: '8', name: 'Eka Saputra', nis: '1221401', class: '12 TKJ 1', role: 'siswa' }
+    { id: '3', name: 'tes2', nis: 'tes2', class: '10 TKJ 1', role: 'siswa' }
   ],
 
   // Teachers Database
@@ -57,9 +63,7 @@ const defaultState = {
     { id: '3', class: '10 TKJ 1', hari: 'Selasa', mapel: 'Administrasi Server & Cloud', guru: 'Hendra Gunawan, M.T', ruangan: 'Lab Server', waktu: '07:30 - 10:00 WIB' },
     { id: '4', class: '10 TKJ 1', hari: 'Rabu', mapel: 'Administrasi Infrastruktur Jaringan (AIJ)', guru: 'Siti Rahmawati, S.Pd', ruangan: 'Lab Jaringan 2', waktu: '08:00 - 10:30 WIB' },
     { id: '5', class: '10 TKJ 1', hari: 'Kamis', mapel: 'Fiber Optic & Splicing', guru: 'Budi Santoso, S.Kom', ruangan: 'Lab Fiber Optic', waktu: '07:30 - 10:00 WIB' },
-    { id: '6', class: '10 TKJ 1', hari: 'Jumat', mapel: 'Cyber Security & Network Defense', guru: 'Hendra Gunawan, M.T', ruangan: 'Lab Cyber Defense', waktu: '07:30 - 09:30 WIB' },
-    { id: '7', class: '10 TKJ 2', hari: 'Senin', mapel: 'Administrasi Server & Cloud', guru: 'Hendra Gunawan, M.T', ruangan: 'Lab Server', waktu: '07:30 - 10:00 WIB' },
-    { id: '8', class: '11 TKJ 1', hari: 'Senin', mapel: 'Routing BGP & OSPF Mikrotik', guru: 'Budi Santoso, S.Kom', ruangan: 'Lab Jaringan 1', waktu: '07:30 - 10:30 WIB' }
+    { id: '6', class: '10 TKJ 1', hari: 'Jumat', mapel: 'Cyber Security & Network Defense', guru: 'Hendra Gunawan, M.T', ruangan: 'Lab Cyber Defense', waktu: '07:30 - 09:30 WIB' }
   ],
 
   // Attendance Records
@@ -69,12 +73,7 @@ const defaultState = {
   grades: [],
 
   // News & Video Broadcasts (TKJ News)
-  broadcastNews: [
-    { id: '1', title: 'Tutorial Konfigurasi Mikrotik Router & VLAN TKJ SMKN 6 Batam', url: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ' },
-    { id: '2', title: 'Dokumentasi Praktikum Fiber Optic & Splicing Siswa TKJ', url: 'https://www.youtube.com/watch?v=0h2h4UvP-50' },
-    { id: '3', title: 'Profil Jurusan Teknik Komputer & Jaringan SMKN 6 Batam', url: 'https://www.youtube.com/watch?v=ScMzIvxBSi4' },
-    { id: '4', title: 'Workshop Cyber Security & Network Defense', url: 'https://www.youtube.com/watch?v=inWWhr5tnEA' }
-  ],
+  broadcastNews: [],
 
   // Active Tabs per role
   activeTabs: {
@@ -145,8 +144,10 @@ const defaultState = {
 class Store {
   constructor() {
     this.listeners = [];
+    this.isSyncingWithFirebase = false;
     this.loadState();
     this.applyTheme();
+    this.initFirebaseSync();
     this.initSupabaseSync();
   }
 
@@ -171,6 +172,239 @@ class Store {
     } else {
       document.body.classList.remove('dark-theme');
       document.documentElement.classList.remove('dark-theme');
+    }
+  }
+
+  initFirebaseSync() {
+    if (!isFirebaseConnected || !db) return;
+
+    try {
+      // 1. Sync central state document
+      const stateRef = doc(db, 'smkn6', 'app_state');
+      onSnapshot(stateRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const remoteData = docSnap.data();
+          const {
+            students,
+            teachers,
+            attendance,
+            classes,
+            schedules,
+            mapel,
+            grades,
+            broadcastNews,
+            galeriItems,
+            kalenderAgendas,
+            elibraryBooks,
+            ...cleanRemote
+          } = remoteData;
+          this.isSyncingWithFirebase = true;
+          this.state = {
+            ...this.state,
+            ...cleanRemote,
+            isLoggedIn: this.state.isLoggedIn,
+            activeRole: this.state.activeRole,
+            activeTabs: this.state.activeTabs
+          };
+          this.saveStateToLocalStorage();
+          this.isSyncingWithFirebase = false;
+          this.notify();
+        }
+      }, (error) => {
+        console.warn("Firebase state listener info:", error.message || error);
+      });
+
+      // 2. Sync news / broadcastNews / tkjNews collection from Firestore muridtkj
+      ['news', 'broadcastNews', 'broadcast_news', 'tkj_news', 'tkjNews'].forEach(colName => {
+        try {
+          onSnapshot(collection(db, colName), (snapshot) => {
+            if (snapshot && !snapshot.empty) {
+              const fetchedNews = snapshot.docs.map(docSnap => {
+                const data = docSnap.data();
+                return {
+                  id: docSnap.id,
+                  title: data.title || data.judul || data.name || data.titleText || data.nama || 'Pengumuman TKJ',
+                  url: data.url || data.link || data.videoUrl || data.youtubeUrl || data.youtube_url || ''
+                };
+              });
+              if (fetchedNews.length > 0) {
+                this.state.broadcastNews = fetchedNews;
+                this.saveStateToLocalStorage();
+                this.notify();
+              }
+            }
+          }, () => {});
+        } catch (e) {}
+      });
+
+      // 3. Sync teachers collection
+      ['teachers', 'guru'].forEach(colName => {
+        try {
+          onSnapshot(collection(db, colName), (snapshot) => {
+            if (snapshot && !snapshot.empty) {
+              const fetched = snapshot.docs.map(docSnap => {
+                const d = docSnap.data();
+                return {
+                  id: docSnap.id,
+                  name: d.name || d.nama || d.teacherName || 'Guru TKJ',
+                  username: d.username || 'guru',
+                  mapel: d.mapel || d.subject || 'Produktif TKJ'
+                };
+              });
+              if (fetched.length > 0) {
+                const seenMap = new Map();
+                fetched.forEach(t => {
+                  const k = (t.name || t.username).toString().trim().toLowerCase();
+                  if (!seenMap.has(k)) seenMap.set(k, t);
+                });
+                this.state.teachers = Array.from(seenMap.values());
+                this.syncCurrentUserData();
+                this.saveStateToLocalStorage();
+                this.notify();
+              }
+            }
+          }, () => {});
+        } catch (e) {}
+      });
+
+      // 4. Sync users/students collection
+      ['users', 'students', 'siswa'].forEach(colName => {
+        try {
+          onSnapshot(collection(db, colName), (snapshot) => {
+            if (snapshot && !snapshot.empty) {
+              const fetched = snapshot.docs
+                .map(docSnap => {
+                  const d = docSnap.data();
+                  return {
+                    id: docSnap.id,
+                    name: d.studentName || d.nama || d.name || 'Siswa',
+                    nis: d.studentId || d.nisn || d.nis || d.id || docSnap.id,
+                    class: d.className || d.kelas || d.class || '10 TKJ 1',
+                    role: d.role || 'siswa'
+                  };
+                })
+                .filter(s => s.role === 'siswa' || !s.role);
+
+              if (fetched.length > 0) {
+                const seenMap = new Map();
+                fetched.forEach(s => {
+                  const k = String(s.id || s.nis || s.name).trim().toLowerCase();
+                  if (!seenMap.has(k)) seenMap.set(k, s);
+                });
+                this.state.students = Array.from(seenMap.values());
+                this.syncCurrentUserData();
+                this.saveStateToLocalStorage();
+                this.notify();
+              }
+            }
+          }, () => {});
+        } catch (e) {}
+      });
+
+      // 5. Sync schedules collection
+      ['schedules', 'jadwal', 'jadwal_pelajaran', 'schedule'].forEach(colName => {
+        try {
+          onSnapshot(collection(db, colName), (snapshot) => {
+            if (snapshot && !snapshot.empty) {
+              const fetchedSchedules = snapshot.docs.map(docSnap => {
+                const d = docSnap.data();
+                const className = d.class || d.className || d.nama_kelas || '10 TKJ 1';
+                return {
+                  id: docSnap.id,
+                  mapel: d.mapel || d.subject || d.nama_mapel || 'Produktif TKJ',
+                  guru: d.guru || d.teacher || d.teacherName || 'Guru TKJ',
+                  hari: d.hari || d.day || 'Senin',
+                  waktu: d.waktu || d.time || '07:30 - 11:30',
+                  ruangan: d.ruangan || d.room || 'Lab TKJ',
+                  level: parseInt(d.level || d.tingkat || (className.match(/\d+/)?.[0]) || 10),
+                  class: className
+                };
+              });
+              if (fetchedSchedules.length > 0) {
+                const seenMap = new Map();
+                fetchedSchedules.forEach(s => {
+                  const k = `${s.mapel}_${s.hari}_${s.waktu}_${s.class}`.toLowerCase();
+                  if (!seenMap.has(k)) seenMap.set(k, s);
+                });
+                this.state.schedules = Array.from(seenMap.values());
+                this.saveStateToLocalStorage();
+                this.notify();
+              }
+            }
+          }, () => {});
+        } catch (e) {}
+      });
+
+      // 6. Sync Galeri Siswa
+      ['galeri_siswa', 'galeri'].forEach(colName => {
+        try {
+          onSnapshot(collection(db, colName), (snapshot) => {
+            if (snapshot && !snapshot.empty) {
+              const fetched = snapshot.docs.map(docSnap => ({
+                id: docSnap.id,
+                ...docSnap.data()
+              }));
+              if (fetched.length > 0) {
+                this.state.galeriItems = fetched;
+                this.saveStateToLocalStorage();
+                this.notify();
+              }
+            }
+          }, () => {});
+        } catch (e) {}
+      });
+
+      // 7. Sync Kalender Agenda
+      ['kalender_agenda', 'kalender', 'agenda'].forEach(colName => {
+        try {
+          onSnapshot(collection(db, colName), (snapshot) => {
+            if (snapshot && !snapshot.empty) {
+              const fetched = snapshot.docs.map(docSnap => ({
+                id: docSnap.id,
+                ...docSnap.data()
+              }));
+              if (fetched.length > 0) {
+                this.state.kalenderAgendas = fetched;
+                this.saveStateToLocalStorage();
+                this.notify();
+              }
+            }
+          }, () => {});
+        } catch (e) {}
+      });
+
+      // 8. Sync E-Library
+      ['elibrary_buku', 'library', 'buku'].forEach(colName => {
+        try {
+          onSnapshot(collection(db, colName), (snapshot) => {
+            if (snapshot && !snapshot.empty) {
+              const fetched = snapshot.docs.map(docSnap => ({
+                id: docSnap.id,
+                ...docSnap.data()
+              }));
+              if (fetched.length > 0) {
+                this.state.elibraryBooks = fetched;
+                this.saveStateToLocalStorage();
+                this.notify();
+              }
+            }
+          }, () => {});
+        } catch (e) {}
+      });
+
+      // 9. Sync Visi Misi
+      try {
+        onSnapshot(doc(db, 'content_visimisi', 'visimisi_tkj'), (docSnap) => {
+          if (docSnap.exists()) {
+            this.state.visiMisi = docSnap.data();
+            this.saveStateToLocalStorage();
+            this.notify();
+          }
+        }, () => {});
+      } catch (e) {}
+
+    } catch (err) {
+      console.warn('Firebase sync error:', err);
     }
   }
 
@@ -523,6 +757,9 @@ class Store {
     this.state.teachers.push(teacher);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'teachers', newId), teacher).catch(e => console.warn(e));
+    }
     if (supabase) {
       supabase.from('teachers').upsert([teacher]).catch(e => console.warn(e));
     }
@@ -533,6 +770,9 @@ class Store {
     this.state.teachers = this.state.teachers.filter(t => String(t.id) !== idStr);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      deleteDoc(doc(db, 'teachers', idStr)).catch(e => console.warn(e));
+    }
     if (supabase) {
       supabase.from('teachers').delete().eq('id', idStr).catch(e => console.warn(e));
     }
@@ -544,6 +784,9 @@ class Store {
     this.state.mapel.push(obj);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'subjects', subjectId), obj).catch(e => console.warn(e));
+    }
     if (supabase) {
       supabase.from('subjects').upsert([obj]).catch(e => console.warn(e));
     }
@@ -556,6 +799,9 @@ class Store {
     this.state.classes.push(obj);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'classes', classId), obj).catch(e => console.warn(e));
+    }
     if (supabase) {
       supabase.from('classes').upsert([obj]).catch(e => console.warn(e));
     }
@@ -567,6 +813,9 @@ class Store {
     this.state.schedules.push(schedule);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'schedules', newId), schedule).catch(e => console.warn(e));
+    }
     if (supabase) {
       supabase.from('schedules').upsert([schedule]).catch(e => console.warn(e));
     }
@@ -577,6 +826,9 @@ class Store {
     this.state.schedules = this.state.schedules.filter(s => String(s.id) !== idStr);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      deleteDoc(doc(db, 'schedules', idStr)).catch(e => console.warn(e));
+    }
     if (supabase) {
       supabase.from('schedules').delete().eq('id', idStr).catch(e => console.warn(e));
     }
@@ -588,6 +840,10 @@ class Store {
     this.state.broadcastNews.push(newsObj);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'broadcastNews', newId), newsObj).catch(err => console.warn(err));
+      setDoc(doc(db, 'news', newId), newsObj).catch(err => console.warn(err));
+    }
     if (supabase) {
       supabase.from('broadcastNews').upsert([newsObj]).catch(err => console.warn(err));
     }
@@ -601,6 +857,10 @@ class Store {
       item.url = newUrl;
       this.saveState();
 
+      if (isFirebaseConnected && db) {
+        setDoc(doc(db, 'broadcastNews', idStr), item, { merge: true }).catch(err => console.warn(err));
+        setDoc(doc(db, 'news', idStr), item, { merge: true }).catch(err => console.warn(err));
+      }
       if (supabase) {
         supabase.from('broadcastNews').upsert([{ id: idStr, title: newTitle, url: newUrl }]).catch(err => console.warn(err));
       }
@@ -627,6 +887,10 @@ class Store {
     this.state.broadcastNews = this.state.broadcastNews.filter(n => String(n.id) !== idStr);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      deleteDoc(doc(db, 'broadcastNews', idStr)).catch(err => console.warn(err));
+      deleteDoc(doc(db, 'news', idStr)).catch(err => console.warn(err));
+    }
     if (supabase) {
       supabase.from('broadcastNews').delete().eq('id', idStr).catch(err => console.warn(err));
     }
@@ -641,6 +905,9 @@ class Store {
       item.mapel = mapel;
       this.saveState();
 
+      if (isFirebaseConnected && db) {
+        setDoc(doc(db, 'teachers', idStr), item, { merge: true }).catch(err => console.warn(err));
+      }
       if (supabase) {
         supabase.from('teachers').upsert([{ id: idStr, name, username, mapel }]).catch(err => console.warn(err));
       }
@@ -655,6 +922,9 @@ class Store {
       item.nama_mapel = newName;
       this.saveState();
 
+      if (isFirebaseConnected && db) {
+        setDoc(doc(db, 'subjects', idStr), item, { merge: true }).catch(err => console.warn(err));
+      }
       if (supabase) {
         supabase.from('subjects').upsert([{ id: idStr, name: newName, nama_mapel: newName }]).catch(err => console.warn(err));
       }
@@ -666,6 +936,9 @@ class Store {
     this.state.mapel = this.state.mapel.filter(m => String(m.id) !== idStr);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      deleteDoc(doc(db, 'subjects', idStr)).catch(err => console.warn(err));
+    }
     if (supabase) {
       supabase.from('subjects').delete().eq('id', idStr).catch(err => console.warn(err));
     }
@@ -683,6 +956,14 @@ class Store {
     this.state.students.push(studentObj);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'users', String(newId)), {
+        studentName: studentObj.name,
+        studentId: studentObj.nis,
+        className: studentObj.class,
+        role: 'siswa'
+      }, { merge: true }).catch(err => console.warn(err));
+    }
     if (supabase) {
       supabase.from('users').upsert([studentObj]).catch(err => console.warn(err));
     }
@@ -697,6 +978,14 @@ class Store {
       item.class = className;
       this.saveState();
 
+      if (isFirebaseConnected && db) {
+        setDoc(doc(db, 'users', idStr), {
+          studentName: name,
+          studentId: nis,
+          className: className,
+          role: 'siswa'
+        }, { merge: true }).catch(err => console.warn(err));
+      }
       if (supabase) {
         supabase.from('users').upsert([{
           id: idStr,
@@ -714,6 +1003,9 @@ class Store {
     this.state.students = this.state.students.filter(s => String(s.id) !== idStr && String(s.nis) !== idStr);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      deleteDoc(doc(db, 'users', idStr)).catch(err => console.warn(err));
+    }
     if (supabase) {
       supabase.from('users').delete().eq('id', idStr).catch(err => console.warn(err));
     }
@@ -726,6 +1018,9 @@ class Store {
       Object.assign(item, updatedData);
       this.saveState();
 
+      if (isFirebaseConnected && db) {
+        setDoc(doc(db, 'schedules', idStr), item, { merge: true }).catch(err => console.warn(err));
+      }
       if (supabase) {
         supabase.from('schedules').upsert([item]).catch(err => console.warn(err));
       }
@@ -795,6 +1090,9 @@ class Store {
     this.deduplicateAttendance();
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'attendance', newId), attObj).catch(e => console.warn(e));
+    }
     if (supabase) {
       supabase.from('attendance').upsert([attObj]).catch(e => console.warn(e));
     }
@@ -820,6 +1118,9 @@ class Store {
     }
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'grades', newId), gradeObj).catch(e => console.warn(e));
+    }
     if (supabase) {
       supabase.from('grades').upsert([gradeObj]).catch(e => console.warn(e));
     }
@@ -833,6 +1134,9 @@ class Store {
     };
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'content_visimisi', 'visimisi_tkj'), this.state.visiMisi, { merge: true }).catch(e => console.warn(e));
+    }
     if (supabase) {
       supabase.from('content_visimisi').upsert([{ id: 'visimisi_tkj', visi: this.state.visiMisi.visi, misi: this.state.visiMisi.misi }]).catch(e => console.warn(e));
     }
@@ -853,6 +1157,9 @@ class Store {
     this.state.galeriItems.unshift(newItem);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'galeri_siswa', newItem.id), newItem).catch(e => console.warn(e));
+    }
     if (supabase) {
       supabase.from('galeri_siswa').upsert([newItem]).then(({ error }) => {
         if (error) console.warn('Supabase galeri_siswa upsert note:', error.message);
@@ -868,6 +1175,9 @@ class Store {
       Object.assign(item, updatedData);
       this.saveState();
 
+      if (isFirebaseConnected && db) {
+        setDoc(doc(db, 'galeri_siswa', idStr), item, { merge: true }).catch(e => console.warn(e));
+      }
       if (supabase) {
         supabase.from('galeri_siswa').upsert([item]).then(({ error }) => {
           if (error) console.warn('Supabase galeri_siswa update note:', error.message);
@@ -882,6 +1192,9 @@ class Store {
     this.state.galeriItems = this.state.galeriItems.filter(g => String(g.id) !== idStr);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      deleteDoc(doc(db, 'galeri_siswa', idStr)).catch(e => console.warn(e));
+    }
     if (supabase) {
       supabase.from('galeri_siswa').delete().eq('id', idStr).then(({ error }) => {
         if (error) console.warn('Supabase galeri_siswa delete note:', error.message);
@@ -903,6 +1216,9 @@ class Store {
     this.state.kalenderAgendas.push(newAgenda);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'kalender_agenda', newAgenda.id), newAgenda).catch(e => console.warn(e));
+    }
     if (supabase) {
       supabase.from('kalender_agenda').upsert([newAgenda]).catch(e => console.warn(e));
     }
@@ -914,6 +1230,9 @@ class Store {
     this.state.kalenderAgendas = this.state.kalenderAgendas.filter(a => String(a.id) !== idStr);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      deleteDoc(doc(db, 'kalender_agenda', idStr)).catch(e => console.warn(e));
+    }
     if (supabase) {
       supabase.from('kalender_agenda').delete().eq('id', idStr).catch(e => console.warn(e));
     }
@@ -932,6 +1251,9 @@ class Store {
     this.state.elibraryBooks.push(newBook);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      setDoc(doc(db, 'elibrary_buku', newBook.id), newBook).catch(e => console.warn(e));
+    }
     if (supabase) {
       supabase.from('elibrary_buku').upsert([newBook]).catch(e => console.warn(e));
     }
@@ -943,6 +1265,9 @@ class Store {
     this.state.elibraryBooks = this.state.elibraryBooks.filter(b => String(b.id) !== idStr);
     this.saveState();
 
+    if (isFirebaseConnected && db) {
+      deleteDoc(doc(db, 'elibrary_buku', idStr)).catch(e => console.warn(e));
+    }
     if (supabase) {
       supabase.from('elibrary_buku').delete().eq('id', idStr).catch(e => console.warn(e));
     }
