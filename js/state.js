@@ -44,7 +44,8 @@ const defaultState = {
   activeTabs: {
     siswa: 'home',   // 'home', 'pelajaran', 'scan', 'notifikasi', 'akun'
     guru: 'beranda', // 'beranda', 'absensi', 'nilai', 'profil'
-    admin: 'home'    // 'home', 'guru', 'mapel', 'siswa', 'jadwal', 'setting'
+    admin: 'home',   // 'home', 'guru', 'mapel', 'siswa', 'jadwal', 'setting'
+    guest: 'home'    // 'home', 'galeri', 'kalender', 'videotkj', 'info'
   },
 
   // Sub tab filters

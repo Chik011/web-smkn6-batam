@@ -61,7 +61,8 @@ function syncTabFromHash() {
     const validTabs = {
       siswa: ['home', 'pelajaran', 'scan', 'notifikasi', 'akun', 'visimisi', 'gurutkj', 'totalsiswa', 'kalender', 'galerisiswa', 'library', 'elibrary', 'videotkj'],
       guru: ['beranda', 'absensi', 'nilai', 'profil'],
-      admin: ['home', 'guru', 'mapel', 'siswa', 'jadwal', 'setting', 'galeri', 'kalender', 'elibrary']
+      admin: ['home', 'guru', 'mapel', 'siswa', 'jadwal', 'setting', 'galeri', 'kalender', 'elibrary'],
+      guest: ['home', 'galeri', 'kalender', 'info', 'videotkj']
     };
     if (validTabs[role] && validTabs[role].includes(hash)) {
       if (store.state.activeTabs[role] !== hash) {
@@ -180,9 +181,10 @@ function renderApp() {
   syncTabFromHash();
 
   const activeTab = state.activeTabs[role] || (role === 'guru' ? 'beranda' : 'home');
-  const targetUrl = `./${role}.html#${activeTab}`;
+  const pageRole = (role === 'guest') ? 'siswa' : role;
+  const targetUrl = `./${pageRole}.html#${activeTab}`;
   const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-  if (currentPath !== `${role}.html` || window.location.hash !== '#' + activeTab) {
+  if (currentPath !== `${pageRole}.html` || window.location.hash !== '#' + activeTab) {
     try {
       history.replaceState(null, '', targetUrl);
     } catch (e) { }
@@ -192,6 +194,7 @@ function renderApp() {
   if (role === 'siswa') screenResult = renderSiswaScreen(state);
   else if (role === 'guru') screenResult = renderGuruScreen(state);
   else if (role === 'admin') screenResult = renderAdminScreen(state);
+  else if (role === 'guest') screenResult = renderGuestScreen(state);
 
   const headerExists = document.querySelector('.desktop-header-block');
   let phoneScreen = document.getElementById('phoneScreen');
@@ -359,6 +362,339 @@ function bindBottomNavEvents(role) {
       }
     });
   });
+}
+
+function renderGuestScreen(state) {
+  const activeTab = state.activeTabs.guest || 'home';
+  const guestName = state.currentUser?.guest?.name || state.loggedName || 'Tamu';
+
+  const currentHour = new Date().getHours();
+  let greeting = 'Selamat Datang';
+  if (currentHour >= 4 && currentHour < 11) greeting = 'Selamat Pagi ☀️';
+  else if (currentHour >= 11 && currentHour < 15) greeting = 'Selamat Siang 🌤️';
+  else if (currentHour >= 15 && currentHour < 18) greeting = 'Selamat Sore 🌇';
+  else greeting = 'Selamat Malam 🌙';
+
+  let contentHtml = '';
+
+  if (activeTab === 'home') {
+    const newsList = state.broadcastNews || [];
+    contentHtml = `
+      <div class="app-header-card" style="background: linear-gradient(135deg, #0f4c75 0%, #1b6ca8 50%, #0a3d5c 100%);">
+        <div class="header-top-row">
+          <div class="user-info-group">
+            <div class="user-avatar-circle" style="background: rgba(255,255,255,0.2); box-shadow: 0 4px 14px rgba(0,0,0,0.2);">
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            </div>
+            <div class="user-text-details">
+              <p style="font-size:0.75rem; opacity:0.85; margin-bottom:2px;">${greeting},</p>
+              <h3>${guestName}</h3>
+              <p style="font-size:0.72rem; opacity:0.75;">👤 Mode Tamu / Pengunjung</p>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.15); padding:6px 12px; border-radius:20px; font-size:0.7rem; font-weight:700; color:#fff; letter-spacing:0.5px;">GUEST</div>
+        </div>
+      </div>
+
+      <div class="overlapping-card" style="margin-top:-12px;">
+        <div style="background: linear-gradient(135deg, #fff8e1, #fff3cd); border:1px solid #fde68a; border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px;">
+          <div style="width:40px; height:40px; background:#f59e0b; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:1.2rem;">👋</div>
+          <div>
+            <h4 style="font-size:0.88rem; font-weight:700; color:#92400e; margin:0 0 2px 0;">Selamat Datang di SMKN 6 Batam!</h4>
+            <p style="font-size:0.73rem; color:#78350f; margin:0; line-height:1.4;">Anda login sebagai tamu. Jelajahi informasi sekolah kami.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding: 0 16px 16px 16px;">
+        <h4 style="font-size:0.8rem; font-weight:800; color:#1e293b; text-transform:uppercase; letter-spacing:0.5px; margin:18px 0 12px 0;">📌 Menu Informasi</h4>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px;">
+          <button onclick="window.switchRoleTab('guest','galeri')" style="background:#f0f9ff; border:1.5px solid #bae6fd; border-radius:14px; padding:14px 12px; text-align:left; cursor:pointer; transition:all 0.2s;">
+            <div style="font-size:1.4rem; margin-bottom:6px;">🖼️</div>
+            <div style="font-size:0.82rem; font-weight:700; color:#0369a1;">Galeri Sekolah</div>
+            <div style="font-size:0.68rem; color:#64748b; margin-top:2px;">Foto & kegiatan</div>
+          </button>
+          <button onclick="window.switchRoleTab('guest','kalender')" style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:14px; padding:14px 12px; text-align:left; cursor:pointer; transition:all 0.2s;">
+            <div style="font-size:1.4rem; margin-bottom:6px;">📅</div>
+            <div style="font-size:0.82rem; font-weight:700; color:#16a34a;">Kalender Akademik</div>
+            <div style="font-size:0.68rem; color:#64748b; margin-top:2px;">Agenda sekolah</div>
+          </button>
+          <button onclick="window.switchRoleTab('guest','videotkj')" style="background:#fdf4ff; border:1.5px solid #e9d5ff; border-radius:14px; padding:14px 12px; text-align:left; cursor:pointer; transition:all 0.2s;">
+            <div style="font-size:1.4rem; margin-bottom:6px;">🎬</div>
+            <div style="font-size:0.82rem; font-weight:700; color:#9333ea;">Video TKJ</div>
+            <div style="font-size:0.68rem; color:#64748b; margin-top:2px;">Konten YouTube</div>
+          </button>
+          <button onclick="window.switchRoleTab('guest','info')" style="background:#fff7ed; border:1.5px solid #fed7aa; border-radius:14px; padding:14px 12px; text-align:left; cursor:pointer; transition:all 0.2s;">
+            <div style="font-size:1.4rem; margin-bottom:6px;">ℹ️</div>
+            <div style="font-size:0.82rem; font-weight:700; color:#ea580c;">Info Sekolah</div>
+            <div style="font-size:0.68rem; color:#64748b; margin-top:2px;">Profil & kontak</div>
+          </button>
+        </div>
+
+        ${newsList.length > 0 ? `
+          <h4 style="font-size:0.8rem; font-weight:800; color:#1e293b; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 10px 0;">📢 Pengumuman Terbaru</h4>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            ${newsList.slice(0, 3).map(n => `
+              <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #0284c7; border-radius:10px; padding:10px 12px;">
+                <h5 style="font-size:0.82rem; font-weight:700; color:#1e293b; margin:0 0 2px 0;">${n.title || 'Pengumuman'}</h5>
+                <p style="font-size:0.7rem; color:#64748b; margin:0;">${n.url ? `<a href="${n.url}" target="_blank" style="color:#0284c7;">Buka Link →</a>` : 'Tidak ada link.'}</p>
+              </div>
+            `).join('')}
+          </div>
+        ` : `
+          <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; padding:20px; text-align:center;">
+            <div style="font-size:2rem; margin-bottom:8px;">📭</div>
+            <p style="font-size:0.8rem; color:#64748b; margin:0;">Belum ada pengumuman terbaru.</p>
+          </div>
+        `}
+
+        <div style="margin-top:18px; background:linear-gradient(135deg,#0f2942,#1a3a5c); border-radius:16px; padding:16px; text-align:center;">
+          <p style="font-size:0.78rem; color:#93c5fd; margin:0 0 10px 0;">Ingin akses fitur lengkap?</p>
+          <button onclick="window.logout(true)" style="background:#0ea5e9; color:white; border:none; border-radius:10px; padding:10px 20px; font-size:0.82rem; font-weight:700; cursor:pointer;">🔐 Login sebagai Siswa/Guru</button>
+        </div>
+      </div>
+    `;
+  } else if (activeTab === 'galeri') {
+    const galeri = state.galeri || [];
+    contentHtml = `
+      <div style="padding:16px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+          <div style="width:36px; height:36px; background:linear-gradient(135deg,#0ea5e9,#0284c7); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">🖼️</div>
+          <div>
+            <h2 style="font-size:1rem; font-weight:800; color:#0f172a; margin:0;">Galeri Sekolah</h2>
+            <p style="font-size:0.72rem; color:#64748b; margin:0;">Foto & kegiatan SMKN 6 Batam</p>
+          </div>
+        </div>
+        ${galeri.length > 0 ? `
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            ${galeri.map(g => `
+              <div style="border-radius:12px; overflow:hidden; background:#f1f5f9; aspect-ratio:1; position:relative;">
+                <img src="${g.url || g.imageUrl || ''}" alt="${g.title || 'Foto'}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'" />
+                <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(transparent,rgba(0,0,0,0.6)); padding:8px 6px 6px 6px;">
+                  <p style="font-size:0.68rem; font-weight:600; color:white; margin:0;">${g.title || 'Foto Sekolah'}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : `
+          <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:16px; padding:40px 20px; text-align:center;">
+            <div style="font-size:3rem; margin-bottom:12px;">🖼️</div>
+            <h4 style="font-size:0.9rem; font-weight:700; color:#334155; margin:0 0 6px 0;">Galeri Masih Kosong</h4>
+            <p style="font-size:0.78rem; color:#64748b; margin:0;">Admin belum menambahkan foto galeri.</p>
+          </div>
+        `}
+      </div>
+    `;
+  } else if (activeTab === 'kalender') {
+    contentHtml = `
+      <div style="padding:16px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+          <div style="width:36px; height:36px; background:linear-gradient(135deg,#10b981,#059669); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">📅</div>
+          <div>
+            <h2 style="font-size:1rem; font-weight:800; color:#0f172a; margin:0;">Kalender Akademik</h2>
+            <p style="font-size:0.72rem; color:#64748b; margin:0;">Agenda & tanggal penting 2026/2027</p>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #0284c7; border-radius:12px; padding:12px 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:0.7rem; font-weight:700; color:#0284c7;">15 - 20 Sep 2026</span>
+              <span style="background:#e0f2fe; color:#0284c7; padding:2px 8px; border-radius:6px; font-size:0.65rem; font-weight:700;">Ujian</span>
+            </div>
+            <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:0 0 2px 0;">Ujian Tengah Semester Ganjil</h4>
+            <p style="font-size:0.72rem; color:#64748b; margin:0;">Seluruh mata pelajaran untuk semua kelas.</p>
+          </div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #6366f1; border-radius:12px; padding:12px 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:0.7rem; font-weight:700; color:#6366f1;">05 - 12 Okt 2026</span>
+              <span style="background:#e0e7ff; color:#4338ca; padding:2px 8px; border-radius:6px; font-size:0.65rem; font-weight:700;">TKJ Specialty</span>
+            </div>
+            <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:0 0 2px 0;">Lomba Kompetensi Siswa (LKS)</h4>
+            <p style="font-size:0.72rem; color:#64748b; margin:0;">Kompetisi antar siswa jurusan TKJ.</p>
+          </div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #10b981; border-radius:12px; padding:12px 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:0.7rem; font-weight:700; color:#10b981;">10 - 15 Nov 2026</span>
+              <span style="background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:6px; font-size:0.65rem; font-weight:700;">UKK TKJ</span>
+            </div>
+            <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:0 0 2px 0;">Uji Kompetensi Keahlian</h4>
+            <p style="font-size:0.72rem; color:#64748b; margin:0;">Ujian akhir kompetensi keahlian TKJ.</p>
+          </div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #f59e0b; border-radius:12px; padding:12px 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:0.7rem; font-weight:700; color:#d97706;">01 Des 2026</span>
+              <span style="background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:6px; font-size:0.65rem; font-weight:700;">Libur</span>
+            </div>
+            <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:0 0 2px 0;">Hari Maulid Nabi Muhammad SAW</h4>
+            <p style="font-size:0.72rem; color:#64748b; margin:0;">Libur nasional — kegiatan sekolah diliburkan.</p>
+          </div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #ef4444; border-radius:12px; padding:12px 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:0.7rem; font-weight:700; color:#ef4444;">15 - 30 Des 2026</span>
+              <span style="background:#fee2e2; color:#dc2626; padding:2px 8px; border-radius:6px; font-size:0.65rem; font-weight:700;">Semester</span>
+            </div>
+            <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:0 0 2px 0;">Ujian Akhir Semester Ganjil</h4>
+            <p style="font-size:0.72rem; color:#64748b; margin:0;">Ujian semester untuk kenaikan kelas.</p>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (activeTab === 'videotkj') {
+    const youtubeList = state.broadcastNews || [];
+    contentHtml = `
+      <div style="padding:16px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+          <div style="width:36px; height:36px; background:linear-gradient(135deg,#9333ea,#7c3aed); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">🎬</div>
+          <div>
+            <h2 style="font-size:1rem; font-weight:800; color:#0f172a; margin:0;">Video TKJ</h2>
+            <p style="font-size:0.72rem; color:#64748b; margin:0;">Konten pembelajaran dari YouTube TKJ SMKN 6</p>
+          </div>
+        </div>
+        <a href="https://www.youtube.com/@tkjteknikkomputerdanjaring7669" target="_blank" rel="noopener noreferrer"
+           style="display:flex; align-items:center; gap:10px; background:linear-gradient(135deg,#dc2626,#b91c1c); color:white; border-radius:12px; padding:12px 14px; text-decoration:none; margin-bottom:14px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+          <div>
+            <div style="font-size:0.85rem; font-weight:700;">Subscribe Channel TKJ SMKN 6</div>
+            <div style="font-size:0.7rem; opacity:0.85;">@tkjteknikkomputerdanjaring7669</div>
+          </div>
+          <svg style="margin-left:auto;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        ${youtubeList.length > 0 ? `
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            ${youtubeList.map(v => {
+              const ytId = v.url ? (v.url.match(/(?:v=|youtu\.be\/)([^&\n?]+)/)?.[1] || '') : '';
+              return `
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden;">
+                  ${ytId ? `<img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" style="width:100%; height:140px; object-fit:cover;" alt="${v.title}" />` : ''}
+                  <div style="padding:10px 12px;">
+                    <h4 style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:0 0 6px 0;">${v.title || 'Video TKJ'}</h4>
+                    ${v.url ? `<a href="${v.url}" target="_blank" style="font-size:0.73rem; color:#0284c7; font-weight:600; text-decoration:none;">▶ Tonton di YouTube →</a>` : ''}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        ` : `
+          <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:16px; padding:40px 20px; text-align:center;">
+            <div style="font-size:3rem; margin-bottom:12px;">🎬</div>
+            <h4 style="font-size:0.9rem; font-weight:700; color:#334155; margin:0 0 6px 0;">Belum Ada Video</h4>
+            <p style="font-size:0.78rem; color:#64748b; margin:0;">Admin belum menambahkan video pembelajaran.</p>
+          </div>
+        `}
+      </div>
+    `;
+  } else if (activeTab === 'info') {
+    contentHtml = `
+      <div style="padding:16px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+          <div style="width:36px; height:36px; background:linear-gradient(135deg,#f59e0b,#d97706); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">ℹ️</div>
+          <div>
+            <h2 style="font-size:1rem; font-weight:800; color:#0f172a; margin:0;">Info Sekolah</h2>
+            <p style="font-size:0.72rem; color:#64748b; margin:0;">Profil & kontak SMKN 6 Batam</p>
+          </div>
+        </div>
+
+        <div style="background:linear-gradient(135deg,#0b2545,#134074); border-radius:16px; padding:18px; margin-bottom:14px; display:flex; align-items:center; gap:14px;">
+          <img src="img/Logo_SMKN6.png" alt="Logo" style="width:56px; height:56px; object-fit:contain; border-radius:12px;" />
+          <div>
+            <h3 style="font-size:1rem; font-weight:800; color:#ffffff; margin:0 0 2px 0;">SMK NEGERI 6 BATAM</h3>
+            <p style="font-size:0.72rem; color:#93c5fd; margin:0;">Teknik Komputer & Jaringan (TKJ)</p>
+            <p style="font-size:0.68rem; color:#64748b; margin:4px 0 0 0; color:#7dd3fc;">Terakreditasi A</p>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px;">
+            <span style="font-size:1.2rem;">📍</span>
+            <div>
+              <div style="font-size:0.78rem; font-weight:700; color:#1e293b;">Alamat</div>
+              <div style="font-size:0.72rem; color:#64748b;">Jl. Kabil, Batam Kota, Kepulauan Riau</div>
+            </div>
+          </div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px;">
+            <span style="font-size:1.2rem;">📞</span>
+            <div>
+              <div style="font-size:0.78rem; font-weight:700; color:#1e293b;">Telepon</div>
+              <div style="font-size:0.72rem; color:#64748b;">(0778) 123456</div>
+            </div>
+          </div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px;">
+            <span style="font-size:1.2rem;">✉️</span>
+            <div>
+              <div style="font-size:0.78rem; font-weight:700; color:#1e293b;">Email</div>
+              <div style="font-size:0.72rem; color:#64748b;">info@smkn6batam.sch.id</div>
+            </div>
+          </div>
+          <a href="https://www.instagram.com/tkj_smkn_6/" target="_blank" rel="noopener noreferrer"
+             style="background:#fdf2f8; border:1px solid #f9a8d4; border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; text-decoration:none;">
+            <span style="font-size:1.2rem;">📷</span>
+            <div>
+              <div style="font-size:0.78rem; font-weight:700; color:#be185d;">Instagram</div>
+              <div style="font-size:0.72rem; color:#64748b;">@tkj_smkn_6</div>
+            </div>
+            <svg style="margin-left:auto;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#be185d" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:14px; padding:14px; margin-bottom:14px;">
+          <h4 style="font-size:0.82rem; font-weight:800; color:#15803d; margin:0 0 8px 0;">🎯 Visi TKJ SMKN 6 Batam</h4>
+          <p style="font-size:0.75rem; color:#166534; line-height:1.5; margin:0;">"Menjadi lembaga pendidikan kejuruan yang unggul, berkarakter, dan menghasilkan lulusan kompeten di bidang Teknik Komputer & Jaringan."</p>
+        </div>
+
+        <div style="margin-top:4px; text-align:center;">
+          <button onclick="window.logout(true)" style="background:linear-gradient(135deg,#64748b,#475569); color:white; border:none; border-radius:12px; padding:12px 24px; font-size:0.83rem; font-weight:700; cursor:pointer; width:100%;">🔐 Kembali & Login Akun Lain</button>
+        </div>
+      </div>
+    `;
+  }
+
+  const bottomNavHtml = `
+    <nav class="phone-bottom-nav">
+      <button class="nav-item ${activeTab === 'home' ? 'active' : ''}" data-tab="home">
+        <div class="nav-icon-wrapper">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 00-1 1m-6 0h6"/></svg>
+        </div>
+        <span>Home</span>
+      </button>
+
+      <button class="nav-item ${activeTab === 'galeri' ? 'active' : ''}" data-tab="galeri">
+        <div class="nav-icon-wrapper">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        </div>
+        <span>Galeri</span>
+      </button>
+
+      <button class="nav-item ${activeTab === 'kalender' ? 'active' : ''}" data-tab="kalender">
+        <div class="nav-icon-wrapper">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        </div>
+        <span>Kalender</span>
+      </button>
+
+      <button class="nav-item ${activeTab === 'videotkj' ? 'active' : ''}" data-tab="videotkj">
+        <div class="nav-icon-wrapper">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <span>Video</span>
+      </button>
+
+      <button class="nav-item ${activeTab === 'info' ? 'active' : ''}" data-tab="info">
+        <div class="nav-icon-wrapper">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <span>Info</span>
+      </button>
+
+      <button class="nav-item nav-logout-btn" type="button" onclick="window.logout()" title="Logout">
+        <div class="nav-icon-wrapper">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        </div>
+        <span>Logout</span>
+      </button>
+    </nav>
+  `;
+
+  return { contentHtml, bottomNavHtml };
 }
 
 // Global Window Helpers for Interactive Inline Click Triggers
