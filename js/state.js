@@ -2,6 +2,7 @@
 import { supabase, getYouTubeDetails } from './supabase.js';
 
 const STORAGE_KEY = 'SMKN6_APP_DATA_V3';
+const SESSION_KEY = 'SMKN6_SESSION_DATA_V1';
 
 const defaultState = {
   isLoggedIn: false,
@@ -142,10 +143,11 @@ class Store {
     if (!supabase) return;
 
     try {
-      // 1. Fetch App State (Global state if table exists)
+      // 1. Fetch App State (Global state if table exists - exclude private session login)
       const { data: stateData } = await supabase.from('app_state').select('*').limit(1).maybeSingle();
       if (stateData && stateData.state) {
-        this.state = { ...this.state, ...stateData.state };
+        const { isLoggedIn, activeRole, currentUser, activeTabs, ...safeGlobalState } = stateData.state;
+        this.state = { ...this.state, ...safeGlobalState };
         this.saveStateToLocalStorage();
         this.notify();
       }
@@ -257,13 +259,36 @@ class Store {
           ...parsed,
           activeTabs: { ...defaultState.activeTabs, ...(parsed.activeTabs || {}) },
           currentUser: { ...defaultState.currentUser, ...(parsed.currentUser || {}) },
-          adminSubView: { ...defaultState.adminSubView, ...(parsed.adminSubView || {}) }
+          adminSubView: { ...defaultState.adminSubView, ...(parsed.adminSubView || {}) },
+          isLoggedIn: false // Selalu default tidak login saat buka web baru
         };
       } else {
         this.state = JSON.parse(JSON.stringify(defaultState));
       }
+
+      // Restore session data (hanya bertahan selama tab/browser aktif, hilang saat browser ditutup)
+      const sessionSaved = sessionStorage.getItem(SESSION_KEY);
+      if (sessionSaved) {
+        const sessionParsed = JSON.parse(sessionSaved);
+        if (sessionParsed && typeof sessionParsed === 'object') {
+          this.state.isLoggedIn = !!sessionParsed.isLoggedIn;
+          if (sessionParsed.activeRole) this.state.activeRole = sessionParsed.activeRole;
+          if (sessionParsed.activeTabs) {
+            this.state.activeTabs = { ...this.state.activeTabs, ...sessionParsed.activeTabs };
+          }
+          if (sessionParsed.currentUser) {
+            this.state.currentUser = { ...this.state.currentUser, ...sessionParsed.currentUser };
+          }
+          if (sessionParsed.guruSubTab) {
+            this.state.guruSubTab = { ...this.state.guruSubTab, ...sessionParsed.guruSubTab };
+          }
+          if (sessionParsed.adminSubView) {
+            this.state.adminSubView = { ...this.state.adminSubView, ...sessionParsed.adminSubView };
+          }
+        }
+      }
     } catch (e) {
-      console.error("Error loading state from LocalStorage", e);
+      console.error("Error loading state from Storage", e);
       this.state = JSON.parse(JSON.stringify(defaultState));
     }
     this.applyTheme();
@@ -271,9 +296,25 @@ class Store {
 
   saveStateToLocalStorage() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+      // Simpan data master ke localStorage tanpa status login permanen
+      const persistentState = {
+        ...this.state,
+        isLoggedIn: false
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(persistentState));
+
+      // Simpan status sesi aktif ke sessionStorage (tetap bertahan saat di-refresh F5)
+      const sessionData = {
+        isLoggedIn: this.state.isLoggedIn,
+        activeRole: this.state.activeRole,
+        activeTabs: this.state.activeTabs,
+        currentUser: this.state.currentUser,
+        guruSubTab: this.state.guruSubTab,
+        adminSubView: this.state.adminSubView
+      };
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
     } catch (e) {
-      console.error("Error saving state to LocalStorage", e);
+      console.error("Error saving state to Storage", e);
     }
   }
 
@@ -395,6 +436,9 @@ class Store {
 
   logout() {
     this.state.isLoggedIn = false;
+    try {
+      sessionStorage.removeItem(SESSION_KEY);
+    } catch (e) { }
     this.saveState();
   }
 
