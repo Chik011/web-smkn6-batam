@@ -399,7 +399,7 @@ function renderAkun(state) {
   `;
 }
 
-function renderVisiMisiView(state) {
+export function renderVisiMisiView(state) {
   const data = state.visiMisi || {
     visi: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     misi: [
@@ -449,7 +449,7 @@ window.filterSiswaList = function(q) {
   store.notify();
 };
 
-function renderGuruTKJView(state) {
+export function renderGuruTKJView(state) {
   const allTeachers = state.teachers || [];
   const q = (window.filterGuruQuery || '').trim().toLowerCase();
   
@@ -491,7 +491,7 @@ function renderGuruTKJView(state) {
   `;
 }
 
-function renderTotalSiswaView(state) {
+export function renderTotalSiswaView(state) {
   const allStudents = state.students || [];
 
   const k10 = allStudents.filter(s => {
@@ -551,7 +551,7 @@ function renderTotalSiswaView(state) {
   `;
 }
 
-function generateMonthCalendarHtml(year, monthIndex) {
+export function generateMonthCalendarHtml(year, monthIndex, monthOffset = 0) {
   const monthNames = [
     'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
     'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
@@ -618,12 +618,21 @@ function generateMonthCalendarHtml(year, monthIndex) {
     `;
   }
 
+  let badgeLabel = 'Bulan Mendatang';
+  if (isCurrentMonth || monthOffset === 0) {
+    badgeLabel = 'Bulan Ini (Real-Time)';
+  } else if (monthOffset === 1) {
+    badgeLabel = 'Bulan Depan';
+  } else if (monthOffset === 2) {
+    badgeLabel = 'Bulan Ke-3';
+  }
+
   return `
     <div style="background:white; border:1px solid #e2e8f0; border-radius:16px; padding:14px; box-shadow:0 2px 8px rgba(0,0,0,0.04); margin-bottom:14px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #f1f5f9;">
         <h4 style="font-size:0.95rem; font-weight:800; color:#0f172a; margin:0;">🗓️ ${monthNames[monthIndex]} ${year}</h4>
         <span style="font-size:0.7rem; font-weight:700; color:${isCurrentMonth ? '#0284c7' : '#64748b'}; background:${isCurrentMonth ? '#e0f2fe' : '#f1f5f9'}; padding:3px 8px; border-radius:6px;">
-          ${isCurrentMonth ? 'Bulan Ini (Real-Time)' : 'Bulan Depan'}
+          ${badgeLabel}
         </span>
       </div>
 
@@ -686,7 +695,7 @@ window.showCalendarDateDetail = function(monthName, day, year) {
     </div>
     <h3 style="font-size:1.1rem; font-weight:800; color:#0f172a; margin:0 0 8px 0; line-height:1.35;">${eventTitle}</h3>
     <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid ${eventColor}; padding:12px 14px; border-radius:12px; margin-bottom:16px;">
-      <div style="font-size:0.72rem; font-weight:700; color:#64748b; margin-bottom:4px; text-transform:uppercase;">Deskripsi Acara (Lorem Ipsum):</div>
+      <div style="font-size:0.72rem; font-weight:700; color:#64748b; margin-bottom:4px; text-transform:uppercase;">Deskripsi Acara:</div>
       <p style="font-size:0.8rem; color:#334155; line-height:1.55; margin:0;">
         ${eventDesc}
       </p>
@@ -696,7 +705,7 @@ window.showCalendarDateDetail = function(monthName, day, year) {
   overlay.classList.add('open');
 };
 
-function renderKalenderView(state) {
+export function renderKalenderView(state) {
   const now = new Date();
   const curYear = now.getFullYear();
   const curMonth = now.getMonth();
@@ -705,14 +714,19 @@ function renderKalenderView(state) {
   const nextYear = nextMonthDate.getFullYear();
   const nextMonth = nextMonthDate.getMonth();
 
-  const month1Html = generateMonthCalendarHtml(curYear, curMonth);
-  const month2Html = generateMonthCalendarHtml(nextYear, nextMonth);
+  const thirdMonthDate = new Date(curYear, curMonth + 2, 1);
+  const thirdYear = thirdMonthDate.getFullYear();
+  const thirdMonth = thirdMonthDate.getMonth();
+
+  const month1Html = generateMonthCalendarHtml(curYear, curMonth, 0);
+  const month2Html = generateMonthCalendarHtml(nextYear, nextMonth, 1);
+  const month3Html = generateMonthCalendarHtml(thirdYear, thirdMonth, 2);
 
   const agendas = state.kalenderAgendas || [
-    { id: '1', date: '15 - 20 September 2026', tag: 'PTS', title: 'Lorem Ipsum Dolor Sit Amet', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', color: '#0284c7', bg: '#e0f2fe', mName: 'September', dNum: 15 },
-    { id: '2', date: '05 - 12 Oktober 2026', tag: 'Sertifikasi', title: 'Lorem Ipsum Consectetur Adipiscing', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.', color: '#6366f1', bg: '#e0e7ff', mName: 'Oktober', dNum: 5 },
-    { id: '3', date: '10 - 15 November 2026', tag: 'UKK TKJ', title: 'Lorem Ipsum Eiusmod Tempor', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.', color: '#10b981', bg: '#dcfce7', mName: 'November', dNum: 10 },
-    { id: '4', date: '01 - 10 Desember 2026', tag: 'PAS Ganjil', title: 'Lorem Ipsum Labore Et Dolore', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa.', color: '#f59e0b', bg: '#fef3c7', mName: 'Desember', dNum: 1 }
+    { id: '1', date: '15 - 20 September 2026', tag: 'PTS', title: 'Penilaian Tengah Semester Ganjil', desc: 'Pelaksanaan PTS Ganjil untuk seluruh siswa kelas X, XI, dan XII TKJ.', color: '#0284c7', bg: '#e0f2fe', mName: 'September', dNum: 15 },
+    { id: '2', date: '05 - 12 Oktober 2026', tag: 'Sertifikasi', title: 'Uji Sertifikasi Kompetensi Mikrotik MTCNA', desc: 'Pelaksanaan sertifikasi internasional jaringan Mikrotik untuk siswa tingkat akhir.', color: '#6366f1', bg: '#e0e7ff', mName: 'Oktober', dNum: 5 },
+    { id: '3', date: '10 - 15 November 2026', tag: 'UKK TKJ', title: 'Pra-Uji Kompetensi Keahlian (UKK)', desc: 'Simulasi perakitan jaringan, routing, dan instalasi server.', color: '#10b981', bg: '#dcfce7', mName: 'November', dNum: 10 },
+    { id: '4', date: '01 - 10 Desember 2026', tag: 'PAS Ganjil', title: 'Penilaian Akhir Semester (PAS)', desc: 'Ujian akhir semester ganjil tahun ajaran 2026/2027.', color: '#f59e0b', bg: '#fef3c7', mName: 'Desember', dNum: 1 }
   ];
 
   return `
@@ -721,7 +735,7 @@ function renderKalenderView(state) {
         <button style="background:none; border:none; cursor:pointer;" onclick="window.switchSiswaTab('home')">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </button>
-        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b;">📅 Kalender Akademik Real-Time</h3>
+        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b; margin:0;">📅 Kalender Akademik (3 Bulan Real-Time)</h3>
       </div>
     </div>
     <div style="padding:16px;">
@@ -730,6 +744,9 @@ function renderKalenderView(state) {
 
       <!-- Month 2: Next Month -->
       ${month2Html}
+
+      <!-- Month 3: Third Month -->
+      ${month3Html}
 
       <!-- Detailed Agenda List -->
       <div style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:16px 0 10px 0;">Agenda & Catatan Penting (Klik untuk detail):</div>
@@ -741,7 +758,7 @@ function renderKalenderView(state) {
               <span style="background:${a.bg || '#e0f2fe'}; color:${a.color || '#0284c7'}; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${a.tag}</span>
             </div>
             <h4 style="font-size:0.9rem; font-weight:700; color:#1e293b; margin:4px 0 2px 0;">${a.title}</h4>
-            <p style="font-size:0.75rem; color:#64748b; margin:0; line-height:1.4;">${a.desc || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'}</p>
+            <p style="font-size:0.75rem; color:#64748b; margin:0; line-height:1.4;">${a.desc || 'Deskripsi agenda sekolah.'}</p>
           </div>
         `).join('')}
       </div>
@@ -749,7 +766,7 @@ function renderKalenderView(state) {
   `;
 }
 
-function renderGaleriSiswaView(state) {
+export function renderGaleriSiswaView(state) {
   const items = (state.galeriItems && state.galeriItems.length > 0) ? state.galeriItems : [
     { id: '1', title: 'Juara 1 LKS Network Administration', category: '🏆 PRESTASI', tagColor: '#b45309', tagBg: '#fef3c7', imageUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80', subtitle: 'Tim Siswa TKJ SMKN 6 Batam berhasil meraih Medali Emas LKS.' },
     { id: '2', title: 'Praktikum Fiber Optic Splicing', category: '🛠️ PRAKTIKUM', tagColor: '#0369a1', tagBg: '#e0f2fe', imageUrl: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=600&q=80', subtitle: 'Penyambungan kabel serat optik menggunakan Fusion Splicer.' },
@@ -814,7 +831,7 @@ function getGaleriItems() {
     ];
 }
 
-function renderGaleriDetailPage(state) {
+export function renderGaleriDetailPage(state) {
   const items = getGaleriItems();
   const idOrIdx = window.selectedGaleriItemId || '1';
 
@@ -972,7 +989,7 @@ window.filterLibrary = function(q) {
   store.notify();
 };
 
-function renderLibraryView(state) {
+export function renderLibraryView(state) {
   const allBooks = (state.elibraryBooks && state.elibraryBooks.length > 0) ? state.elibraryBooks : [
     { id: '1', title: 'Jaringan Dasar & Cisco Routing', category: 'Modular TKJ', desc: 'Modul praktikum konfigurasi Mikrotik, Cisco Packet Tracer & VLAN.', color: '#0284c7', icon: '📘', coverColor: 'linear-gradient(135deg, #0284c7, #0369a1)' },
     { id: '2', title: 'Administrasi System & Server Linux', category: 'Server & Cloud', desc: 'Panduan lengkap instalasi Debian, DNS Server, Web Server Apache & Nginx.', color: '#10b981', icon: '📗', coverColor: 'linear-gradient(135deg, #10b981, #047857)' },
@@ -1036,7 +1053,7 @@ function renderLibraryView(state) {
   `;
 }
 
-function renderVidioTKJView(state) {
+export function renderVidioTKJView(state) {
   const newsList = state.broadcastNews || [];
 
   return `
