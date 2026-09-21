@@ -403,13 +403,13 @@ function renderAkun(state) {
         <svg width="18" height="18" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
       </div>
 
-      <div class="account-menu-item" style="cursor:default;">
-        <div class="account-menu-left">
-          <span style="font-size:1.15rem;">${state.themeMode === 'dark' ? '🌙' : '☀️'}</span>
-          <span>Tema Gelap (Dark Mode)</span>
-        </div>
-        <input type="checkbox" ${state.themeMode === 'dark' ? 'checked' : ''} onchange="window.toggleThemeMode(this.checked)" style="width:20px; height:20px; cursor:pointer;" />
-      </div>
+      <button type="button" class="theme-toggle" role="switch" aria-label="Tema gelap" aria-checked="${state.themeMode === 'dark'}" onclick="window.toggleThemeMode(window.store.state.themeMode !== 'dark')">
+        <span class="theme-toggle-copy">
+          <span class="theme-toggle-title">Tema Gelap</span>
+          <span class="theme-toggle-status">${state.themeMode === 'dark' ? 'Aktif' : 'Nonaktif'}</span>
+        </span>
+        <span class="theme-toggle-track" aria-hidden="true"></span>
+      </button>
 
       <div class="account-menu-item" onclick="window.logout()">
         <div class="account-menu-left danger">

@@ -514,13 +514,13 @@ function renderProfil(state) {
         <p style="font-size:0.8rem; color:#64748b; margin-top:2px;">User: @${teacher.username}</p>
         <p style="font-size:0.8rem; color:#0284c7; font-weight:600; margin-top:4px;">Mapel: ${teacher.mapel}</p>
 
-        <div style="margin-top:16px; padding:12px; background:rgba(241,245,249,0.5); border-radius:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #e2e8f0;">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.1rem;">${state.themeMode === 'dark' ? '🌙' : '☀️'}</span>
-            <span style="font-size:0.85rem; font-weight:600; color:#1e293b;">Tema Gelap (Dark Mode)</span>
-          </div>
-          <input type="checkbox" ${state.themeMode === 'dark' ? 'checked' : ''} onchange="window.toggleThemeMode(this.checked)" style="width:20px; height:20px; cursor:pointer;" />
-        </div>
+        <button type="button" class="theme-toggle" role="switch" aria-label="Tema gelap" aria-checked="${state.themeMode === 'dark'}" onclick="window.toggleThemeMode(window.store.state.themeMode !== 'dark')">
+        <span class="theme-toggle-copy">
+          <span class="theme-toggle-title">Tema Gelap</span>
+          <span class="theme-toggle-status">${state.themeMode === 'dark' ? 'Aktif' : 'Nonaktif'}</span>
+        </span>
+        <span class="theme-toggle-track" aria-hidden="true"></span>
+      </button>
 
         <button class="btn-danger-outline mt-4" onclick="window.logout()">
           🚪 Logout dari Guru

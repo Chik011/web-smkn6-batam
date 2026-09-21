@@ -865,16 +865,13 @@ function renderSetting(state) {
     </div>
 
     <div class="content-card mt-4">
-      <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span style="font-size:1.3rem;">${state.themeMode === 'dark' ? '🌙' : '☀️'}</span>
-          <div>
-            <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b;">Tema Gelap (Dark Mode)</h4>
-            <p style="font-size:0.72rem; color:#64748b;">Ubah tampilan seluruh antarmuka aplikasi menjadi gelap/terang.</p>
-          </div>
-        </div>
-        <input type="checkbox" ${state.themeMode === 'dark' ? 'checked' : ''} onchange="window.toggleThemeMode(this.checked)" style="width:22px; height:22px; cursor:pointer;" />
-      </div>
+      <button type="button" class="theme-toggle" role="switch" aria-label="Tema gelap" aria-checked="${state.themeMode === 'dark'}" onclick="window.toggleThemeMode(window.store.state.themeMode !== 'dark')">
+        <span class="theme-toggle-copy">
+          <span class="theme-toggle-title">Tema Gelap</span>
+          <span class="theme-toggle-status">${state.themeMode === 'dark' ? 'Aktif' : 'Nonaktif'}</span>
+        </span>
+        <span class="theme-toggle-track" aria-hidden="true"></span>
+      </button>
     </div>
 
     <div style="padding:0 16px 20px;">
