@@ -45,7 +45,6 @@ export function renderSiswaScreen(state) {
     case 'nilaidetail':
       contentHtml = renderNilaiDetailView(state);
       break;
-    case 'scan':
     case 'galeri':
       contentHtml = renderGaleriSiswaView(state);
       break;
@@ -75,7 +74,7 @@ export function renderSiswaScreen(state) {
         <span>Pelajaran</span>
       </button>
 
-      <button class="nav-item ${activeTab === 'galerisiswa' || activeTab === 'galeri' || activeTab === 'galeridetail' || activeTab === 'scan' ? 'active' : ''}" data-tab="galerisiswa">
+      <button class="nav-item ${activeTab === 'galerisiswa' || activeTab === 'galeri' || activeTab === 'galeridetail' ? 'active' : ''}" data-tab="galerisiswa">
         <div class="nav-icon-wrapper">
           <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
         </div>
@@ -575,6 +574,15 @@ export function renderTotalSiswaView(state) {
   `;
 }
 
+function agendaMatchesDate(agenda, monthName, day, year) {
+  const date = (agenda.date || '').trim();
+  const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  const iso = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (iso) return Number(iso[1]) === year && months[Number(iso[2]) - 1] === monthName && Number(iso[3]) === day;
+  const range = date.match(/^(\d{1,2})(?:\s*[-?]\s*(\d{1,2}))?\s+(\S+)\s+(\d{4})$/);
+  return !!range && Number(range[4]) === year && range[3].toLowerCase() === monthName.toLowerCase() && day >= Number(range[1]) && day <= Number(range[2] || range[1]);
+}
+
 export function generateMonthCalendarHtml(year, monthIndex, monthOffset = 0) {
   const monthNames = [
     'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -593,22 +601,9 @@ export function generateMonthCalendarHtml(year, monthIndex, monthOffset = 0) {
   const totalDays = new Date(year, monthIndex + 1, 0).getDate();
 
   const events = {};
-  if (monthNames[monthIndex] === 'September') {
-    for (let d = 15; d <= 20; d++) {
-      events[d] = { label: 'PTS Ganjil', color: '#0284c7', bg: '#e0f2fe' };
-    }
-  } else if (monthNames[monthIndex] === 'Oktober') {
-    for (let d = 5; d <= 12; d++) {
-      events[d] = { label: 'MTCNA TKJ', color: '#4338ca', bg: '#e0e7ff' };
-    }
-  } else if (monthNames[monthIndex] === 'November') {
-    for (let d = 10; d <= 15; d++) {
-      events[d] = { label: 'UKK TKJ', color: '#15803d', bg: '#dcfce7' };
-    }
-  } else if (monthNames[monthIndex] === 'Desember') {
-    for (let d = 1; d <= 10; d++) {
-      events[d] = { label: 'PAS Ganjil', color: '#b45309', bg: '#fef3c7' };
-    }
+  for (let day = 1; day <= totalDays; day++) {
+    const agenda = (store.state.kalenderAgendas || []).find(a => agendaMatchesDate(a, monthNames[monthIndex], day, year));
+    if (agenda) events[day] = { label: agenda.title, color: agenda.color || '#0284c7', bg: agenda.bg || '#e0f2fe' };
   }
 
   let cellsHtml = '';
@@ -678,37 +673,12 @@ window.showCalendarDateDetail = function(monthName, day, year) {
 
   const dateStr = `${day} ${monthName} ${year}`;
   
-  let eventTag = '🗓️ AGENDA SCHEDULER';
-  let eventTitle = `Lorem Ipsum Dolor Sit Amet`;
-  let eventColor = '#0284c7';
-  let eventBg = '#e0f2fe';
-  let eventDesc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.';
-
-  if (monthName === 'September' && day >= 15 && day <= 20) {
-    eventTag = '🏆 PTS GANJIL';
-    eventTitle = `Lorem Ipsum Dolor Sit Amet`;
-    eventColor = '#0284c7';
-    eventBg = '#e0f2fe';
-    eventDesc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
-  } else if (monthName === 'Oktober' && day >= 5 && day <= 12) {
-    eventTag = '📜 SERTIFIKASI MTCNA';
-    eventTitle = `Lorem Ipsum Consectetur Adipiscing`;
-    eventColor = '#6366f1';
-    eventBg = '#e0e7ff';
-    eventDesc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.';
-  } else if (monthName === 'November' && day >= 10 && day <= 15) {
-    eventTag = '💻 SIMULASI UKK TKJ';
-    eventTitle = `Lorem Ipsum Eiusmod Tempor`;
-    eventColor = '#10b981';
-    eventBg = '#dcfce7';
-    eventDesc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
-  } else if (monthName === 'Desember' && day >= 1 && day <= 10) {
-    eventTag = '📝 PAS GANJIL';
-    eventTitle = `Lorem Ipsum Labore Et Dolore`;
-    eventColor = '#f59e0b';
-    eventBg = '#fef3c7';
-    eventDesc = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.';
-  }
+  const agenda = (store.state.kalenderAgendas || []).find(a => agendaMatchesDate(a, monthName, day, year));
+  const eventTag = agenda?.tag || 'AGENDA';
+  const eventTitle = agenda?.title || 'Belum ada kegiatan';
+  const eventColor = agenda?.color || '#0284c7';
+  const eventBg = agenda?.bg || '#e0f2fe';
+  const eventDesc = agenda?.desc || 'Belum ada kegiatan yang ditambahkan admin untuk tanggal ini.';
 
   card.innerHTML = `
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -746,12 +716,7 @@ export function renderKalenderView(state) {
   const month2Html = generateMonthCalendarHtml(nextYear, nextMonth, 1);
   const month3Html = generateMonthCalendarHtml(thirdYear, thirdMonth, 2);
 
-  const agendas = state.kalenderAgendas || [
-    { id: '1', date: '15 - 20 September 2026', tag: 'PTS', title: 'Penilaian Tengah Semester Ganjil', desc: 'Pelaksanaan PTS Ganjil untuk seluruh siswa kelas X, XI, dan XII TKJ.', color: '#0284c7', bg: '#e0f2fe', mName: 'September', dNum: 15 },
-    { id: '2', date: '05 - 12 Oktober 2026', tag: 'Sertifikasi', title: 'Uji Sertifikasi Kompetensi Mikrotik MTCNA', desc: 'Pelaksanaan sertifikasi internasional jaringan Mikrotik untuk siswa tingkat akhir.', color: '#6366f1', bg: '#e0e7ff', mName: 'Oktober', dNum: 5 },
-    { id: '3', date: '10 - 15 November 2026', tag: 'UKK TKJ', title: 'Pra-Uji Kompetensi Keahlian (UKK)', desc: 'Simulasi perakitan jaringan, routing, dan instalasi server.', color: '#10b981', bg: '#dcfce7', mName: 'November', dNum: 10 },
-    { id: '4', date: '01 - 10 Desember 2026', tag: 'PAS Ganjil', title: 'Penilaian Akhir Semester (PAS)', desc: 'Ujian akhir semester ganjil tahun ajaran 2026/2027.', color: '#f59e0b', bg: '#fef3c7', mName: 'Desember', dNum: 1 }
-  ];
+  const agendas = state.kalenderAgendas || [];
 
   return `
     <div style="background:white; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">
@@ -773,10 +738,11 @@ export function renderKalenderView(state) {
       ${month3Html}
 
       <!-- Detailed Agenda List -->
-      <div style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:16px 0 10px 0;">Agenda & Catatan Penting (Klik untuk detail):</div>
+      <div style="font-size:0.85rem; font-weight:700; color:#1e293b; margin:16px 0 10px 0;">Agenda & Catatan Penting:</div>
       <div style="display:flex; flex-direction:column; gap:10px;">
+        ${agendas.length ? '' : '<p style="color:#64748b;">Belum ada kegiatan yang ditambahkan admin.</p>'}
         ${agendas.map(a => `
-          <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid ${a.color || '#0284c7'}; padding:12px 14px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.03); cursor:pointer;" onclick="window.showCalendarDateDetail('${a.mName || 'September'}', ${a.dNum || 15}, 2026)">
+          <div style="background:white; border:1px solid #e2e8f0; border-left:4px solid ${a.color || '#0284c7'}; padding:12px 14px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span style="font-size:0.75rem; font-weight:700; color:${a.color || '#0284c7'};">${a.date}</span>
               <span style="background:${a.bg || '#e0f2fe'}; color:${a.color || '#0284c7'}; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${a.tag}</span>
@@ -1014,14 +980,7 @@ window.filterLibrary = function(q) {
 };
 
 export function renderLibraryView(state) {
-  const allBooks = (state.elibraryBooks && state.elibraryBooks.length > 0) ? state.elibraryBooks : [
-    { id: '1', title: 'Jaringan Dasar & Cisco Routing', category: 'Modular TKJ', desc: 'Modul praktikum konfigurasi Mikrotik, Cisco Packet Tracer & VLAN.', color: '#0284c7', icon: '📘', coverColor: 'linear-gradient(135deg, #0284c7, #0369a1)' },
-    { id: '2', title: 'Administrasi System & Server Linux', category: 'Server & Cloud', desc: 'Panduan lengkap instalasi Debian, DNS Server, Web Server Apache & Nginx.', color: '#10b981', icon: '📗', coverColor: 'linear-gradient(135deg, #10b981, #047857)' },
-    { id: '3', title: 'Cyber Security & Network Defense', category: 'Security', desc: 'Dasar-dasar keamanan jaringan, Firewall, Penetration Testing & Enkripsi.', color: '#6366f1', icon: '📙', coverColor: 'linear-gradient(135deg, #6366f1, #4338ca)' },
-    { id: '4', title: 'Desain Grafis & Multimedia', category: 'Multimedia', desc: 'Panduan dasar desain grafis, CorelDraw, Photoshop untuk pembelajaran TKJ.', color: '#f59e0b', icon: '📒', coverColor: 'linear-gradient(135deg, #f59e0b, #d97706)' },
-    { id: '5', title: 'Pemrograman Web & Database', category: 'Coding', desc: 'HTML, CSS, JavaScript, PHP, MySQL untuk pembuatan aplikasi web modern.', color: '#ec4899', icon: '📓', coverColor: 'linear-gradient(135deg, #ec4899, #db2777)' },
-    { id: '6', title: 'Troubleshooting & Diagnosa Jaringan', category: 'Teknis', desc: 'Panduan troubleshooting masalah jaringan, kabel, dan perangkat keras.', color: '#14b8a6', icon: '📔', coverColor: 'linear-gradient(135deg, #14b8a6, #0d9488)' }
-  ];
+  const allBooks = state.elibraryBooks || [];
 
   const q = (window.librarySearchQuery || '').trim().toLowerCase();
   const books = q ? allBooks.filter(b =>
@@ -1052,7 +1011,7 @@ export function renderLibraryView(state) {
       ${books.length === 0 ? `
         <div style="text-align:center; padding:40px 20px; color:#64748b;">
           <div style="font-size:2.5rem; margin-bottom:8px;">📭</div>
-          <p style="font-size:0.85rem; font-weight:600;">Buku tidak ditemukan untuk "${q}"</p>
+          <p style="font-size:0.85rem; font-weight:600;">${q ? `Buku tidak ditemukan untuk "${q}"` : 'Belum ada e-book yang ditambahkan admin.'}</p>
         </div>
       ` : `
       <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:14px;">
@@ -1133,26 +1092,31 @@ window.openNilaiDetail = function(mapelId, mapelName) {
   window.switchSiswaTab('nilaidetail');
 };
 
+function studentGrades(state) {
+  const user = state.currentUser.siswa;
+  if (!user?.id) return [];
+  return (state.grades || []).flatMap(g => {
+    if (g.class && g.class !== user.class) return [];
+    const score = g.scores ? g.scores[user.id] : String(g.studentId) === String(user.id) ? (g.nilai ?? g.score) : undefined;
+    if (score === undefined || score === null || String(score).trim() === '' || !Number.isFinite(Number(score))) return [];
+    return [{ ...g, nilai: Number(score) }];
+  });
+}
+
 function renderNilaiView(state) {
   const user = state.currentUser.siswa;
-  const grades = state.grades || [];
+  const grades = studentGrades(state);
   const mapelList = state.mapel || [];
 
   // Group grades by mapel for this student
   const groupedByMapel = {};
   grades.forEach(g => {
-    if (!g.studentId || String(g.studentId) !== String(user.id || '1')) return;
     const key = g.mapel || g.subject || 'Umum';
     if (!groupedByMapel[key]) groupedByMapel[key] = [];
     groupedByMapel[key].push(g);
   });
 
-  // Fall back to mapel list if no real grade data
-  const displayMapel = Object.keys(groupedByMapel).length > 0
-    ? Object.keys(groupedByMapel)
-    : (mapelList.length > 0
-        ? mapelList.map(m => m.name || m)
-        : ['Matematika', 'Jaringan Dasar', 'Administrasi Infrastruktur', 'Pemrograman Web', 'Bahasa Indonesia', 'Bahasa Inggris']);
+  const displayMapel = Object.keys(groupedByMapel);
 
   const mapelColors = ['#0284c7','#10b981','#6366f1','#f59e0b','#ec4899','#14b8a6','#ef4444','#8b5cf6'];
 
@@ -1177,7 +1141,7 @@ function renderNilaiView(state) {
         <div style="width:48px; height:48px; border-radius:14px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-size:1.8rem;">🎓</div>
       </div>
 
-      <p style="font-size:0.8rem; color:#64748b; margin:0 0 14px; font-weight:600;">Pilih mata pelajaran untuk melihat nilai per pertemuan:</p>
+      <p style="font-size:0.8rem; color:#64748b; margin:0 0 14px; font-weight:600;">${displayMapel.length ? 'Pilih mata pelajaran untuk melihat nilai per pertemuan:' : 'Belum ada nilai yang dimasukkan guru/admin.'}</p>
 
       <div style="display:flex; flex-direction:column; gap:10px;">
         ${displayMapel.map((mapelName, idx) => {
@@ -1199,7 +1163,7 @@ function renderNilaiView(state) {
                 </div>
               </div>
               <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
-                ${avgNilai !== null ? `<div style="text-align:right;"><div style="font-size:1.1rem; font-weight:800; color:${gradeColor};">${avgNilai}</div><div style="font-size:0.65rem; font-weight:700; color:${gradeColor};">Grade ${grade}</div></div>` : ''}
+                ${avgNilai !== null ? `<div style="text-align:right;"><div style="font-size:1.1rem; font-weight:800; color:${gradeColor};">${avgNilai ?? '-'}</div><div style="font-size:0.65rem; font-weight:700; color:${gradeColor};">Grade ${grade}</div></div>` : ''}
                 <svg width="16" height="16" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
               </div>
             </div>
@@ -1213,24 +1177,9 @@ function renderNilaiView(state) {
 function renderNilaiDetailView(state) {
   const selected = window.selectedNilaiMapel || { id: '0', name: 'Mata Pelajaran' };
   const user = state.currentUser.siswa;
-  const allGrades = state.grades || [];
-
-  const mapelGrades = allGrades.filter(g =>
-    (String(g.studentId) === String(user.id || '1')) &&
-    ((g.mapel || g.subject || '') === selected.name)
-  );
-
-  // Fallback sample data if no real data
-  const pertemuanList = mapelGrades.length > 0 ? mapelGrades : [
-    { pertemuan: 1, topik: 'Pengenalan Materi', nilai: 85, keterangan: 'Tugas Harian' },
-    { pertemuan: 2, topik: 'Praktikum Dasar', nilai: 90, keterangan: 'Praktikum' },
-    { pertemuan: 3, topik: 'Kuis Tengah', nilai: 78, keterangan: 'Kuis' },
-    { pertemuan: 4, topik: 'Proyek Individu', nilai: 88, keterangan: 'Proyek' },
-    { pertemuan: 5, topik: 'UTS / PTS', nilai: 82, keterangan: 'Ujian' }
-  ];
-
-  const avgNilai = Math.round(pertemuanList.reduce((s, p) => s + parseFloat(p.nilai || p.score || 0), 0) / pertemuanList.length);
-  const grade = avgNilai >= 90 ? 'A' : avgNilai >= 80 ? 'B' : avgNilai >= 70 ? 'C' : avgNilai >= 60 ? 'D' : 'E';
+  const pertemuanList = studentGrades(state).filter(g => (g.mapel || g.subject || '') === selected.name);
+  const avgNilai = pertemuanList.length ? Math.round(pertemuanList.reduce((sum, p) => sum + p.nilai, 0) / pertemuanList.length) : null;
+  const grade = avgNilai === null ? '-' : avgNilai >= 90 ? 'A' : avgNilai >= 80 ? 'B' : avgNilai >= 70 ? 'C' : avgNilai >= 60 ? 'D' : 'E';
   const gradeColor = avgNilai >= 80 ? '#16a34a' : avgNilai >= 70 ? '#0284c7' : avgNilai >= 60 ? '#f59e0b' : '#dc2626';
 
   return `
@@ -1247,7 +1196,7 @@ function renderNilaiDetailView(state) {
       <div style="background:linear-gradient(135deg, #0b2545, #134074); border-radius:16px; padding:18px; margin-bottom:16px; color:white; display:flex; justify-content:space-between; align-items:center;">
         <div>
           <p style="font-size:0.7rem; opacity:0.75; margin:0 0 4px 0;">Rata-rata Nilai</p>
-          <div style="font-size:2.5rem; font-weight:900; line-height:1; margin-bottom:4px;">${avgNilai}</div>
+          <div style="font-size:2.5rem; font-weight:900; line-height:1; margin-bottom:4px;">${avgNilai ?? '-'}</div>
           <div style="display:inline-block; background:${gradeColor}; color:white; padding:2px 10px; border-radius:8px; font-size:0.72rem; font-weight:800;">Grade ${grade}</div>
         </div>
         <div>
@@ -1256,7 +1205,7 @@ function renderNilaiDetailView(state) {
         </div>
       </div>
 
-      <p style="font-size:0.8rem; font-weight:700; color:#1e293b; margin:0 0 12px;">Rincian Nilai Per Pertemuan:</p>
+      <p style="font-size:0.8rem; font-weight:700; color:#1e293b; margin:0 0 12px;">${pertemuanList.length ? 'Rincian Nilai Per Pertemuan:' : 'Belum ada nilai yang dimasukkan guru/admin.'}</p>
 
       <div style="display:flex; flex-direction:column; gap:8px;">
         ${pertemuanList.map((p, idx) => {
@@ -1276,7 +1225,7 @@ function renderNilaiDetailView(state) {
                 </div>
               </div>
               <div style="background:${nilaiBg}; border:1px solid ${nilaiColor}50; padding:6px 12px; border-radius:10px; text-align:center; flex-shrink:0; min-width:48px;">
-                <div style="font-size:1.2rem; font-weight:800; color:${nilaiColor}; line-height:1;">${nilaiNum || '-'}</div>
+                <div style="font-size:1.2rem; font-weight:800; color:${nilaiColor}; line-height:1;">${nilaiNum}</div>
               </div>
             </div>
           `;

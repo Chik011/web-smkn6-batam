@@ -69,7 +69,7 @@ function syncTabFromHash() {
   const hash = window.location.hash.replace('#', '').trim();
   if (role && hash) {
     const validTabs = {
-      siswa: ['home', 'pelajaran', 'scan', 'notifikasi', 'akun', 'visimisi', 'gurutkj', 'totalsiswa', 'kalender', 'galerisiswa', 'library', 'elibrary', 'videotkj'],
+      siswa: ['home', 'pelajaran', 'nilai', 'nilaidetail', 'notifikasi', 'akun', 'visimisi', 'gurutkj', 'totalsiswa', 'kalender', 'galerisiswa', 'library', 'elibrary', 'videotkj'],
       guru: ['beranda', 'absensi', 'nilai', 'profil'],
       admin: ['home', 'guru', 'mapel', 'siswa', 'jadwal', 'setting', 'galeri', 'kalender', 'elibrary'],
       guest: ['home', 'galeri', 'galerisiswa', 'galeridetail', 'kalender', 'videotkj', 'visimisi', 'gurutkj', 'totalsiswa', 'elibrary', 'library']
@@ -947,12 +947,7 @@ window.toggleFlipCard = function () {
   }
 };
 
-window.simulateScanQR = function () {
-  window.showToast('📡 Memindai QR Code presensi...', 'info');
-  setTimeout(() => {
-    window.showToast('✅ Presensi berhasil! Kehadiran Anda hari ini telah dicatat.', 'success');
-  }, 1000);
-};
+
 
 // Modal Windows Handler
 window.openSiswaModal = function (type) {
@@ -1353,7 +1348,7 @@ window.openSiswaModal = function (type) {
     `;
   } else if (type === 'lainnya') {
     card.innerHTML = `
-      <div class="modal-title" style="font-weight:800; font-size:1.15rem; color:#0f172a;">⚙️ Semua Fitur Aplikasi SMKN 6</div>
+      <div class="modal-title" style="font-weight:800; font-size:1.15rem; color:#0f172a;">⚙️ Semua fitur aplikasi TKJ SMKN 6</div>
       <p style="font-size:0.78rem; color:#64748b; margin-bottom:14px;">Pilih fitur atau layanan digital yang ingin diakses:</p>
 
       <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; max-height:340px; overflow-y:auto; padding-right:4px;">
@@ -1429,13 +1424,7 @@ window.openSiswaModal = function (type) {
           </div>
         </button>
 
-        <button style="padding:12px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; font-weight:700; font-size:0.78rem; color:#1e293b; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left; transition:all 0.2s;" onclick="window.closeModal(); window.switchSiswaTab('scan');">
-          <span style="font-size:1.3rem;">📸</span>
-          <div>
-            <div>Presensi</div>
-            <span style="font-size:0.68rem; font-weight:400; color:#64748b;">Scan QR Presensi</span>
-          </div>
-        </button>
+
       </div>
       <button class="btn-primary mt-4" style="width:100%; font-weight:700;" onclick="window.closeModal()">Tutup</button>
     `;

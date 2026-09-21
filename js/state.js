@@ -15,6 +15,20 @@ import { supabase, getYouTubeDetails } from './supabase.js';
 const STORAGE_KEY = 'SMKN6_APP_DATA_V3';
 const SESSION_KEY = 'SMKN6_SESSION_DATA_V1';
 
+const legacyContentSeeds = {kalenderAgendas: [
+    { id: '1', date: '15 - 20 September 2026', tag: 'PTS', title: 'Penilaian Tengah Semester Ganjil', desc: 'Pelaksanaan PTS Ganjil untuk seluruh siswa kelas X, XI, dan XII TKJ.', color: '#0284c7', bg: '#e0f2fe' },
+    { id: '2', date: '05 - 12 Oktober 2026', tag: 'Sertifikasi', title: 'Uji Sertifikasi Kompetensi Mikrotik MTCNA', desc: 'Pelaksanaan sertifikasi internasional jaringan Mikrotik untuk siswa tingkat akhir.', color: '#6366f1', bg: '#e0e7ff' },
+    { id: '3', date: '10 - 15 November 2026', tag: 'UKK TKJ', title: 'Pra-Uji Kompetensi Keahlian (UKK)', desc: 'Simulasi perakitan jaringan, routing, dan instalasi server.', color: '#10b981', bg: '#dcfce7' },
+    { id: '4', date: '01 - 10 Desember 2026', tag: 'PAS Ganjil', title: 'Penilaian Akhir Semester (PAS)', desc: 'Ujian akhir semester ganjil tahun ajaran 2026/2027.', color: '#f59e0b', bg: '#fef3c7' }
+  ],
+elibraryBooks: [
+    { id: '1', title: 'Jaringan Dasar & Cisco Routing', category: 'Modular TKJ', desc: 'Modul praktikum konfigurasi Mikrotik, Cisco Packet Tracer & VLAN.', color: '#0284c7', icon: '📘' },
+    { id: '2', title: 'Administrasi System & Server Linux', category: 'Server & Cloud', desc: 'Panduan lengkap instalasi Debian, DNS Server, Web Server Apache & Nginx.', color: '#10b981', icon: '📗' },
+    { id: '3', title: 'Cyber Security & Network Defense', category: 'Security', desc: 'Dasar-dasar keamanan jaringan, Firewall, Penetration Testing & Enkripsi.', color: '#6366f1', icon: '📙' }
+  ]};
+function cleanContentCache(items, key) {
+ return (Array.isArray(items) ? items : []).filter(item => !legacyContentSeeds[key].some(seed => Object.entries(seed).every(([field, value]) => item[field] === value)));
+}
 const defaultState = {
   isLoggedIn: false,
   activeRole: 'siswa', // 'siswa', 'guru', 'admin'
@@ -120,19 +134,10 @@ const defaultState = {
   ],
 
   // Kalender Agenda Database
-  kalenderAgendas: [
-    { id: '1', date: '15 - 20 September 2026', tag: 'PTS', title: 'Penilaian Tengah Semester Ganjil', desc: 'Pelaksanaan PTS Ganjil untuk seluruh siswa kelas X, XI, dan XII TKJ.', color: '#0284c7', bg: '#e0f2fe' },
-    { id: '2', date: '05 - 12 Oktober 2026', tag: 'Sertifikasi', title: 'Uji Sertifikasi Kompetensi Mikrotik MTCNA', desc: 'Pelaksanaan sertifikasi internasional jaringan Mikrotik untuk siswa tingkat akhir.', color: '#6366f1', bg: '#e0e7ff' },
-    { id: '3', date: '10 - 15 November 2026', tag: 'UKK TKJ', title: 'Pra-Uji Kompetensi Keahlian (UKK)', desc: 'Simulasi perakitan jaringan, routing, dan instalasi server.', color: '#10b981', bg: '#dcfce7' },
-    { id: '4', date: '01 - 10 Desember 2026', tag: 'PAS Ganjil', title: 'Penilaian Akhir Semester (PAS)', desc: 'Ujian akhir semester ganjil tahun ajaran 2026/2027.', color: '#f59e0b', bg: '#fef3c7' }
-  ],
+  kalenderAgendas: [],
 
   // E-Library Database
-  elibraryBooks: [
-    { id: '1', title: 'Jaringan Dasar & Cisco Routing', category: 'Modular TKJ', desc: 'Modul praktikum konfigurasi Mikrotik, Cisco Packet Tracer & VLAN.', color: '#0284c7', icon: '📘' },
-    { id: '2', title: 'Administrasi System & Server Linux', category: 'Server & Cloud', desc: 'Panduan lengkap instalasi Debian, DNS Server, Web Server Apache & Nginx.', color: '#10b981', icon: '📗' },
-    { id: '3', title: 'Cyber Security & Network Defense', category: 'Security', desc: 'Dasar-dasar keamanan jaringan, Firewall, Penetration Testing & Enkripsi.', color: '#6366f1', icon: '📙' }
-  ],
+  elibraryBooks: [],
 
   biometricEnabled: false,
   themeMode: 'light',
@@ -355,42 +360,22 @@ class Store {
       });
 
       // 7. Sync Kalender Agenda
-      ['kalender_agenda', 'kalender', 'agenda'].forEach(colName => {
-        try {
-          onSnapshot(collection(db, colName), (snapshot) => {
-            if (snapshot && !snapshot.empty) {
-              const fetched = snapshot.docs.map(docSnap => ({
-                id: docSnap.id,
-                ...docSnap.data()
-              }));
-              if (fetched.length > 0) {
-                this.state.kalenderAgendas = fetched;
-                this.saveStateToLocalStorage();
-                this.notify();
-              }
-            }
-          }, () => {});
-        } catch (e) {}
-      });
+      try {
+        onSnapshot(collection(db, 'kalender_agenda'), snapshot => {
+          this.state.kalenderAgendas = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+          this.saveStateToLocalStorage();
+          this.notify();
+        }, () => {});
+      } catch (e) {}
 
       // 8. Sync E-Library
-      ['elibrary_buku', 'library', 'buku'].forEach(colName => {
-        try {
-          onSnapshot(collection(db, colName), (snapshot) => {
-            if (snapshot && !snapshot.empty) {
-              const fetched = snapshot.docs.map(docSnap => ({
-                id: docSnap.id,
-                ...docSnap.data()
-              }));
-              if (fetched.length > 0) {
-                this.state.elibraryBooks = fetched;
-                this.saveStateToLocalStorage();
-                this.notify();
-              }
-            }
-          }, () => {});
-        } catch (e) {}
-      });
+      try {
+        onSnapshot(collection(db, 'elibrary_buku'), snapshot => {
+          this.state.elibraryBooks = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+          this.saveStateToLocalStorage();
+          this.notify();
+        }, () => {});
+      } catch (e) {}
 
       // 9. Sync Visi Misi
       try {
@@ -557,8 +542,8 @@ class Store {
           schedules: (parsed.schedules && parsed.schedules.length > 0) ? parsed.schedules : defaultState.schedules,
           broadcastNews: (parsed.broadcastNews && parsed.broadcastNews.length > 0) ? parsed.broadcastNews : defaultState.broadcastNews,
           galeriItems: (parsed.galeriItems && parsed.galeriItems.length > 0) ? parsed.galeriItems : defaultState.galeriItems,
-          kalenderAgendas: (parsed.kalenderAgendas && parsed.kalenderAgendas.length > 0) ? parsed.kalenderAgendas : defaultState.kalenderAgendas,
-          elibraryBooks: (parsed.elibraryBooks && parsed.elibraryBooks.length > 0) ? parsed.elibraryBooks : defaultState.elibraryBooks,
+          kalenderAgendas: cleanContentCache(parsed.kalenderAgendas, 'kalenderAgendas'),
+          elibraryBooks: cleanContentCache(parsed.elibraryBooks, 'elibraryBooks'),
           activeTabs: { ...defaultState.activeTabs, ...(parsed.activeTabs || {}) },
           currentUser: { ...defaultState.currentUser, ...(parsed.currentUser || {}) },
           adminSubView: { ...defaultState.adminSubView, ...(parsed.adminSubView || {}) },
