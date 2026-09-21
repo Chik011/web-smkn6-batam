@@ -162,15 +162,17 @@ class Store {
   }
 
   setThemeMode(theme) {
-    this.state.themeMode = theme;
-    this.saveState();
+    this.state.themeMode = theme === 'dark' ? 'dark' : 'light';
     this.applyTheme();
+    this.saveStateToLocalStorage();
+    this.notify();
   }
 
   applyTheme() {
     const theme = (this.state && this.state.themeMode) ? this.state.themeMode : 'light';
     document.body.setAttribute('data-theme', theme);
     document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.style.colorScheme = theme;
     if (theme === 'dark') {
       document.body.classList.add('dark-theme');
       document.documentElement.classList.add('dark-theme');
@@ -201,6 +203,7 @@ class Store {
             galeriItems,
             kalenderAgendas,
             elibraryBooks,
+            themeMode,
             ...cleanRemote
           } = remoteData;
           this.isSyncingWithFirebase = true;
@@ -401,7 +404,7 @@ class Store {
       try {
         const { data: stateData } = await supabase.from('app_state').select('*').limit(1).maybeSingle();
         if (stateData && stateData.state) {
-          const { isLoggedIn, activeRole, currentUser, activeTabs, ...safeGlobalState } = stateData.state;
+          const { isLoggedIn, activeRole, currentUser, activeTabs, themeMode, ...safeGlobalState } = stateData.state;
           this.state = { ...this.state, ...safeGlobalState };
           this.saveStateToLocalStorage();
           this.notify();
@@ -621,6 +624,7 @@ class Store {
         galeriItems,
         kalenderAgendas,
         elibraryBooks,
+        themeMode,
         ...lightweightState
       } = this.state;
 
