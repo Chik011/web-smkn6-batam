@@ -2555,7 +2555,7 @@ body::before, .desktop-header-block::after { content: none; }
   padding: 0 20px;
 }
 .desktop-layout .news-section-wrapper { margin: 24px 20px; }
-.desktop-layout .news-scroll-row, .tkj-video-grid {
+.tkj-video-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 20px;
@@ -2564,7 +2564,7 @@ body::before, .desktop-header-block::after { content: none; }
   padding: 0;
 }
 .tkj-video-grid { padding: 20px; }
-.desktop-layout .news-card-item, .tkj-video-card {
+.tkj-video-card {
   width: auto;
   min-width: 0;
   border: 1px solid var(--line-soft);
@@ -2573,7 +2573,7 @@ body::before, .desktop-header-block::after { content: none; }
   overflow: hidden;
   box-shadow: none;
 }
-.desktop-layout .news-thumb, .tkj-video-thumb {
+.tkj-video-thumb {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2588,23 +2588,15 @@ body::before, .desktop-header-block::after { content: none; }
   cursor: pointer;
 }
 .tkj-video-thumb img { position: absolute; inset: 0; display: block; }
-.desktop-layout .news-card-title {
-  background: var(--bg-card);
-  color: var(--text-main);
-  white-space: normal;
-  overflow-wrap: anywhere;
-  line-height: 1.5;
-  padding: 12px 14px;
-}
 .tkj-video-info { padding: 14px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
 .tkj-video-info h4 { overflow-wrap: anywhere; }
 .tkj-video-thumb:focus-visible { outline: 3px solid var(--accent-blue); outline-offset: -3px; }
 @media (min-width: 640px) {
-  .desktop-layout .news-scroll-row, .tkj-video-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tkj-video-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .desktop-layout .guest-apps-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 @media (min-width: 1200px) {
-  .desktop-layout .news-scroll-row, .tkj-video-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .tkj-video-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .desktop-layout .news-section-wrapper { margin-inline: 32px; }
   .desktop-layout .guest-apps-grid, .tkj-video-grid { padding-inline: 32px; }
 }
