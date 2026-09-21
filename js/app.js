@@ -103,7 +103,7 @@ function getFooterHtml() {
           </div>
           <div class="footer-brand-info">
             <h4 class="footer-title">SMK NEGERI 6 BATAM</h4>
-            <p class="footer-subtitle">Teknik Komputer & Jaringan (TKJ) • Hub Akademik</p>
+            <p class="footer-subtitle">Teknik Komputer & Jaringan (TKJ)</p>
           </div>
         </div>
 
@@ -217,8 +217,8 @@ function renderApp() {
           <div class="desktop-brand">
             <img src="img/Logo_SMKN6.png" alt="Logo SMKN 6 Batam" class="logo-icon" />
             <div class="desktop-title">
-              <h1>SMKN 6 <span>Academic Hub</span></h1>
-              <p>Sistem informasi akademik terpadu</p>
+              <h1>Teknik Komputer Dan Jaringan</h1>
+              <p>SMK Negri 6 Batam</p>
             </div>
           </div>
 
@@ -413,7 +413,7 @@ function renderGuestHome(state, guestName) {
 
     <!-- Fitur Aplikasi Section -->
     <div class="section-title" style="padding: 0 16px; margin-top: 14px;">Fitur Aplikasi & Informasi</div>
-    <div class="apps-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; padding: 0 16px 8px 16px;">
+    <div class="apps-grid guest-apps-grid">
       <button class="app-icon-item" onclick="window.switchRoleTab('guest','visimisi')">
         <div class="icon-box" style="background:#fef3c7; color:#d97706;">🎯</div>
         <span>Visi Misi</span>
@@ -456,7 +456,7 @@ function renderGuestHome(state, guestName) {
     </div>
 
     <!-- TKJ News Section -->
-    <div class="news-section-wrapper" style="padding: 0 16px;">
+    <div class="news-section-wrapper">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <div class="section-title" style="margin:0;">TKJ News & Video</div>
         <button style="background:none; border:none; color:#0284c7; font-weight:700; font-size:0.78rem; cursor:pointer; display:flex; align-items:center; gap:4px;" onclick="window.switchRoleTab('guest','videotkj')">
@@ -470,7 +470,7 @@ function renderGuestHome(state, guestName) {
             <div class="news-card-item" data-index="${idx}" onclick="window.playNewsVideoById('${item.id}', ${idx})" style="cursor:pointer;">
               <div class="news-thumb" style="position:relative; overflow:hidden; border-radius:12px; background:#0f172a; pointer-events:none;">
                 ${yt.thumbnailUrl ? `
-                  <img src="${yt.thumbnailUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:inherit;" onerror="this.style.display='none'" />
+                  <img loading="lazy" decoding="async" src="${yt.thumbnailUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:inherit;" onerror="this.style.display='none'" />
                 ` : ''}
                 <div class="news-play-btn" style="position:relative; z-index:2; box-shadow:0 4px 12px rgba(0,0,0,0.3); pointer-events:none;">
                   <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -1169,7 +1169,7 @@ window.openSiswaModal = function (type) {
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed rgba(255,255,255,0.2); padding-top:8px;">
               <span style="font-size:0.65rem; opacity:0.7;">Terverifikasi Otomatis</span>
-              <span style="font-size:0.65rem; color:#38bdf8; font-weight:700;">Academic Hub</span>
+              <span style="font-size:0.65rem; color:#38bdf8; font-weight:700;">TKJ</span>
             </div>
           </div>
         </div>
@@ -1284,7 +1284,7 @@ window.openSiswaModal = function (type) {
             <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px; display:flex; gap:12px; align-items:center;">
               <div style="width:100px; height:60px; border-radius:8px; background:#0f172a; position:relative; overflow:hidden; flex-shrink:0; cursor:pointer;" onclick="window.playNewsVideoById('${item.id}', ${idx})">
                 ${yt.thumbnailUrl ? `
-                  <img src="${yt.thumbnailUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'" />
+                  <img loading="lazy" decoding="async" src="${yt.thumbnailUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'" />
                 ` : ''}
                 <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.3);">
                   <div style="width:26px; height:26px; border-radius:50%; background:rgba(255,255,255,0.9); color:#0b345e; display:flex; align-items:center; justify-content:center; font-size:0.7rem;">▶</div>

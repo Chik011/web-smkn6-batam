@@ -242,7 +242,7 @@ function renderHome(state) {
             <div class="news-card-item" data-index="${idx}" onclick="window.playNewsVideoById('${item.id}', ${idx})" style="cursor:pointer;">
               <div class="news-thumb" style="position:relative; overflow:hidden; border-radius:12px; background:#0f172a; pointer-events:none;">
                 ${yt.thumbnailUrl ? `
-                  <img src="${yt.thumbnailUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:inherit;" onerror="this.style.display='none'" />
+                  <img loading="lazy" decoding="async" src="${yt.thumbnailUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:inherit;" onerror="this.style.display='none'" />
                 ` : ''}
                 <div class="news-play-btn" style="position:relative; z-index:2; box-shadow:0 4px 12px rgba(0,0,0,0.3); pointer-events:none;">
                   <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -1045,29 +1045,29 @@ export function renderVidioTKJView(state) {
         <button style="background:none; border:none; cursor:pointer;" onclick="window.switchSiswaTab('home')">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </button>
-        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b;">📰 TKJ News & Learning SMKN 6</h3>
+        <h3 style="font-size:1.05rem; font-weight:700; color:#1e293b;">📰 TKJ News</h3>
       </div>
       <span style="background:#fee2e2; color:#dc2626; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700;">${newsList.length} Video</span>
     </div>
 
-    <div style="padding:16px; display:flex; flex-direction:column; gap:14px;">
+    <div class="tkj-video-grid">
       ${newsList.length === 0 ? `
-        <div style="text-align:center; padding:36px 20px; color:#64748b; font-size:0.85rem;">Belum ada video pembelajaran TKJ yang diunggah.</div>
+        <div style="grid-column:1 / -1; text-align:center; padding:36px 20px; color:#64748b; font-size:0.85rem;">Belum ada video pembelajaran TKJ yang diunggah.</div>
       ` : newsList.map((item, idx) => {
         const yt = getYouTubeDetails(item.url);
         return `
-          <div style="background:white; border:1px solid #e2e8f0; border-radius:16px; overflow:hidden; box-shadow:0 3px 10px rgba(0,0,0,0.04);">
-            <div style="position:relative; width:100%; height:170px; background:#0f172a; cursor:pointer;" onclick="window.playNewsVideoById('${item.id}', ${idx})">
+          <article class="tkj-video-card">
+            <button type="button" class="tkj-video-thumb" aria-label="Putar video" onclick="window.playNewsVideoById('${item.id}', ${idx})">
               ${yt.thumbnailUrl ? `
-                <img src="${yt.thumbnailUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'" />
+                <img loading="lazy" decoding="async" src="${yt.thumbnailUrl}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'" />
               ` : ''}
               <div style="position:absolute; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center;">
                 <div style="width:52px; height:52px; border-radius:50%; background:#dc2626; color:white; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(220,38,38,0.4);">
                   <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 </div>
               </div>
-            </div>
-            <div style="padding:14px; display:flex; justify-content:space-between; align-items:center;">
+            </button>
+            <div class="tkj-video-info">
               <div>
                 <h4 style="font-size:0.92rem; font-weight:700; color:#0f172a; margin:0 0 4px 0;">${item.title}</h4>
                 <p style="font-size:0.75rem; color:#64748b; margin:0;">Pembelajaran TKJ SMKN 6 Batam</p>
@@ -1076,7 +1076,7 @@ export function renderVidioTKJView(state) {
                 ▶ Tonton
               </button>
             </div>
-          </div>
+          </article>
         `;
       }).join('')}
     </div>

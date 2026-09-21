@@ -135,7 +135,7 @@ function renderHome(state) {
       <span style="font-size:0.75rem; opacity:0.85;">📥 Klik untuk unduh rekap data</span>
     </div>
 
-    <!-- Kelola Konten & Media Academic Hub (Admin Main Actions) -->
+    <!-- Kelola Konten & Media TKJ (Admin Main Actions) -->
     <div class="content-card">
       <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
         <span style="font-size:1.4rem;">🛠️</span>
@@ -835,12 +835,12 @@ function renderSetting(state) {
       </form>
     </div>
 
-    <!-- Kelola Konten Academic Hub (Admin) -->
+    <!-- Kelola Konten TKJ (Admin) -->
     <div class="content-card mt-4">
       <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
         <span style="font-size:1.4rem;">🛠️</span>
         <div>
-          <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin:0;">Kelola Konten Academic Hub (Admin)</h4>
+          <h4 style="font-size:0.95rem; font-weight:700; color:#1e293b; margin:0;">Kelola Konten TKJ (Admin)</h4>
           <p style="font-size:0.72rem; color:#64748b; margin:2px 0 0 0;">Edit Visi Misi, Tambah Gambar Galeri, Edit Kalender, & E-Library.</p>
         </div>
       </div>
@@ -881,7 +881,7 @@ function renderSetting(state) {
       <button class="btn-danger-outline" onclick="window.logout()">
         🚪 Logout dari Admin
       </button>
-      <p style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-top:16px;">Versi 1.3.0 - TKJ Online Academic Hub (Firebase Connected)</p>
+      <p style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-top:16px;">Versi 1.3.0 - TKJ Online</p>
     </div>
   `;
 }
